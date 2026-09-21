@@ -6,252 +6,235 @@
 <title>TVERN — The Tavern</title>
 <meta name="description" content="The Tavern (TVERN) — X meets a live blockchain feed. A free social layer for Robinhood Chain, for traders, memers & degens. Brewing now." />
 
-<!-- Open Graph / social preview -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="TVERN — The Tavern" />
 <meta property="og:description" content="X meets a live blockchain feed. The social layer for Robinhood Chain. For traders, memers & degens. Brewing now." />
 <meta property="og:url" content="https://tvern.xyz" />
+<meta property="og:image" content="https://tvern.xyz/assets/logo.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="TVERN — The Tavern" />
 <meta name="twitter:description" content="X meets a live blockchain feed. The social layer for Robinhood Chain. Brewing now." />
+<meta name="twitter:image" content="https://tvern.xyz/assets/logo.jpg" />
 
-<!-- Favicon: inline SVG mug -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2314141a'/%3E%3Cg stroke='%230e0e16' stroke-width='4' stroke-linejoin='round'%3E%3Crect x='30' y='42' width='34' height='42' rx='7' fill='%23c8f135'/%3E%3Cpath d='M64 50h7a7 7 0 0 1 7 7v9a7 7 0 0 1-7 7h-7' fill='none'/%3E%3Ccircle cx='38' cy='36' r='9' fill='%23fff'/%3E%3Ccircle cx='50' cy='32' r='11' fill='%23fff'/%3E%3Ccircle cx='60' cy='37' r='8' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --bg:#0e0e13;
-    --bg2:#15151d;
-    --ink:#0c0c14;
+    --bg:#0b0b0f;
+    --panel:#131319;
+    --panel2:#17171f;
+    --ink:#0b0b0f;
     --lime:#c8f135;
-    --lime-soft:#d9f96a;
-    --foam:#fbfbf4;
-    --text:#efeff2;
-    --muted:#9a9aa7;
-    --card:#191922;
-    --line:#2a2a37;
+    --lime2:#a9d81c;
+    --foam:#f6f7ef;
+    --text:#f3f3f6;
+    --muted:#8c8c99;
+    --line:rgba(255,255,255,.09);
+    --up:#5be08a;
+    --down:#ff6b6b;
+    --font-d:"Bricolage Grotesque", system-ui, sans-serif;
+    --font-b:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
-    background:
-      radial-gradient(1100px 720px at 50% -10%, rgba(200,241,53,.10), transparent 60%),
-      radial-gradient(900px 600px at 85% 110%, rgba(200,241,53,.06), transparent 60%),
-      var(--bg);
+    background:var(--bg);
     color:var(--text);
-    font-family:"Trebuchet MS", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family:var(--font-b);
     min-height:100%;
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
+    position:relative;
   }
 
-  /* floating ambient bubbles */
-  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-  .bubbles i{
-    position:absolute;bottom:-40px;display:block;
-    width:14px;height:14px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.9), rgba(200,241,53,.25) 55%, transparent 70%);
-    opacity:.0;
-    animation:rise linear infinite;
-  }
-  @keyframes rise{
-    0%{transform:translateY(0) scale(.6);opacity:0}
-    10%{opacity:.7}
-    90%{opacity:.5}
-    100%{transform:translateY(-108vh) scale(1.1);opacity:0}
-  }
+  /* ambient background layers */
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg .glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5}
+  .bg .g1{width:620px;height:620px;left:50%;top:-260px;transform:translateX(-50%);
+    background:radial-gradient(circle,rgba(200,241,53,.30),transparent 65%)}
+  .bg .g2{width:520px;height:520px;right:-160px;bottom:-160px;
+    background:radial-gradient(circle,rgba(200,241,53,.12),transparent 65%);animation:drift 16s ease-in-out infinite}
+  .bg .g3{width:440px;height:440px;left:-160px;bottom:10%;
+    background:radial-gradient(circle,rgba(90,120,255,.10),transparent 65%);animation:drift 22s ease-in-out infinite reverse}
+  @keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px)}}
+  .bg .grid{position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+    background-size:54px 54px;mask-image:radial-gradient(circle at 50% 30%,#000,transparent 75%)}
+  .bubbles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.85),rgba(200,241,53,.22) 55%,transparent 72%);
+    opacity:0;animation:rise linear infinite}
+  @keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}12%{opacity:.6}100%{transform:translateY(-108vh) scale(1.1);opacity:0}}
 
-  .wrap{
-    position:relative;z-index:2;
-    max-width:920px;margin:0 auto;
-    min-height:100vh;padding:34px 22px 60px;
-    display:flex;flex-direction:column;
-  }
+  .wrap{position:relative;z-index:2;max-width:1080px;margin:0 auto;padding:26px 22px 56px;
+    min-height:100vh;display:flex;flex-direction:column}
 
   /* top bar */
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .brandmini{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
-  .brandmini .dot{width:9px;height:9px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime);animation:pulse 1.8s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.5;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
-  .status{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.02)}
+  .brandmini{display:flex;align-items:center;gap:11px}
+  .brandmini img{width:34px;height:34px;border-radius:9px;display:block}
+  .brandmini b{font-family:var(--font-d);font-weight:800;letter-spacing:.4px;font-size:18px}
+  .pill{font-size:12.5px;color:var(--text);border:1px solid var(--line);border-radius:999px;
+    padding:7px 13px;background:rgba(255,255,255,.03);display:flex;align-items:center;gap:8px}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px var(--lime);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:.45;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
-  /* hero */
-  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;padding:26px 0}
+  /* hero grid */
+  .hero{flex:1;display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center;padding:40px 0 28px}
+  @media (max-width:880px){.hero{grid-template-columns:1fr;gap:34px;padding:30px 0}}
 
-  .mug-stage{position:relative;width:230px;height:230px;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
-  .mug-stage svg{width:100%;height:100%;overflow:visible}
-  .mug-stage:hover{animation:tip .6s ease}
-  @keyframes tip{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}60%{transform:rotate(4deg)}}
+  .left{display:flex;flex-direction:column;align-items:flex-start;gap:22px}
+  @media (max-width:880px){.left{align-items:center;text-align:center}}
 
-  .wordmark{
-    font-size:clamp(58px,15vw,120px);
-    line-height:.9;font-weight:900;letter-spacing:2px;margin:4px 0 0;
-    background:linear-gradient(180deg,#fff 0%, var(--lime-soft) 55%, var(--lime) 100%);
+  .logo-hero{position:relative;width:118px;height:118px}
+  .logo-hero::after{content:"";position:absolute;inset:-18px;border-radius:50%;
+    background:radial-gradient(circle,rgba(200,241,53,.35),transparent 65%);filter:blur(14px);z-index:-1}
+  .logo-hero img{width:100%;height:100%;border-radius:26px;display:block;
+    box-shadow:0 18px 50px rgba(0,0,0,.6);animation:bob 4.5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-2deg)}}
+
+  .kicker{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--lime);font-weight:700}
+  .wordmark{font-family:var(--font-d);font-weight:800;letter-spacing:-1px;line-height:.92;
+    font-size:clamp(64px,11vw,120px);margin:0;
+    background:linear-gradient(180deg,#fff 0%,#eaffb0 45%,var(--lime) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    text-shadow:0 0 40px rgba(200,241,53,.25);
-  }
-  .subwordmark{font-size:14px;letter-spacing:7px;text-transform:uppercase;color:var(--muted);margin-top:-2px}
+    filter:drop-shadow(0 6px 30px rgba(200,241,53,.22))}
+  .tag{font-family:var(--font-d);font-weight:700;font-size:clamp(21px,3.4vw,30px);line-height:1.15;margin:0;max-width:15ch}
+  .tag .accent{color:var(--lime)}
 
-  /* rotating phrases */
-  .rotator{
-    min-height:2.4em;display:flex;align-items:center;justify-content:center;
-    font-size:clamp(18px,3.2vw,26px);font-weight:700;color:var(--text);
-    max-width:640px;padding:0 6px;
-  }
-  .rotator .ph{opacity:0;transform:translateY(8px);transition:.5s;position:absolute}
-  .rotator .ph.on{opacity:1;transform:none;position:relative}
-  .rotator .accent{color:var(--lime)}
-  .rotcaret{display:inline-block;width:3px;height:1.05em;background:var(--lime);margin-left:6px;vertical-align:-2px;animation:blink 1s steps(1) infinite;border-radius:2px}
-  @keyframes blink{50%{opacity:0}}
-
-  .lead{max-width:600px;color:var(--muted);font-size:16px;line-height:1.6;margin:2px auto 0}
-  .lead b{color:var(--text)}
-
-  /* brewing bar */
-  .brew{width:min(440px,88%);margin:6px auto 0}
-  .brew .label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px;letter-spacing:.5px}
-  .brew .track{height:14px;border-radius:999px;background:#101017;border:1px solid var(--line);overflow:hidden;position:relative}
-  .brew .fill{height:100%;width:0;border-radius:999px;
-    background:linear-gradient(90deg,#8fbf1e,var(--lime));
-    background-size:32px 32px;
-    animation:fillup 2.6s cubic-bezier(.2,.8,.2,1) forwards, stripes 1s linear infinite;
-    box-shadow:0 0 18px rgba(200,241,53,.5);
-  }
-  @keyframes fillup{to{width:68%}}
-  @keyframes stripes{from{background-position:0 0}to{background-position:32px 0}}
+  .rotator{min-height:1.6em;font-size:clamp(15px,2.4vw,18px);font-weight:500;color:var(--muted);max-width:34ch}
+  .rotator .r{opacity:0;transition:.45s;position:absolute}
+  .rotator .r.on{opacity:1;position:relative}
+  .rotator .accent{color:var(--text);font-weight:600}
 
   /* waitlist */
-  .cta{width:min(460px,92%);margin:26px auto 0}
-  .form{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);padding:8px;border-radius:16px}
-  .form input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:15px;padding:10px 12px;font-family:inherit}
-  .form input::placeholder{color:#71717f}
-  .form button{
-    border:0;cursor:pointer;font-weight:800;font-family:inherit;font-size:15px;
-    color:var(--ink);background:linear-gradient(180deg,var(--lime-soft),var(--lime));
-    padding:11px 18px;border-radius:11px;letter-spacing:.3px;
-    box-shadow:0 6px 18px rgba(200,241,53,.28);transition:transform .12s ease, box-shadow .2s;
-  }
-  .form button:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(200,241,53,.4)}
-  .form button:active{transform:translateY(0)}
-  .note{font-size:12.5px;color:var(--muted);margin-top:10px;min-height:1.2em}
+  .cta{width:100%;max-width:430px}
+  .form{display:flex;gap:8px;background:var(--panel);border:1px solid var(--line);padding:7px;border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .form input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:15px;padding:11px 12px}
+  .form input::placeholder{color:#6f6f7c}
+  .form button{border:0;cursor:pointer;font-family:var(--font-d);font-weight:800;font-size:15px;color:var(--ink);
+    background:linear-gradient(180deg,#e0ff7a,var(--lime));padding:0 20px;border-radius:11px;letter-spacing:.2px;
+    box-shadow:0 6px 18px rgba(200,241,53,.3);transition:transform .12s,box-shadow .2s;white-space:nowrap}
+  .form button:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(200,241,53,.45)}
+  .note{font-size:13px;color:var(--muted);margin-top:11px;min-height:1.2em}
   .note.ok{color:var(--lime)}
 
-  /* chips */
-  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:24px}
-  .chip{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:rgba(255,255,255,.02)}
-  .chip b{color:var(--lime)}
+  .stats{display:flex;gap:22px;flex-wrap:wrap}
+  @media (max-width:880px){.stats{justify-content:center}}
+  .stat b{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--text);display:block;line-height:1}
+  .stat span{font-size:12px;color:var(--muted);letter-spacing:.3px}
+
+  /* ===== live feed panel (the star) ===== */
+  .feedcard{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:22px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);position:relative}
+  .feedcard::before{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;
+    background:linear-gradient(180deg,rgba(200,241,53,.35),transparent 40%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .feedhead{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .feedhead .t{display:flex;align-items:center;gap:9px;font-family:var(--font-d);font-weight:700;font-size:14.5px}
+  .feedhead .peek{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 9px}
+  .feed{height:412px;overflow:hidden;position:relative;padding:6px 0;
+    mask-image:linear-gradient(180deg,transparent,#000 7%,#000 93%,transparent)}
+  .feed ul{list-style:none;margin:0;padding:0}
+  .row{display:flex;gap:12px;padding:13px 18px;align-items:flex-start;
+    animation:slidein .5s cubic-bezier(.2,.8,.2,1)}
+  @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+  .av{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center;font-size:17px;
+    background:linear-gradient(135deg,#23232e,#191921);border:1px solid var(--line)}
+  .rbody{flex:1;min-width:0}
+  .rtop{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .handle{font-weight:600;font-size:14px;color:var(--text)}
+  .badge{font-size:10px;color:var(--lime);border:1px solid rgba(200,241,53,.4);border-radius:999px;padding:1px 6px}
+  .rtime{font-size:11.5px;color:var(--muted);margin-left:auto}
+  .action{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .action .sym{color:var(--text);font-weight:600}
+  .action .amt{color:var(--lime);font-weight:600}
+  .action .buy{color:var(--up);font-weight:600}
+  .action .sell{color:var(--down);font-weight:600}
+  .rmeta{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
+  .rmeta span{display:flex;align-items:center;gap:5px}
+  .rmeta svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7}
 
   /* footer */
-  .foot{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:38px;color:var(--muted);font-size:13px}
+  .foot{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:44px;color:var(--muted);font-size:13px;text-align:center}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:6px}
+  .chip{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:rgba(255,255,255,.02)}
+  .chip b{color:var(--lime)}
   .socials{display:flex;gap:10px}
-  .socials a{
-    width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
-    border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;
-    transition:.15s;
-  }
+  .socials a{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel);color:var(--text);text-decoration:none;transition:.15s}
   .socials a:hover{border-color:var(--lime);color:var(--lime);transform:translateY(-2px)}
   .socials svg{width:19px;height:19px;fill:currentColor}
-  .disclaimer{max-width:640px;text-align:center;font-size:11.5px;color:#63636f;line-height:1.6}
+  .disclaimer{max-width:620px;font-size:11.5px;color:#5f5f6b;line-height:1.6}
 
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none !important;transition:none !important}
-    .brew .fill{width:68%}
-  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
+<div class="bg" aria-hidden="true">
+  <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <div class="grid"></div>
+</div>
 <div class="bubbles" id="bubbles" aria-hidden="true"></div>
 
 <div class="wrap">
   <header class="topbar">
-    <div class="brandmini"><span class="dot"></span> TVERN</div>
-    <div class="status">🍺 Now brewing · V1 incoming</div>
+    <div class="brandmini"><img src="assets/logo.jpg" alt="" /><b>TVERN</b></div>
+    <div class="pill"><span class="live-dot"></span> Brewing V1 · Robinhood Chain</div>
   </header>
 
   <main class="hero">
-    <div class="mug-stage" role="img" aria-label="The Tavern beer mug logo">
-      <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="beer" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#d9f96a"/>
-            <stop offset="1" stop-color="#b6e226"/>
-          </linearGradient>
-          <clipPath id="mugClip"><rect x="46" y="70" width="86" height="118" rx="18"/></clipPath>
-        </defs>
-
-        <!-- handle -->
-        <path d="M132 96 h20 a24 24 0 0 1 24 24 v8 a24 24 0 0 1 -24 24 h-20"
-              fill="none" stroke="#0c0c14" stroke-width="11" stroke-linecap="round"/>
-
-        <!-- mug body -->
-        <rect x="46" y="70" width="86" height="118" rx="18" fill="url(#beer)" stroke="#0c0c14" stroke-width="9"/>
-
-        <!-- sloshing beer surface + shimmer inside -->
-        <g clip-path="url(#mugClip)">
-          <rect class="slosh" x="30" y="60" width="120" height="20" fill="#e7ffa0" opacity=".55"/>
-          <g class="shimmer" fill="#0c0c14" opacity=".85" stroke="none">
-            <path d="M64 118 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
-            <path d="M84 128 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
-            <path d="M104 118 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
-          </g>
-          <!-- inner rising bubbles -->
-          <circle class="ib ib1" cx="70" cy="180" r="4" fill="#f2ffb8"/>
-          <circle class="ib ib2" cx="92" cy="180" r="3" fill="#f2ffb8"/>
-          <circle class="ib ib3" cx="112" cy="180" r="5" fill="#f2ffb8"/>
-        </g>
-
-        <!-- foam cloud -->
-        <g class="foam" stroke="#0c0c14" stroke-width="8" stroke-linejoin="round">
-          <circle cx="58" cy="60" r="16" fill="#fbfbf4"/>
-          <circle cx="82" cy="48" r="21" fill="#fbfbf4"/>
-          <circle cx="110" cy="46" r="19" fill="#fbfbf4"/>
-          <circle cx="132" cy="58" r="15" fill="#fbfbf4"/>
-          <circle cx="95" cy="66" r="20" fill="#fbfbf4"/>
-          <circle cx="70" cy="70" r="15" fill="#fbfbf4"/>
-          <circle cx="120" cy="70" r="14" fill="#fbfbf4"/>
-        </g>
-      </svg>
-    </div>
-
-    <div>
+    <!-- left -->
+    <section class="left">
+      <div class="logo-hero"><img src="assets/logo.jpg" alt="The Tavern logo" /></div>
+      <div class="kicker">The Tavern</div>
       <h1 class="wordmark">TVERN</h1>
-      <div class="subwordmark">The&nbsp;Tavern</div>
-    </div>
+      <h2 class="tag">Where <span class="accent">Robinhood Chain</span> culture lives.</h2>
+      <div class="rotator" id="rotator" aria-live="polite"></div>
 
-    <div class="rotator" id="rotator" aria-live="polite"></div>
+      <div class="cta">
+        <form class="form" id="wl" novalidate>
+          <input id="email" type="email" placeholder="you@degen.xyz — join the waitlist" autocomplete="email" />
+          <button type="submit">Pull up 🍺</button>
+        </form>
+        <div class="note" id="note">One free signature to browse. Never a transaction. No gas — just vibes.</div>
+      </div>
 
-    <p class="lead">
-      X meets a live blockchain feed. <b>The Tavern</b> is a free social layer for
-      <b>Robinhood Chain</b> — the chain fills the feed, you follow the whales,
-      react to the moves, and roast the paper hands.
-    </p>
+      <div class="stats">
+        <div class="stat"><b>100%</b><span>Free forever</span></div>
+        <div class="stat"><b>0</b><span>Gas to browse</span></div>
+        <div class="stat"><b>24/7</b><span>The chain never sleeps</span></div>
+      </div>
+    </section>
 
-    <div class="brew">
-      <div class="label"><span>BREWING V1</span><span class="pct" id="pct">0%</span></div>
-      <div class="track"><div class="fill" id="fill"></div></div>
-    </div>
+    <!-- right: live feed preview -->
+    <section>
+      <div class="feedcard">
+        <div class="feedhead">
+          <div class="t"><span class="live-dot"></span> Live on Robinhood Chain</div>
+          <div class="peek">sneak peek</div>
+        </div>
+        <div class="feed"><ul id="feed"></ul></div>
+      </div>
+    </section>
+  </main>
 
-    <div class="cta">
-      <form class="form" id="wl" novalidate>
-        <input id="email" type="email" placeholder="you@degen.xyz — join the waitlist" autocomplete="email" />
-        <button type="submit">Pull up 🍺</button>
-      </form>
-      <div class="note" id="note">One free signature to browse. Never a transaction. No gas, just vibes.</div>
-    </div>
-
+  <footer class="foot">
     <div class="chips">
       <span class="chip">🐋 <b>Whale</b> moves, live</span>
       <span class="chip">📈 Tokenized <b>stocks</b> on-chain</span>
       <span class="chip">💬 Follow · reply · repost</span>
       <span class="chip">🎭 Traders · memers · <b>degens</b></span>
-      <span class="chip">🆓 <b>100% free</b></span>
     </div>
-  </main>
-
-  <footer class="foot">
     <div class="socials">
-      <a href="https://x.com/" target="_blank" rel="noopener" aria-label="X / Twitter" id="xlink">
+      <a href="https://x.com/" target="_blank" rel="noopener" aria-label="X / Twitter">
         <svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L5.9 22H2.8l7.5-8.6L2 2h6.6l4.5 6.6L18.9 2Zm-1.1 18h1.7L7.3 4H5.5l12.3 16Z"/></svg>
       </a>
       <a href="https://github.com/Juanius-ahos/TVERN" target="_blank" rel="noopener" aria-label="GitHub">
@@ -259,8 +242,8 @@
       </a>
     </div>
     <div class="disclaimer">
-      The Tavern is an independent social product and is not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc.
-      Nothing here is financial advice. © 2026 TVERN.
+      The Tavern is an independent social product and is not affiliated with, endorsed by, or sponsored by
+      Robinhood Markets, Inc. Nothing here is financial advice. © 2026 TVERN.
     </div>
   </footer>
 </div>
@@ -269,86 +252,93 @@
   // ambient bubbles
   (function(){
     var box=document.getElementById('bubbles');
-    var N=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:26;
-    for(var i=0;i<N;i++){
-      var b=document.createElement('i');
-      var s=6+Math.random()*16;
-      b.style.left=(Math.random()*100)+'vw';
-      b.style.width=b.style.height=s+'px';
-      b.style.animationDuration=(7+Math.random()*10)+'s';
-      b.style.animationDelay=(-Math.random()*12)+'s';
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    for(var i=0;i<22;i++){
+      var b=document.createElement('i'),s=6+Math.random()*15;
+      b.style.left=(Math.random()*100)+'vw';b.style.width=b.style.height=s+'px';
+      b.style.animationDuration=(8+Math.random()*10)+'s';b.style.animationDelay=(-Math.random()*14)+'s';
       box.appendChild(b);
     }
   })();
 
-  // rotating phrases
+  // rotating tagline
   (function(){
-    var phrases=[
+    var lines=[
+      'X meets a <span class="accent">live blockchain feed</span>.',
       'The chain fills the feed. <span class="accent">You react.</span>',
-      'A whale just bought <span class="accent">$187k of NVDA</span> on-chain.',
       'Follow the whales. <span class="accent">Roast the paper hands.</span>',
-      'Wallets waking up. Whales moving. <span class="accent">All in one feed.</span>',
-      'Built for <span class="accent">traders, memers &amp; degens.</span>',
-      'The chain never sleeps. <span class="accent">Neither does the tavern.</span>',
-      'No gas to browse. <span class="accent">Just vibes.</span>'
+      'Free social app where the <span class="accent">chain</span> is the content.'
     ];
-    var el=document.getElementById('rotator');
-    var span=document.createElement('span'); span.className='ph on';
-    var caret=document.createElement('span'); caret.className='rotcaret';
-    el.appendChild(span); el.appendChild(caret);
-    var i=0;
-    function show(){ span.innerHTML=phrases[i]; span.classList.add('on'); }
+    var el=document.getElementById('rotator'),s=document.createElement('span');
+    s.className='r on';el.appendChild(s);var i=0;
+    function show(){s.innerHTML=lines[i];}
     show();
-    setInterval(function(){
-      span.classList.remove('on');
-      setTimeout(function(){ i=(i+1)%phrases.length; show(); }, 480);
-    }, 3200);
+    setInterval(function(){s.classList.remove('on');
+      setTimeout(function(){i=(i+1)%lines.length;show();s.classList.add('on');},450);},3400);
   })();
 
-  // brewing % counter synced to bar
+  // ===== simulated live on-chain feed =====
   (function(){
-    var pct=document.getElementById('pct'), target=68, dur=2600, start=null;
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ pct.textContent='68%'; return; }
-    function step(t){
-      if(!start)start=t;
-      var p=Math.min((t-start)/dur,1);
-      var e=1-Math.pow(1-p,3);
-      pct.textContent=Math.round(e*target)+'%';
-      if(p<1)requestAnimationFrame(step);
+    var feed=document.getElementById('feed');
+    var handles=[
+      ['0x9f…a2c1','🐋'],['diamondhands.eth','💎'],['0x4b…e7f0','🦍'],['gme.til.zero','🚀'],
+      ['tendies.eth','🍗'],['0xC0…ffee','☕'],['paperhand.exe','🧻'],['0x1a…b33f','🔥'],
+      ['moon.or.bust','🌙'],['0x7d…9a10','🐳'],['spacex.bag','🛰️'],['0x2e…44dd','⚡']
+    ];
+    var assets=['NVDA','TSLA','GME','SPY','AAPL','SpaceX','MSTR','AMD','QQQ','COIN','META','PLTR'];
+    var templ=[
+      function(a,amt){return 'bought <span class="buy">+'+amt+'</span> of <span class="sym">$'+a+'</span>';},
+      function(a,amt){return 'sold <span class="sell">−'+amt+'</span> of <span class="sym">$'+a+'</span>';},
+      function(a,amt){return 'swapped into <span class="sym">$'+a+'</span> · <span class="amt">'+amt+'</span>';},
+      function(a,amt){return 'aped <span class="amt">'+amt+'</span> into <span class="sym">$'+a+'</span>';}
+    ];
+    var wakes=['💤 dormant wallet woke up','🐋 new whale entered','🔔 large position opened'];
+    function money(){var n=[187400,42100,930500,12750,2100000,64800,318000,8900,1450000,73200];
+      var v=n[Math.floor(Math.random()*n.length)];return '$'+v.toLocaleString('en-US');}
+    function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+    function svgHeart(){return '<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-8.5C.5 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5.5 3.5 3.5 7C19 16.5 12 21 12 21z"/></svg>';}
+    function svgReply(){return '<svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>';}
+    function svgRepost(){return '<svg viewBox="0 0 24 24"><path d="M4 8l4-4 4 4M8 4v10a4 4 0 0 0 4 4h8M20 16l-4 4-4-4M16 20V10a4 4 0 0 0-4-4H4"/></svg>';}
+
+    function makeRow(first){
+      var h=rnd(handles),a=rnd(assets),t=rnd(templ),amt=money(),verified=Math.random()<.35;
+      var wake=Math.random()<.18?rnd(wakes):null;
+      var li=document.createElement('li');
+      li.className='row';
+      var likes=(Math.floor(Math.random()*900)+12),reps=(Math.floor(Math.random()*140)+2),rt=(Math.floor(Math.random()*90)+1);
+      li.innerHTML=
+        '<div class="av">'+h[1]+'</div>'+
+        '<div class="rbody">'+
+          '<div class="rtop"><span class="handle">'+h[0]+'</span>'+
+            (verified?'<span class="badge">whale</span>':'')+
+            '<span class="rtime">'+ (first?'now':(Math.floor(Math.random()*58)+2)+'s') +'</span></div>'+
+          '<div class="action">'+ (wake?wake+' — ':'') + t(a,amt) +' on-chain</div>'+
+          '<div class="rmeta"><span>'+svgReply()+reps+'</span><span>'+svgRepost()+rt+'</span><span>'+svgHeart()+likes+'</span></div>'+
+        '</div>';
+      return li;
     }
-    requestAnimationFrame(step);
+    // seed
+    for(var i=0;i<7;i++){feed.appendChild(makeRow(false));}
+    // stream new events on top
+    if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+      setInterval(function(){
+        feed.insertBefore(makeRow(true),feed.firstChild);
+        while(feed.children.length>9){feed.removeChild(feed.lastChild);}
+      }, 2200);
+    }
   })();
 
-  // waitlist (front-end only for now — see README to wire a real endpoint)
+  // waitlist (front-end only — see README to wire Formspree/Tally)
   (function(){
-    var f=document.getElementById('wl'), email=document.getElementById('email'), note=document.getElementById('note');
+    var f=document.getElementById('wl'),email=document.getElementById('email'),note=document.getElementById('note');
     f.addEventListener('submit',function(e){
       e.preventDefault();
       var v=(email.value||'').trim();
-      var ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      if(!ok){ note.className='note'; note.textContent='Enter a valid email, degen. 🍺'; return; }
-      try{
-        var list=JSON.parse(localStorage.getItem('tvern_wl')||'[]');
-        if(list.indexOf(v)<0)list.push(v);
-        localStorage.setItem('tvern_wl',JSON.stringify(list));
-      }catch(_){}
-      note.className='note ok';
-      note.textContent="You're on the list. First round's on the chain. 🍻";
-      email.value='';
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){note.className='note';note.textContent='Enter a valid email, degen. 🍺';return;}
+      try{var l=JSON.parse(localStorage.getItem('tvern_wl')||'[]');if(l.indexOf(v)<0)l.push(v);localStorage.setItem('tvern_wl',JSON.stringify(l));}catch(_){}
+      note.className='note ok';note.textContent="You're on the list. First round's on the chain. 🍻";email.value='';
     });
   })();
 </script>
-
-<style>
-  /* animated SVG bits */
-  .foam{animation:foamBob 3.4s ease-in-out infinite;transform-origin:95px 58px}
-  @keyframes foamBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-  .slosh{animation:slosh 3s ease-in-out infinite}
-  @keyframes slosh{0%,100%{transform:translateX(-6px) rotate(-1deg)}50%{transform:translateX(-14px) rotate(1deg)}}
-  .ib{animation:ibrise 3.2s ease-in infinite;opacity:0}
-  .ib2{animation-delay:.9s}.ib3{animation-delay:1.7s}
-  @keyframes ibrise{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-96px);opacity:0}}
-  @media (prefers-reduced-motion: reduce){.foam,.slosh,.ib{animation:none}}
-</style>
 </body>
 </html>
