@@ -123,33 +123,37 @@
 
   /* ===== blurred living-feed backdrop ===== */
   .feedbg{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
-    filter:blur(6px) saturate(1.1);opacity:.82}
+    filter:blur(5px) saturate(1.12);opacity:.85}
   .scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
-    background:radial-gradient(76% 64% at 50% 44%, rgba(8,9,11,.72), rgba(8,9,11,.40) 56%, rgba(8,9,11,.12))}
-  .c{position:absolute;border-radius:15px;background:rgba(21,24,29,.92);border:1px solid rgba(255,255,255,.06);
-    padding:12px;box-shadow:0 24px 50px rgba(0,0,0,.45);will-change:transform,opacity;
-    animation:life 11s ease forwards}
+    background:radial-gradient(74% 62% at 50% 44%, rgba(8,9,11,.74), rgba(8,9,11,.42) 55%, rgba(8,9,11,.12))}
+  /* X.com-style post card */
+  .c{position:absolute;border-radius:16px;background:rgba(19,22,27,.95);border:1px solid rgba(255,255,255,.07);
+    padding:13px 15px;box-shadow:0 26px 58px rgba(0,0,0,.5);width:322px;will-change:transform,opacity;
+    animation:life 12s ease forwards}
+  .c.wide{width:346px}.c.slim{width:290px}
   @keyframes life{
-    0%{opacity:0;transform:translateY(-34px) scale(.92) rotate(var(--rot))}
-    12%{opacity:1;transform:translateY(0) scale(1) rotate(var(--rot))}
-    82%{opacity:1;transform:translateY(10px) scale(1) rotate(var(--rot))}
-    100%{opacity:0;transform:translateY(34px) scale(.99) rotate(var(--rot))}}
-  .c .chead{display:flex;gap:9px;align-items:center}
-  .c .cav{width:30px;height:30px;border-radius:50%;flex:none}
-  .c .clines{flex:1}
-  .c .clines i{display:block;height:7px;border-radius:5px;background:rgba(255,255,255,.15)}
-  .c .clines i.s{width:52%;margin-top:6px;height:6px;background:rgba(255,255,255,.09)}
-  .c .ctext{margin-top:11px}
-  .c .ctext i{display:block;height:8px;border-radius:5px;background:rgba(255,255,255,.13);margin:6px 0}
-  .c .ctext i.w{width:58%}
-  .c .cchip{margin-top:11px;width:70px;height:22px;border-radius:7px;
-    background:rgba(198,255,50,.16);border:1px solid rgba(198,255,50,.3)}
-  .c .cchip.up{background:rgba(87,217,119,.16);border-color:rgba(87,217,119,.32)}
-  .c .thumb{height:100px;border-radius:11px;position:relative;display:grid;place-items:center;overflow:hidden}
-  .c .thumb .play{width:0;height:0;border-left:17px solid rgba(255,255,255,.82);
-    border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;
-    filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
-  .c.media{width:220px}.c.post{width:210px}.c.mini{width:170px}
+    0%{opacity:0;transform:translateY(-36px) scale(.92) rotate(var(--rot))}
+    11%{opacity:1;transform:translateY(0) scale(1) rotate(var(--rot))}
+    83%{opacity:1;transform:translateY(10px) scale(1) rotate(var(--rot))}
+    100%{opacity:0;transform:translateY(36px) scale(.99) rotate(var(--rot))}}
+  .c .chead{display:flex;gap:11px;align-items:flex-start}
+  .c .cav{width:40px;height:40px;border-radius:50%;flex:none;overflow:hidden}
+  .c .cav img{width:100%;height:100%;object-fit:cover;display:block}
+  .c .cid{flex:1;min-width:0;padding-top:3px}
+  .c .crow{display:flex;align-items:center;gap:7px}
+  .c .cname{height:10px;width:78px;border-radius:5px;background:rgba(255,255,255,.28)}
+  .c .cverif{width:14px;height:14px;border-radius:50%;background:#4aa8ff;flex:none}
+  .c .chandle{height:8px;width:64px;border-radius:5px;background:rgba(255,255,255,.11)}
+  .c .ctext{margin-top:10px}
+  .c .ctext i{display:block;height:8px;border-radius:5px;background:rgba(255,255,255,.16);margin:7px 0}
+  .c .ctext i.m{width:84%}.c .ctext i.w{width:56%}
+  .c .thumb{margin-top:12px;height:160px;border-radius:14px;overflow:hidden;position:relative;
+    background:linear-gradient(135deg,#243049,#14202e)}
+  .c .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .c .cacts{display:flex;justify-content:space-between;margin-top:12px;padding-right:14px;color:rgba(255,255,255,.32)}
+  .c .cacts .act{display:flex;align-items:center;gap:6px}
+  .c .cacts .act svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7}
+  .c .cacts .act b{display:block;width:16px;height:6px;border-radius:4px;background:rgba(255,255,255,.15)}
 
   @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
@@ -214,52 +218,50 @@
 </footer>
 
 <script>
-  // ===== blurred living-feed backdrop (posts + videos dropping in) =====
+  // ===== blurred living-feed backdrop: X.com-style posts w/ web3 images =====
   (function(){
     var box=document.getElementById('feedbg');
     if(!box || window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-    var avs=['linear-gradient(135deg,#3a4d2a,#1c2a12)','linear-gradient(135deg,#2a3a4d,#12202a)',
-      'linear-gradient(135deg,#4d2a3a,#2a1220)','linear-gradient(135deg,#4d442a,#2a2412)',
-      'linear-gradient(135deg,#2f4d43,#122a24)','linear-gradient(135deg,#413a52,#1e1a2a)'];
-    var thumbs=['linear-gradient(135deg,#2a3550,#16202e)','linear-gradient(135deg,#3a2f52,#1e1a2a)',
-      'linear-gradient(135deg,#2f4d3a,#122a1e)','linear-gradient(135deg,#523a2a,#2a1c12)',
-      'linear-gradient(135deg,#1f3d4d,#12242a)','linear-gradient(135deg,#4d3a2f,#2a1c12)'];
+    var kws=['bitcoin','ethereum','cryptocurrency','trading','stockmarket','finance',
+      'blockchain','nft','coins','investing','forex','crypto'];
     function pick(a){return a[Math.floor(Math.random()*a.length)];}
-    function post(){
-      var chip=Math.random()<.5?' up':'';
-      return {cls:'post',html:
-        '<div class="chead"><div class="cav" style="background:'+pick(avs)+'"></div>'+
-        '<div class="clines"><i></i><i class="s"></i></div></div>'+
-        '<div class="ctext"><i></i><i class="w"></i></div>'+
-        '<div class="cchip'+chip+'"></div>'};
+    function img(w,h){return 'https://loremflickr.com/'+w+'/'+h+'/'+pick(kws)+'?lock='+Math.floor(Math.random()*99999);}
+    var icoR='<svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>';
+    var icoRt='<svg viewBox="0 0 24 24"><path d="M4 8l4-4 4 4M8 4v10a4 4 0 0 0 4 4h8M20 16l-4 4-4-4M16 20V10a4 4 0 0 0-4-4H4"/></svg>';
+    var icoL='<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-8.5C.5 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5.5 3.5 3.5 7C19 16.5 12 21 12 21z"/></svg>';
+    var icoV='<svg viewBox="0 0 24 24"><path d="M3 20V10M9 20V4M15 20v-8M21 20V8"/></svg>';
+    function head(lines){
+      var t='<div class="ctext"><i class="m"></i>'+(lines>1?'<i></i>':'')+'<i class="w"></i></div>';
+      return '<div class="chead"><div class="cav"><img src="'+img(48,48)+'" onerror="this.remove()"></div>'+
+        '<div class="cid"><div class="crow"><span class="cname"></span><span class="cverif"></span><span class="chandle"></span></div>'+
+        t+'</div></div>';
     }
-    function media(){
-      return {cls:'media',html:
-        '<div class="thumb" style="background:'+pick(thumbs)+'"><div class="play"></div></div>'+
-        '<div class="ctext"><i></i><i class="w"></i></div>'};
+    function acts(){
+      return '<div class="cacts">'+
+        '<span class="act">'+icoR+'<b></b></span><span class="act">'+icoRt+'<b></b></span>'+
+        '<span class="act">'+icoL+'<b></b></span><span class="act">'+icoV+'<b></b></span></div>';
     }
-    function mini(){
-      return {cls:'mini',html:
-        '<div class="chead"><div class="cav" style="background:'+pick(avs)+'"></div>'+
-        '<div class="clines"><i></i><i class="s"></i></div></div>'};
-    }
+    function withImg(){return head(1)+'<div class="thumb"><img src="'+img(420,300)+'" onerror="this.remove()"></div>'+acts();}
+    function textOnly(){return head(3)+acts();}
+    function bigImg(){return head(1)+'<div class="thumb" style="height:200px"><img src="'+img(440,340)+'" onerror="this.remove()"></div>'+acts();}
     function spawn(){
-      if(box.children.length>14) return;
-      var r=Math.random(),t=r<.42?post():(r<.78?media():mini());
+      if(box.children.length>9) return;
+      var r=Math.random(),html,cls;
+      if(r<0.58){html=withImg();cls='';}
+      else if(r<0.8){html=textOnly();cls='slim';}
+      else{html=bigImg();cls='wide';}
       var el=document.createElement('div');
-      el.className='c '+t.cls;
-      el.innerHTML=t.html;
-      var vw=window.innerWidth,vh=window.innerHeight;
-      var w=t.cls==='media'?220:(t.cls==='mini'?170:210);
+      el.className='c '+cls;
+      el.innerHTML=html;
+      var vw=window.innerWidth,vh=window.innerHeight,w=cls==='wide'?346:(cls==='slim'?290:322);
       el.style.left=Math.round(Math.random()*(vw-w-20)+10)+'px';
-      el.style.top=Math.round(Math.random()*(vh*0.82)+vh*0.02)+'px';
-      el.style.setProperty('--rot',(Math.random()*8-4).toFixed(1)+'deg');
+      el.style.top=Math.round(Math.random()*(vh*0.78)+vh*0.02)+'px';
+      el.style.setProperty('--rot',(Math.random()*7-3.5).toFixed(1)+'deg');
       el.addEventListener('animationend',function(){el.remove();});
       box.appendChild(el);
     }
-    // seed a few, then keep dropping
-    for(var i=0;i<8;i++){setTimeout(spawn,i*220);}
-    setInterval(spawn,1050);
+    for(var i=0;i<6;i++){setTimeout(spawn,i*320);}
+    setInterval(spawn,1500);
   })();
 
   // cycling loading lines
