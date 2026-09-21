@@ -58,7 +58,15 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
   .wrap{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;padding:56px 24px 34px;max-width:760px;margin:0 auto;width:100%}
+    text-align:center;padding:52px 24px 30px;max-width:760px;margin:0 auto;width:100%}
+  .panel{position:relative;display:flex;flex-direction:column;align-items:center;width:100%;max-width:600px;
+    padding:44px 44px 40px;border-radius:30px;
+    background:linear-gradient(180deg, rgba(22,25,31,.66), rgba(12,14,18,.52));
+    border:1px solid rgba(255,255,255,.11);
+    box-shadow:0 44px 110px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.09);
+    -webkit-backdrop-filter:blur(18px) saturate(1.15);backdrop-filter:blur(18px) saturate(1.15);
+    animation:rise 1s cubic-bezier(.2,.7,.2,1) both}
+  @media(max-width:560px){.panel{padding:34px 20px 32px;border-radius:24px}}
 
   .logo{width:98px;height:98px;margin-bottom:26px;filter:drop-shadow(0 14px 40px rgba(198,255,50,.2));
     animation:rise .9s cubic-bezier(.2,.7,.2,1) both, float 7s ease-in-out infinite 1s}
@@ -124,9 +132,11 @@
   /* ===== blurred living-feed backdrop ===== */
   /* ===== full blurred X.com app in the background ===== */
   .appbg{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
-    filter:blur(9px) saturate(1.12);opacity:.92;display:flex;justify-content:center}
+    filter:blur(9px) saturate(1.1);opacity:.82;display:flex;justify-content:center}
   .scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
-    background:radial-gradient(72% 62% at 50% 44%, rgba(8,9,11,.8), rgba(8,9,11,.46) 54%, rgba(8,9,11,.14))}
+    background:
+      radial-gradient(58% 52% at 50% 44%, rgba(8,9,11,.5), rgba(8,9,11,.28) 60%, transparent 82%),
+      linear-gradient(180deg, rgba(8,9,11,.5) 0%, transparent 22%, transparent 74%, rgba(8,9,11,.66) 100%)}
   .col{height:100vh;overflow:hidden;flex:none}
   .col.l{width:238px;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column}
   .col.c{width:600px;border-right:1px solid rgba(255,255,255,.07)}
@@ -261,6 +271,7 @@
 <div class="scrim" aria-hidden="true"></div>
 
 <main class="wrap">
+  <section class="panel">
   <img class="logo" src="assets/logo.png" alt="The Tavern logo" />
   <p class="tag">TVERN</p>
 
@@ -293,6 +304,7 @@
     </form>
     <div class="note" id="note">Be first through the door. No spam, ever.</div>
   </div>
+  </section>
 </main>
 
 <footer>
