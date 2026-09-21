@@ -121,9 +121,40 @@
   .socials svg{width:16px;height:16px;fill:currentColor}
   .fine{max-width:540px;text-align:center;font-size:11.5px;line-height:1.6;color:var(--faint)}
 
+  /* ===== blurred living-feed backdrop ===== */
+  .feedbg{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
+    filter:blur(6px) saturate(1.1);opacity:.82}
+  .scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(76% 64% at 50% 44%, rgba(8,9,11,.72), rgba(8,9,11,.40) 56%, rgba(8,9,11,.12))}
+  .c{position:absolute;border-radius:15px;background:rgba(21,24,29,.92);border:1px solid rgba(255,255,255,.06);
+    padding:12px;box-shadow:0 24px 50px rgba(0,0,0,.45);will-change:transform,opacity;
+    animation:life 11s ease forwards}
+  @keyframes life{
+    0%{opacity:0;transform:translateY(-34px) scale(.92) rotate(var(--rot))}
+    12%{opacity:1;transform:translateY(0) scale(1) rotate(var(--rot))}
+    82%{opacity:1;transform:translateY(10px) scale(1) rotate(var(--rot))}
+    100%{opacity:0;transform:translateY(34px) scale(.99) rotate(var(--rot))}}
+  .c .chead{display:flex;gap:9px;align-items:center}
+  .c .cav{width:30px;height:30px;border-radius:50%;flex:none}
+  .c .clines{flex:1}
+  .c .clines i{display:block;height:7px;border-radius:5px;background:rgba(255,255,255,.15)}
+  .c .clines i.s{width:52%;margin-top:6px;height:6px;background:rgba(255,255,255,.09)}
+  .c .ctext{margin-top:11px}
+  .c .ctext i{display:block;height:8px;border-radius:5px;background:rgba(255,255,255,.13);margin:6px 0}
+  .c .ctext i.w{width:58%}
+  .c .cchip{margin-top:11px;width:70px;height:22px;border-radius:7px;
+    background:rgba(198,255,50,.16);border:1px solid rgba(198,255,50,.3)}
+  .c .cchip.up{background:rgba(87,217,119,.16);border-color:rgba(87,217,119,.32)}
+  .c .thumb{height:100px;border-radius:11px;position:relative;display:grid;place-items:center;overflow:hidden}
+  .c .thumb .play{width:0;height:0;border-left:17px solid rgba(255,255,255,.82);
+    border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+  .c.media{width:220px}.c.post{width:210px}.c.mini{width:170px}
+
   @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
-    .loadtext .lt{position:absolute}.loadtext .lt.on{position:relative;opacity:1}}
+    .loadtext .lt{position:absolute}.loadtext .lt.on{position:relative;opacity:1}
+    .feedbg{display:none}}
 </style>
 </head>
 <body>
@@ -132,6 +163,8 @@
   <div class="aurora"></div><div class="aurora two"></div>
   <div class="beam"></div><div class="vignette"></div><div class="grain"></div>
 </div>
+<div class="feedbg" id="feedbg" aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
 
 <main class="wrap">
   <img class="logo" src="assets/logo.png" alt="The Tavern logo" />
@@ -181,6 +214,54 @@
 </footer>
 
 <script>
+  // ===== blurred living-feed backdrop (posts + videos dropping in) =====
+  (function(){
+    var box=document.getElementById('feedbg');
+    if(!box || window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var avs=['linear-gradient(135deg,#3a4d2a,#1c2a12)','linear-gradient(135deg,#2a3a4d,#12202a)',
+      'linear-gradient(135deg,#4d2a3a,#2a1220)','linear-gradient(135deg,#4d442a,#2a2412)',
+      'linear-gradient(135deg,#2f4d43,#122a24)','linear-gradient(135deg,#413a52,#1e1a2a)'];
+    var thumbs=['linear-gradient(135deg,#2a3550,#16202e)','linear-gradient(135deg,#3a2f52,#1e1a2a)',
+      'linear-gradient(135deg,#2f4d3a,#122a1e)','linear-gradient(135deg,#523a2a,#2a1c12)',
+      'linear-gradient(135deg,#1f3d4d,#12242a)','linear-gradient(135deg,#4d3a2f,#2a1c12)'];
+    function pick(a){return a[Math.floor(Math.random()*a.length)];}
+    function post(){
+      var chip=Math.random()<.5?' up':'';
+      return {cls:'post',html:
+        '<div class="chead"><div class="cav" style="background:'+pick(avs)+'"></div>'+
+        '<div class="clines"><i></i><i class="s"></i></div></div>'+
+        '<div class="ctext"><i></i><i class="w"></i></div>'+
+        '<div class="cchip'+chip+'"></div>'};
+    }
+    function media(){
+      return {cls:'media',html:
+        '<div class="thumb" style="background:'+pick(thumbs)+'"><div class="play"></div></div>'+
+        '<div class="ctext"><i></i><i class="w"></i></div>'};
+    }
+    function mini(){
+      return {cls:'mini',html:
+        '<div class="chead"><div class="cav" style="background:'+pick(avs)+'"></div>'+
+        '<div class="clines"><i></i><i class="s"></i></div></div>'};
+    }
+    function spawn(){
+      if(box.children.length>14) return;
+      var r=Math.random(),t=r<.42?post():(r<.78?media():mini());
+      var el=document.createElement('div');
+      el.className='c '+t.cls;
+      el.innerHTML=t.html;
+      var vw=window.innerWidth,vh=window.innerHeight;
+      var w=t.cls==='media'?220:(t.cls==='mini'?170:210);
+      el.style.left=Math.round(Math.random()*(vw-w-20)+10)+'px';
+      el.style.top=Math.round(Math.random()*(vh*0.82)+vh*0.02)+'px';
+      el.style.setProperty('--rot',(Math.random()*8-4).toFixed(1)+'deg');
+      el.addEventListener('animationend',function(){el.remove();});
+      box.appendChild(el);
+    }
+    // seed a few, then keep dropping
+    for(var i=0;i<8;i++){setTimeout(spawn,i*220);}
+    setInterval(spawn,1050);
+  })();
+
   // cycling loading lines
   (function(){
     var lines=[
