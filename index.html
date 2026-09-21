@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TVERN — The Tavern</title>
+<meta name="description" content="The Tavern (TVERN) — X meets a live blockchain feed. A free social layer for Robinhood Chain, for traders, memers & degens. Brewing now." />
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="TVERN — The Tavern" />
+<meta property="og:description" content="X meets a live blockchain feed. The social layer for Robinhood Chain. For traders, memers & degens. Brewing now." />
+<meta property="og:url" content="https://tvern.xyz" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="TVERN — The Tavern" />
+<meta name="twitter:description" content="X meets a live blockchain feed. The social layer for Robinhood Chain. Brewing now." />
+
+<!-- Favicon: inline SVG mug -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2314141a'/%3E%3Cg stroke='%230e0e16' stroke-width='4' stroke-linejoin='round'%3E%3Crect x='30' y='42' width='34' height='42' rx='7' fill='%23c8f135'/%3E%3Cpath d='M64 50h7a7 7 0 0 1 7 7v9a7 7 0 0 1-7 7h-7' fill='none'/%3E%3Ccircle cx='38' cy='36' r='9' fill='%23fff'/%3E%3Ccircle cx='50' cy='32' r='11' fill='%23fff'/%3E%3Ccircle cx='60' cy='37' r='8' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E" />
+
+<style>
+  :root{
+    --bg:#0e0e13;
+    --bg2:#15151d;
+    --ink:#0c0c14;
+    --lime:#c8f135;
+    --lime-soft:#d9f96a;
+    --foam:#fbfbf4;
+    --text:#efeff2;
+    --muted:#9a9aa7;
+    --card:#191922;
+    --line:#2a2a37;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      radial-gradient(1100px 720px at 50% -10%, rgba(200,241,53,.10), transparent 60%),
+      radial-gradient(900px 600px at 85% 110%, rgba(200,241,53,.06), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:"Trebuchet MS", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height:100%;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* floating ambient bubbles */
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{
+    position:absolute;bottom:-40px;display:block;
+    width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.9), rgba(200,241,53,.25) 55%, transparent 70%);
+    opacity:.0;
+    animation:rise linear infinite;
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) scale(.6);opacity:0}
+    10%{opacity:.7}
+    90%{opacity:.5}
+    100%{transform:translateY(-108vh) scale(1.1);opacity:0}
+  }
+
+  .wrap{
+    position:relative;z-index:2;
+    max-width:920px;margin:0 auto;
+    min-height:100vh;padding:34px 22px 60px;
+    display:flex;flex-direction:column;
+  }
+
+  /* top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brandmini{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+  .brandmini .dot{width:9px;height:9px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime);animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+  .status{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.02)}
+
+  /* hero */
+  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;padding:26px 0}
+
+  .mug-stage{position:relative;width:230px;height:230px;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+  .mug-stage svg{width:100%;height:100%;overflow:visible}
+  .mug-stage:hover{animation:tip .6s ease}
+  @keyframes tip{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}60%{transform:rotate(4deg)}}
+
+  .wordmark{
+    font-size:clamp(58px,15vw,120px);
+    line-height:.9;font-weight:900;letter-spacing:2px;margin:4px 0 0;
+    background:linear-gradient(180deg,#fff 0%, var(--lime-soft) 55%, var(--lime) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(200,241,53,.25);
+  }
+  .subwordmark{font-size:14px;letter-spacing:7px;text-transform:uppercase;color:var(--muted);margin-top:-2px}
+
+  /* rotating phrases */
+  .rotator{
+    min-height:2.4em;display:flex;align-items:center;justify-content:center;
+    font-size:clamp(18px,3.2vw,26px);font-weight:700;color:var(--text);
+    max-width:640px;padding:0 6px;
+  }
+  .rotator .ph{opacity:0;transform:translateY(8px);transition:.5s;position:absolute}
+  .rotator .ph.on{opacity:1;transform:none;position:relative}
+  .rotator .accent{color:var(--lime)}
+  .rotcaret{display:inline-block;width:3px;height:1.05em;background:var(--lime);margin-left:6px;vertical-align:-2px;animation:blink 1s steps(1) infinite;border-radius:2px}
+  @keyframes blink{50%{opacity:0}}
+
+  .lead{max-width:600px;color:var(--muted);font-size:16px;line-height:1.6;margin:2px auto 0}
+  .lead b{color:var(--text)}
+
+  /* brewing bar */
+  .brew{width:min(440px,88%);margin:6px auto 0}
+  .brew .label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px;letter-spacing:.5px}
+  .brew .track{height:14px;border-radius:999px;background:#101017;border:1px solid var(--line);overflow:hidden;position:relative}
+  .brew .fill{height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,#8fbf1e,var(--lime));
+    background-size:32px 32px;
+    animation:fillup 2.6s cubic-bezier(.2,.8,.2,1) forwards, stripes 1s linear infinite;
+    box-shadow:0 0 18px rgba(200,241,53,.5);
+  }
+  @keyframes fillup{to{width:68%}}
+  @keyframes stripes{from{background-position:0 0}to{background-position:32px 0}}
+
+  /* waitlist */
+  .cta{width:min(460px,92%);margin:26px auto 0}
+  .form{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);padding:8px;border-radius:16px}
+  .form input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:15px;padding:10px 12px;font-family:inherit}
+  .form input::placeholder{color:#71717f}
+  .form button{
+    border:0;cursor:pointer;font-weight:800;font-family:inherit;font-size:15px;
+    color:var(--ink);background:linear-gradient(180deg,var(--lime-soft),var(--lime));
+    padding:11px 18px;border-radius:11px;letter-spacing:.3px;
+    box-shadow:0 6px 18px rgba(200,241,53,.28);transition:transform .12s ease, box-shadow .2s;
+  }
+  .form button:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(200,241,53,.4)}
+  .form button:active{transform:translateY(0)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:10px;min-height:1.2em}
+  .note.ok{color:var(--lime)}
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:24px}
+  .chip{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:rgba(255,255,255,.02)}
+  .chip b{color:var(--lime)}
+
+  /* footer */
+  .foot{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:38px;color:var(--muted);font-size:13px}
+  .socials{display:flex;gap:10px}
+  .socials a{
+    width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
+    border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;
+    transition:.15s;
+  }
+  .socials a:hover{border-color:var(--lime);color:var(--lime);transform:translateY(-2px)}
+  .socials svg{width:19px;height:19px;fill:currentColor}
+  .disclaimer{max-width:640px;text-align:center;font-size:11.5px;color:#63636f;line-height:1.6}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .brew .fill{width:68%}
+  }
+</style>
+</head>
+<body>
+
+<div class="bubbles" id="bubbles" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brandmini"><span class="dot"></span> TVERN</div>
+    <div class="status">🍺 Now brewing · V1 incoming</div>
+  </header>
+
+  <main class="hero">
+    <div class="mug-stage" role="img" aria-label="The Tavern beer mug logo">
+      <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="beer" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d9f96a"/>
+            <stop offset="1" stop-color="#b6e226"/>
+          </linearGradient>
+          <clipPath id="mugClip"><rect x="46" y="70" width="86" height="118" rx="18"/></clipPath>
+        </defs>
+
+        <!-- handle -->
+        <path d="M132 96 h20 a24 24 0 0 1 24 24 v8 a24 24 0 0 1 -24 24 h-20"
+              fill="none" stroke="#0c0c14" stroke-width="11" stroke-linecap="round"/>
+
+        <!-- mug body -->
+        <rect x="46" y="70" width="86" height="118" rx="18" fill="url(#beer)" stroke="#0c0c14" stroke-width="9"/>
+
+        <!-- sloshing beer surface + shimmer inside -->
+        <g clip-path="url(#mugClip)">
+          <rect class="slosh" x="30" y="60" width="120" height="20" fill="#e7ffa0" opacity=".55"/>
+          <g class="shimmer" fill="#0c0c14" opacity=".85" stroke="none">
+            <path d="M64 118 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
+            <path d="M84 128 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
+            <path d="M104 118 q6 -12 0 -24 q-6 -12 0 -24" fill="none" stroke="#0c0c14" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <!-- inner rising bubbles -->
+          <circle class="ib ib1" cx="70" cy="180" r="4" fill="#f2ffb8"/>
+          <circle class="ib ib2" cx="92" cy="180" r="3" fill="#f2ffb8"/>
+          <circle class="ib ib3" cx="112" cy="180" r="5" fill="#f2ffb8"/>
+        </g>
+
+        <!-- foam cloud -->
+        <g class="foam" stroke="#0c0c14" stroke-width="8" stroke-linejoin="round">
+          <circle cx="58" cy="60" r="16" fill="#fbfbf4"/>
+          <circle cx="82" cy="48" r="21" fill="#fbfbf4"/>
+          <circle cx="110" cy="46" r="19" fill="#fbfbf4"/>
+          <circle cx="132" cy="58" r="15" fill="#fbfbf4"/>
+          <circle cx="95" cy="66" r="20" fill="#fbfbf4"/>
+          <circle cx="70" cy="70" r="15" fill="#fbfbf4"/>
+          <circle cx="120" cy="70" r="14" fill="#fbfbf4"/>
+        </g>
+      </svg>
+    </div>
+
+    <div>
+      <h1 class="wordmark">TVERN</h1>
+      <div class="subwordmark">The&nbsp;Tavern</div>
+    </div>
+
+    <div class="rotator" id="rotator" aria-live="polite"></div>
+
+    <p class="lead">
+      X meets a live blockchain feed. <b>The Tavern</b> is a free social layer for
+      <b>Robinhood Chain</b> — the chain fills the feed, you follow the whales,
+      react to the moves, and roast the paper hands.
+    </p>
+
+    <div class="brew">
+      <div class="label"><span>BREWING V1</span><span class="pct" id="pct">0%</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+
+    <div class="cta">
+      <form class="form" id="wl" novalidate>
+        <input id="email" type="email" placeholder="you@degen.xyz — join the waitlist" autocomplete="email" />
+        <button type="submit">Pull up 🍺</button>
+      </form>
+      <div class="note" id="note">One free signature to browse. Never a transaction. No gas, just vibes.</div>
+    </div>
+
+    <div class="chips">
+      <span class="chip">🐋 <b>Whale</b> moves, live</span>
+      <span class="chip">📈 Tokenized <b>stocks</b> on-chain</span>
+      <span class="chip">💬 Follow · reply · repost</span>
+      <span class="chip">🎭 Traders · memers · <b>degens</b></span>
+      <span class="chip">🆓 <b>100% free</b></span>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="socials">
+      <a href="https://x.com/" target="_blank" rel="noopener" aria-label="X / Twitter" id="xlink">
+        <svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L5.9 22H2.8l7.5-8.6L2 2h6.6l4.5 6.6L18.9 2Zm-1.1 18h1.7L7.3 4H5.5l12.3 16Z"/></svg>
+      </a>
+      <a href="https://github.com/Juanius-ahos/TVERN" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+      </a>
+    </div>
+    <div class="disclaimer">
+      The Tavern is an independent social product and is not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc.
+      Nothing here is financial advice. © 2026 TVERN.
+    </div>
+  </footer>
+</div>
+
+<script>
+  // ambient bubbles
+  (function(){
+    var box=document.getElementById('bubbles');
+    var N=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:26;
+    for(var i=0;i<N;i++){
+      var b=document.createElement('i');
+      var s=6+Math.random()*16;
+      b.style.left=(Math.random()*100)+'vw';
+      b.style.width=b.style.height=s+'px';
+      b.style.animationDuration=(7+Math.random()*10)+'s';
+      b.style.animationDelay=(-Math.random()*12)+'s';
+      box.appendChild(b);
+    }
+  })();
+
+  // rotating phrases
+  (function(){
+    var phrases=[
+      'The chain fills the feed. <span class="accent">You react.</span>',
+      'A whale just bought <span class="accent">$187k of NVDA</span> on-chain.',
+      'Follow the whales. <span class="accent">Roast the paper hands.</span>',
+      'Wallets waking up. Whales moving. <span class="accent">All in one feed.</span>',
+      'Built for <span class="accent">traders, memers &amp; degens.</span>',
+      'The chain never sleeps. <span class="accent">Neither does the tavern.</span>',
+      'No gas to browse. <span class="accent">Just vibes.</span>'
+    ];
+    var el=document.getElementById('rotator');
+    var span=document.createElement('span'); span.className='ph on';
+    var caret=document.createElement('span'); caret.className='rotcaret';
+    el.appendChild(span); el.appendChild(caret);
+    var i=0;
+    function show(){ span.innerHTML=phrases[i]; span.classList.add('on'); }
+    show();
+    setInterval(function(){
+      span.classList.remove('on');
+      setTimeout(function(){ i=(i+1)%phrases.length; show(); }, 480);
+    }, 3200);
+  })();
+
+  // brewing % counter synced to bar
+  (function(){
+    var pct=document.getElementById('pct'), target=68, dur=2600, start=null;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ pct.textContent='68%'; return; }
+    function step(t){
+      if(!start)start=t;
+      var p=Math.min((t-start)/dur,1);
+      var e=1-Math.pow(1-p,3);
+      pct.textContent=Math.round(e*target)+'%';
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+
+  // waitlist (front-end only for now — see README to wire a real endpoint)
+  (function(){
+    var f=document.getElementById('wl'), email=document.getElementById('email'), note=document.getElementById('note');
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var v=(email.value||'').trim();
+      var ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      if(!ok){ note.className='note'; note.textContent='Enter a valid email, degen. 🍺'; return; }
+      try{
+        var list=JSON.parse(localStorage.getItem('tvern_wl')||'[]');
+        if(list.indexOf(v)<0)list.push(v);
+        localStorage.setItem('tvern_wl',JSON.stringify(list));
+      }catch(_){}
+      note.className='note ok';
+      note.textContent="You're on the list. First round's on the chain. 🍻";
+      email.value='';
+    });
+  })();
+</script>
+
+<style>
+  /* animated SVG bits */
+  .foam{animation:foamBob 3.4s ease-in-out infinite;transform-origin:95px 58px}
+  @keyframes foamBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  .slosh{animation:slosh 3s ease-in-out infinite}
+  @keyframes slosh{0%,100%{transform:translateX(-6px) rotate(-1deg)}50%{transform:translateX(-14px) rotate(1deg)}}
+  .ib{animation:ibrise 3.2s ease-in infinite;opacity:0}
+  .ib2{animation-delay:.9s}.ib3{animation-delay:1.7s}
+  @keyframes ibrise{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-96px);opacity:0}}
+  @media (prefers-reduced-motion: reduce){.foam,.slosh,.ib{animation:none}}
+</style>
+</body>
+</html>
