@@ -132,12 +132,23 @@
   /* ===== blurred living-feed backdrop ===== */
   /* ===== full blurred X.com app in the background ===== */
   .appbg{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
-    filter:blur(9px) saturate(1.1);opacity:.82;display:flex;justify-content:center}
+    filter:blur(9px) saturate(1.1);opacity:.82;display:flex;flex-direction:column}
+  /* simulated app top bar */
+  .apptop{height:56px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;
+    border-bottom:1px solid rgba(255,255,255,.08);background:rgba(11,13,17,.55)}
+  .apptop .lg{width:30px;height:30px;flex:none}
+  .apptop .nm{height:11px;width:88px;border-radius:6px;background:rgba(255,255,255,.22);flex:none}
+  .apptop .sp{flex:1;max-width:440px;height:38px;border-radius:999px;margin:0 24px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
+  .apptop .ic{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.09);flex:none}
+  .apptop .btn{width:78px;height:34px;border-radius:999px;background:var(--accent);opacity:.85;flex:none}
+  .apptop .av{width:34px;height:34px;border-radius:50%;flex:none;background:linear-gradient(135deg,#3a4d2a,#1c2a12)}
+  .cols{flex:1;display:flex;justify-content:center;width:100%;overflow:hidden}
   .scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
     background:
       radial-gradient(58% 52% at 50% 44%, rgba(8,9,11,.5), rgba(8,9,11,.28) 60%, transparent 82%),
       linear-gradient(180deg, rgba(8,9,11,.5) 0%, transparent 22%, transparent 74%, rgba(8,9,11,.66) 100%)}
-  .col{height:100vh;overflow:hidden;flex:none}
+  .col{height:100%;overflow:hidden;flex:none}
   .col.l{width:238px;border-right:1px solid rgba(255,255,255,.07);padding:16px 12px;display:flex;flex-direction:column}
   .col.c{width:600px;border-right:1px solid rgba(255,255,255,.07)}
   .col.r{width:330px;padding:14px 18px}
@@ -235,6 +246,16 @@
   <div class="beam"></div><div class="vignette"></div><div class="grain"></div>
 </div>
 <div class="appbg" aria-hidden="true">
+  <div class="apptop">
+    <img class="lg" src="assets/logo.png" alt="" />
+    <span class="nm"></span>
+    <span class="sp"></span>
+    <span class="ic"></span>
+    <span class="ic"></span>
+    <span class="btn"></span>
+    <span class="av"></span>
+  </div>
+  <div class="cols">
   <div class="col l">
     <img class="navlogo" src="assets/logo.png" alt="" />
     <div class="navi act"><span class="ic"></span><span class="lb"></span></div>
@@ -266,6 +287,7 @@
       <div class="follow"><span class="av"></span><span class="fb"><i></i><i class="s"></i></span><span class="fbtn"></span></div>
       <div class="follow"><span class="av"></span><span class="fb"><i></i><i class="s"></i></span><span class="fbtn"></span></div>
     </div>
+  </div>
   </div>
 </div>
 <div class="scrim" aria-hidden="true"></div>
@@ -309,11 +331,8 @@
 
 <footer>
   <div class="socials">
-    <a href="https://x.com/" target="_blank" rel="noopener" aria-label="X">
+    <a href="https://x.com/TVERN_xyz" target="_blank" rel="noopener" aria-label="TVERN on X">
       <svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L5.9 22H2.8l7.5-8.6L2 2h6.6l4.5 6.6L18.9 2Zm-1.1 18h1.7L7.3 4H5.5l12.3 16Z"/></svg>
-    </a>
-    <a href="https://github.com/Juanius-ahos/TVERN" target="_blank" rel="noopener" aria-label="GitHub">
-      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
     </a>
   </div>
   <p class="fine">Independent and not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc. Nothing here is financial advice. © 2026 TVERN.</p>
