@@ -120,6 +120,12 @@
   button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(198,255,50,.3)}
   .note{font-size:12.5px;color:var(--faint);margin-top:12px;min-height:1.2em}
   .note.ok{color:var(--accent)}
+  .xbtn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;
+    font-weight:600;font-size:15.5px;color:#0a0b0d;background:var(--accent);
+    padding:14px 24px;border-radius:13px;box-shadow:0 6px 18px rgba(198,255,50,.22);
+    transition:transform .12s,box-shadow .2s}
+  .xbtn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(198,255,50,.34)}
+  .xbtn svg{width:17px;height:17px;fill:currentColor}
 
   footer{position:relative;z-index:2;padding:20px 24px 30px;display:flex;flex-direction:column;align-items:center;gap:14px}
   .socials{display:flex;gap:8px}
@@ -320,21 +326,16 @@
   </div>
 
   <div class="cta">
-    <form id="wl" novalidate>
-      <input id="email" type="email" placeholder="Enter your email" autocomplete="email" aria-label="Email address" />
-      <button type="submit">Notify me</button>
-    </form>
-    <div class="note" id="note">Be first through the door. No spam, ever.</div>
+    <a class="xbtn" href="https://x.com/TVERN_xyz" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L5.9 22H2.8l7.5-8.6L2 2h6.6l4.5 6.6L18.9 2Zm-1.1 18h1.7L7.3 4H5.5l12.3 16Z"/></svg>
+      Follow on X for updates
+    </a>
+    <div class="note">We post every step to launch. Come drink with us.</div>
   </div>
   </section>
 </main>
 
 <footer>
-  <div class="socials">
-    <a href="https://x.com/TVERN_xyz" target="_blank" rel="noopener" aria-label="TVERN on X">
-      <svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L5.9 22H2.8l7.5-8.6L2 2h6.6l4.5 6.6L18.9 2Zm-1.1 18h1.7L7.3 4H5.5l12.3 16Z"/></svg>
-    </a>
-  </div>
   <p class="fine">Independent and not affiliated with, endorsed by, or sponsored by Robinhood Markets, Inc. Nothing here is financial advice. © 2026 TVERN.</p>
 </footer>
 
@@ -417,17 +418,6 @@
     }
   })();
 
-  // waitlist (front-end only — see README to wire Formspree/Tally)
-  (function(){
-    var f=document.getElementById('wl'),email=document.getElementById('email'),note=document.getElementById('note');
-    f.addEventListener('submit',function(e){
-      e.preventDefault();
-      var v=(email.value||'').trim();
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){note.className='note';note.textContent='Please enter a valid email.';return;}
-      try{var l=JSON.parse(localStorage.getItem('tvern_wl')||'[]');if(l.indexOf(v)<0)l.push(v);localStorage.setItem('tvern_wl',JSON.stringify(l));}catch(_){}
-      note.className='note ok';note.textContent="You're on the list. See you at opening. 🍻";email.value='';
-    });
-  })();
 </script>
 </body>
 </html>
