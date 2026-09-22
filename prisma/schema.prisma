@@ -29,6 +29,39 @@ model User {
   following    Follow[] @relation("follower")
   followers    Follow[] @relation("following")
   walletFollows WalletFollow[]
+  watches       Watch[]
+  notifications     Notification[] @relation("notifRecipient")
+  notificationsMade Notification[] @relation("notifActor")
+}
+
+// A user watches an asset ($ticker) to keep it in their watchlist.
+model Watch {
+  id        String   @id @default(cuid())
+  userId    String
+  symbol    String   // uppercased ticker
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol])
+  @@index([userId])
+}
+
+// An in-app notification for a recipient user, triggered by an actor.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   // recipient
+  actorId   String   // who triggered it
+  type      String   // LIKE | REPOST | REPLY | FOLLOW
+  postId    String?  // relevant post (the reply, or the liked/reposted post)
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user  User @relation("notifRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("notifActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, read])
 }
 
 // User A follows User B.

@@ -9,10 +9,14 @@ export function PostComposer({
   onPosted,
   initialText = "",
   placeholder = "what's happening on-chain?",
+  parentId,
+  submitLabel = "Post",
 }: {
   onPosted?: () => void;
   initialText?: string;
   placeholder?: string;
+  parentId?: string;
+  submitLabel?: string;
 }) {
   const { user } = useSession();
   const [body, setBody] = useState(initialText);
@@ -42,7 +46,7 @@ export function PostComposer({
     await fetch("/api/posts", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ body, mediaUrl: media?.url, mediaType: media?.type }),
+      body: JSON.stringify({ body, mediaUrl: media?.url, mediaType: media?.type, parentId }),
     });
     setBody("");
     setMedia(null);
@@ -106,7 +110,7 @@ export function PostComposer({
               disabled={busy || uploading || (!body.trim() && !media)}
               className="btn-accent rounded-full px-5 py-1.5 text-[14px] disabled:opacity-40"
             >
-              Post
+              {submitLabel}
             </button>
           </div>
         </div>

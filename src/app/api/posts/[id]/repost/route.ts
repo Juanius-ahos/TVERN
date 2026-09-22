@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
+import { notify } from "@/lib/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,8 @@ export async function POST(
     await prisma.repost.delete({ where: { id: existing.id } });
   } else {
     await prisma.repost.create({ data: { userId: session.userId, postId: id } });
+    const post = await prisma.post.findUnique({ where: { id }, select: { authorId: true } });
+    if (post) await notify({ userId: post.authorId, actorId: session.userId, type: "REPOST", postId: id });
   }
 
   const count = await prisma.repost.count({ where: { postId: id } });

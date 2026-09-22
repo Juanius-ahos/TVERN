@@ -79,6 +79,9 @@ const paths: Record<string, React.ReactNode> = {
   ),
   bolt: <path d="M13 2 4 14h7l-2 8 9-12h-7z" />,
   bookmark: <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />,
+  star: (
+    <path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" />
+  ),
 };
 
 export function Icon({

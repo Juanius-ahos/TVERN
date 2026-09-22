@@ -67,7 +67,9 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             {p.author.username && (
               <span className="font-mono text-[12px] text-[var(--muted)]">{shortAddr(p.author.address)}</span>
             )}
-            <span className="text-[var(--muted)]">· {timeAgo(p.createdAt)}</span>
+            <a href={`/post/${p.id}`} className="text-[var(--muted)] hover:underline">
+              · {timeAgo(p.createdAt)}
+            </a>
           </div>
 
           {p.body && (
@@ -94,9 +96,12 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
           )}
 
           <div className="mt-3 flex items-center gap-6 text-[13px] text-[var(--muted)]">
-            <span className="flex items-center gap-1.5">
+            <a
+              href={`/post/${p.id}`}
+              className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+            >
               <Icon name="comment" size={16} /> {p.replyCount}
-            </span>
+            </a>
             <button
               onClick={repost}
               className={`flex items-center gap-1.5 transition ${reposted ? "text-emerald-400" : "hover:text-emerald-400"}`}

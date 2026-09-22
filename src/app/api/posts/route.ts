@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { notify } from "@/lib/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,12 @@ export async function POST(req: Request) {
     },
     include: { author: { select: { address: true, username: true, avatarUrl: true } } },
   });
+
+  // Notify the parent author when this is a reply.
+  if (post.parentId) {
+    const parent = await prisma.post.findUnique({ where: { id: post.parentId }, select: { authorId: true } });
+    if (parent) await notify({ userId: parent.authorId, actorId: session.userId, type: "REPLY", postId: post.id });
+  }
 
   return NextResponse.json({ post });
 }

@@ -128,3 +128,21 @@ body {
   color: transparent;
   animation: sheen 6s ease-in-out infinite;
 }
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 60s linear infinite;
+  will-change: transform;
+}
+.marquee-mask:hover .marquee-track {
+  animation-play-state: paused;
+}

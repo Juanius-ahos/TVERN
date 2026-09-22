@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "./ConnectButton";
 import { Icon } from "./Icon";
 import { Logo } from "./Logo";
 import { useSession } from "@/lib/useSession";
 
-const nav = [
+const baseNav = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/search", label: "Search", icon: "search" },
   { href: "/whales", label: "Whales", icon: "waves" },
@@ -16,10 +17,32 @@ const nav = [
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!user) {
+      setUnread(0);
+      return;
+    }
+    const load = async () => {
+      try {
+        const d = await fetch("/api/notifications").then((r) => r.json());
+        setUnread(d.unread ?? 0);
+      } catch {}
+    };
+    load();
+    const t = setInterval(load, 30_000);
+    return () => clearInterval(t);
+  }, [user, pathname]);
 
   const items = user
-    ? [...nav, { href: `/wallet/${user.address}`, label: "Profile", icon: "user" }]
-    : nav;
+    ? [
+        ...baseNav,
+        { href: "/watchlist", label: "Watchlist", icon: "star" },
+        { href: "/notifications", label: "Notifications", icon: "bell", badge: unread },
+        { href: `/wallet/${user.address}`, label: "Profile", icon: "user" },
+      ]
+    : baseNav;
 
   return (
     <aside className="sticky top-11 flex h-[calc(100dvh-2.75rem)] flex-col justify-between px-2 py-4 lg:px-3">
@@ -31,15 +54,23 @@ export function Sidebar() {
         <nav className="space-y-1">
           {items.map((n) => {
             const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
+            const badge = "badge" in n ? (n.badge as number) : 0;
             return (
               <a
                 key={n.href}
                 href={n.href}
-                className={`group flex items-center gap-4 rounded-full px-3 py-2.5 text-[16px] transition ${
+                className={`group relative flex items-center gap-4 rounded-full px-3 py-2.5 text-[16px] transition ${
                   active ? "bg-white/[0.06] font-bold text-white" : "text-[var(--text)] hover:bg-white/[0.04]"
                 }`}
               >
-                <Icon name={n.icon} size={22} className={active ? "text-[var(--accent)]" : ""} />
+                <span className="relative">
+                  <Icon name={n.icon} size={22} className={active ? "text-[var(--accent)]" : ""} />
+                  {badge > 0 && (
+                    <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)]">
+                      {badge > 9 ? "9+" : badge}
+                    </span>
+                  )}
+                </span>
                 <span className="hidden lg:block">{n.label}</span>
               </a>
             );

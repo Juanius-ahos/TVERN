@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
+import { notify } from "@/lib/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,10 @@ export async function POST(req: Request) {
       where: { followerId_followingId: { followerId: session.userId, followingId: userId } },
     });
     if (existing) await prisma.follow.delete({ where: { id: existing.id } });
-    else await prisma.follow.create({ data: { followerId: session.userId, followingId: userId } });
+    else {
+      await prisma.follow.create({ data: { followerId: session.userId, followingId: userId } });
+      await notify({ userId, actorId: session.userId, type: "FOLLOW" });
+    }
     return NextResponse.json({ following: !existing, kind: "user" });
   }
 
