@@ -110,18 +110,18 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
         </div>
       </div>
 
-      {/* banner */}
+      {/* banner — no opacity: opacity<1 makes a stacking context that would paint over the avatar */}
       <div
         className="h-36 w-full bg-cover bg-center"
         style={
           user?.bannerUrl
             ? { backgroundImage: `url(${user.bannerUrl})` }
-            : { backgroundImage: gradientFor(addr), opacity: 0.9 }
+            : { backgroundImage: gradientFor(addr) }
         }
       />
 
-      {/* identity */}
-      <div className="px-4">
+      {/* identity — relative + z-10 keeps the avatar above the banner */}
+      <div className="relative z-10 px-4">
         <div className="-mt-10 flex items-end justify-between">
           <div className="rounded-full ring-4 ring-[var(--bg)]">
             <Avatar address={addr} src={user?.avatarUrl} size={84} />
