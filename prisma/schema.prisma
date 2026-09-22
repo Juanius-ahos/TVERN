@@ -1,0 +1,131 @@
+// WTF Happened? — data model
+// Local dev uses SQLite (zero setup). For production we switch `provider` to
+// "postgresql" and point DATABASE_URL at Neon. Schema is written to be portable.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // Neon POOLED url (runtime)
+  directUrl = env("DIRECT_URL")   // Neon DIRECT url (migrations / db push)
+}
+
+// A person. Identity == wallet address. No passwords, no email.
+model User {
+  id        String   @id @default(cuid())
+  address   String   @unique // lowercased 0x address
+  username  String?  @unique
+  bio       String?
+  avatarUrl String?  // custom PFP; falls back to gradient when null
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts        Post[]
+  likes        Like[]
+  reposts      Repost[]
+  following    Follow[] @relation("follower")
+  followers    Follow[] @relation("following")
+  walletFollows WalletFollow[]
+}
+
+// User A follows User B.
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+// A user follows a raw wallet address (which may not be a registered user).
+model WalletFollow {
+  id        String   @id @default(cuid())
+  userId    String
+  address   String   // lowercased 0x address being watched
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, address])
+}
+
+// A post, reply, or quote. body may be empty when it's a pure repost/quote of an event.
+model Post {
+  id        String   @id @default(cuid())
+  authorId  String
+  body      String
+  mediaUrl  String?  // image or video attachment
+  mediaType String?  // "image" | "video"
+  parentId  String?  // reply-to another post
+  eventId   String?  // references a WTF Event (quote/commentary on an on-chain event)
+  createdAt DateTime @default(now())
+
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  Post?   @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Post[]  @relation("replies")
+  event   Event?  @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  likes   Like[]
+  reposts Repost[]
+
+  @@index([createdAt])
+  @@index([parentId])
+  @@index([eventId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Repost {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+// An auto-generated on-chain event surfaced to the feed (the "WTF" content).
+model Event {
+  id           String   @id @default(cuid())
+  kind         String   // BUY | SELL | TRANSFER | WHALE | NEW_WALLET | DORMANT | CORP_ACTION
+  txHash       String
+  logIndex     Int      @default(0)
+  blockNumber  Int
+  blockTs      DateTime
+  assetSymbol  String
+  assetAddress String
+  fromAddr     String
+  toAddr       String
+  amountRaw    String   // token amount as string (wei-like)
+  amountUi     Float    // human amount
+  usdValue     Float
+  severity     Float    // higher = more interesting
+  title        String   // rendered headline
+  createdAt    DateTime @default(now())
+
+  posts Post[]
+
+  @@unique([txHash, logIndex])
+  @@index([createdAt])
+  @@index([usdValue])
+  @@index([assetSymbol])
+  @@index([severity])
+}
