@@ -8,6 +8,7 @@ import { useSession } from "@/lib/useSession";
 
 const nav = [
   { href: "/", label: "Home", icon: "home" },
+  { href: "/search", label: "Search", icon: "search" },
   { href: "/whales", label: "Whales", icon: "waves" },
   { href: "/stocks", label: "Stocks", icon: "trending" },
 ];
