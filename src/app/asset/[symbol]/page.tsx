@@ -1,26 +1,40 @@
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
-import { EventCard, type FeedEvent } from "@/components/EventCard";
 import { AssetChart } from "@/components/AssetChart";
-import { KNOWN_TICKERS } from "@/lib/registry";
+import { ProfileTabs } from "@/components/ProfileTabs";
+import { ReloadComposer } from "@/components/ReloadComposer";
+import type { FeedPost } from "@/components/PostCard";
+import type { FeedEvent } from "@/components/EventCard";
+import { isStockTicker } from "@/lib/assets";
 
-export default async function AssetPage({
-  params,
-}: {
-  params: Promise<{ symbol: string }>;
-}) {
+export default async function AssetPage({ params }: { params: Promise<{ symbol: string }> }) {
   const { symbol: raw } = await params;
   const symbol = raw.toUpperCase();
   const session = await readSession();
+  const isStock = isStockTicker(symbol);
 
-  const events = await prisma.event.findMany({
-    where: { assetSymbol: symbol },
-    orderBy: { blockTs: "desc" },
-    take: 40,
-    include: { _count: { select: { posts: true } } },
-  });
+  const [rawEvents, rawPosts] = await Promise.all([
+    prisma.event.findMany({
+      where: { assetSymbol: symbol },
+      orderBy: { blockTs: "desc" },
+      take: 30,
+      include: { _count: { select: { posts: true } } },
+    }),
+    prisma.post.findMany({
+      where: { parentId: null, body: { contains: `$${symbol}`, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+      include: {
+        author: { select: { address: true, username: true, avatarUrl: true } },
+        event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
+        _count: { select: { likes: true, reposts: true, replies: true } },
+        likes: session ? { where: { userId: session.userId }, select: { id: true } } : false,
+        reposts: session ? { where: { userId: session.userId }, select: { id: true } } : false,
+      },
+    }),
+  ]);
 
-  const items: FeedEvent[] = events.map((e) => ({
+  const events: FeedEvent[] = rawEvents.map((e) => ({
     type: "event",
     id: e.id,
     kind: e.kind,
@@ -35,7 +49,21 @@ export default async function AssetPage({
     commentCount: e._count.posts,
   }));
 
-  const isStock = KNOWN_TICKERS.has(symbol);
+  const posts: FeedPost[] = rawPosts.map((p) => ({
+    type: "post",
+    id: p.id,
+    body: p.body,
+    mediaUrl: p.mediaUrl,
+    mediaType: p.mediaType,
+    author: p.author,
+    event: p.event,
+    createdAt: p.createdAt.toISOString(),
+    likeCount: p._count.likes,
+    repostCount: p._count.reposts,
+    replyCount: p._count.replies,
+    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
+    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
+  }));
 
   return (
     <div>
@@ -43,23 +71,22 @@ export default async function AssetPage({
         <h1 className="flex items-center gap-2 text-[19px] font-bold tracking-tight">
           ${symbol}
           {isStock && (
-            <span className="rounded bg-[color:var(--accent)]/15 px-1.5 py-0.5 text-xs text-[var(--accent)]">
+            <span className="rounded bg-[color:var(--accent)]/15 px-1.5 py-0.5 text-xs font-semibold text-[var(--accent)]">
               STOCK
             </span>
           )}
         </h1>
-        <p className="text-[13px] text-[var(--muted)]">Recent on-chain activity for ${symbol}</p>
+        <p className="text-[13px] text-[var(--muted)]">
+          {isStock ? "Tokenized stock on Robinhood Chain" : "Token on Robinhood Chain"} · price, activity &amp; discussion
+        </p>
       </header>
 
       <div className="space-y-3 px-4 py-3">
         <AssetChart symbol={symbol} />
-        {items.length === 0 && (
-          <div className="py-10 text-center text-[var(--muted)]">No indexed activity for ${symbol} yet.</div>
-        )}
-        {items.map((e) => (
-          <EventCard key={e.id} e={e} canPost={!!session} />
-        ))}
+        {session && <ReloadComposer initialText={`$${symbol} `} placeholder={`Share your take on $${symbol}…`} />}
       </div>
+
+      <ProfileTabs posts={posts} events={events} canPost={!!session} postsLabel="Discussion" />
     </div>
   );
 }

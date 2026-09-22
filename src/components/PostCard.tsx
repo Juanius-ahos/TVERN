@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Avatar } from "./Avatar";
 import { Icon } from "./Icon";
 import { TipButton } from "./TipButton";
+import { RichText } from "@/lib/richtext";
 import { shortAddr, timeAgo } from "@/lib/format";
 
 export type FeedPost = {
@@ -69,7 +70,11 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             <span className="text-[var(--muted)]">· {timeAgo(p.createdAt)}</span>
           </div>
 
-          {p.body && <p className="mt-0.5 whitespace-pre-wrap text-[15px] leading-normal">{p.body}</p>}
+          {p.body && (
+            <p className="mt-0.5 whitespace-pre-wrap text-[15px] leading-normal">
+              <RichText text={p.body} />
+            </p>
+          )}
 
           {p.mediaUrl && (
             <div className="mt-2 overflow-hidden rounded-xl border hairline">

@@ -8,15 +8,17 @@ export function ProfileTabs({
   posts,
   events,
   canPost,
+  postsLabel = "Posts",
 }: {
   posts: FeedPost[];
   events: FeedEvent[];
   canPost: boolean;
+  postsLabel?: string;
 }) {
   const [tab, setTab] = useState<"posts" | "activity">("posts");
 
   const tabs: { key: "posts" | "activity"; label: string; n: number }[] = [
-    { key: "posts", label: "Posts", n: posts.length },
+    { key: "posts", label: postsLabel, n: posts.length },
     { key: "activity", label: "On-chain activity", n: events.length },
   ];
 

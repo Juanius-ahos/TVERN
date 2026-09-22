@@ -5,9 +5,17 @@ import { useSession } from "@/lib/useSession";
 import { Avatar } from "./Avatar";
 import { Icon } from "./Icon";
 
-export function PostComposer({ onPosted }: { onPosted?: () => void }) {
+export function PostComposer({
+  onPosted,
+  initialText = "",
+  placeholder = "what's happening on-chain?",
+}: {
+  onPosted?: () => void;
+  initialText?: string;
+  placeholder?: string;
+}) {
   const { user } = useSession();
-  const [body, setBody] = useState("");
+  const [body, setBody] = useState(initialText);
   const [busy, setBusy] = useState(false);
   const [media, setMedia] = useState<{ url: string; type: string } | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -50,7 +58,7 @@ export function PostComposer({ onPosted }: { onPosted?: () => void }) {
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="what's happening on-chain?"
+            placeholder={placeholder}
             rows={2}
             maxLength={500}
             className="w-full resize-none bg-transparent pt-1.5 text-[17px] outline-none placeholder:text-[var(--muted)]"
