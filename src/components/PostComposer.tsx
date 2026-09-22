@@ -23,7 +23,20 @@ export function PostComposer({
   const [busy, setBusy] = useState(false);
   const [media, setMedia] = useState<{ url: string; type: string } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [pollOpts, setPollOpts] = useState<string[] | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const allowPoll = !parentId;
+
+  function togglePoll() {
+    setPollOpts((p) => (p ? null : ["", ""]));
+  }
+  function setOpt(i: number, v: string) {
+    setPollOpts((p) => (p ? p.map((o, j) => (j === i ? v : o)) : p));
+  }
+  function addOpt() {
+    setPollOpts((p) => (p && p.length < 4 ? [...p, ""] : p));
+  }
 
   async function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -40,16 +53,26 @@ export function PostComposer({
     if (fileRef.current) fileRef.current.value = "";
   }
 
+  const validPoll = pollOpts ? pollOpts.filter((o) => o.trim()).length >= 2 : false;
+  const canSubmit = (!!body.trim() || !!media || validPoll) && !(pollOpts && !validPoll);
+
   async function post() {
-    if (!body.trim() && !media) return;
+    if (!canSubmit) return;
     setBusy(true);
     await fetch("/api/posts", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ body, mediaUrl: media?.url, mediaType: media?.type, parentId }),
+      body: JSON.stringify({
+        body,
+        mediaUrl: media?.url,
+        mediaType: media?.type,
+        parentId,
+        poll: validPoll ? { options: pollOpts } : undefined,
+      }),
     });
     setBody("");
     setMedia(null);
+    setPollOpts(null);
     setBusy(false);
     onPosted?.();
   }
@@ -85,6 +108,33 @@ export function PostComposer({
             </div>
           )}
 
+          {pollOpts && (
+            <div className="mt-2 space-y-2 rounded-xl border hairline p-3">
+              {pollOpts.map((o, i) => (
+                <input
+                  key={i}
+                  value={o}
+                  onChange={(e) => setOpt(i, e.target.value)}
+                  placeholder={`Option ${i + 1}`}
+                  maxLength={60}
+                  className="w-full rounded-lg border hairline bg-transparent px-3 py-1.5 text-[14px] outline-none focus:border-[color:var(--accent)]/60"
+                />
+              ))}
+              <div className="flex items-center justify-between">
+                {pollOpts.length < 4 ? (
+                  <button onClick={addOpt} className="text-[13px] font-semibold text-[var(--accent)] hover:opacity-80">
+                    + Add option
+                  </button>
+                ) : (
+                  <span />
+                )}
+                <button onClick={togglePoll} className="text-[13px] text-[var(--muted)] hover:text-rose-400">
+                  Remove poll
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="mt-2 flex items-center justify-between border-t hairline pt-2.5">
             <div className="flex items-center gap-3">
               <button
@@ -94,6 +144,15 @@ export function PostComposer({
               >
                 <Icon name="external" size={18} />
               </button>
+              {allowPoll && (
+                <button
+                  onClick={togglePoll}
+                  className={`transition hover:opacity-80 ${pollOpts ? "text-[var(--accent)]" : "text-[var(--muted)]"}`}
+                  title="Add a poll"
+                >
+                  <Icon name="trending" size={18} />
+                </button>
+              )}
               <input
                 ref={fileRef}
                 type="file"
@@ -107,7 +166,7 @@ export function PostComposer({
             </div>
             <button
               onClick={post}
-              disabled={busy || uploading || (!body.trim() && !media)}
+              disabled={busy || uploading || !canSubmit}
               className="btn-accent rounded-full px-5 py-1.5 text-[14px] disabled:opacity-40"
             >
               {submitLabel}

@@ -5,6 +5,7 @@ import { Avatar } from "@/components/Avatar";
 import { PostCard, type FeedPost } from "@/components/PostCard";
 import { TopSearch } from "@/components/TopSearch";
 import { shortAddr } from "@/lib/format";
+import { postInclude, mapPost } from "@/lib/feedPost";
 
 export const dynamic = "force-dynamic";
 
@@ -51,13 +52,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         where: { parentId: null, body: { contains: bare, mode: "insensitive" } },
         take: 30,
         orderBy: { createdAt: "desc" },
-        include: {
-          author: { select: { address: true, username: true, avatarUrl: true } },
-          event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-          _count: { select: { likes: true, reposts: true, replies: true } },
-          likes: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-          reposts: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-        },
+        include: postInclude(session?.userId),
       }),
       prisma.event.groupBy({
         by: ["assetSymbol"],
@@ -76,21 +71,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       followers: u._count.followers,
     }));
 
-    posts = rawPosts.map((p) => ({
-      type: "post",
-      id: p.id,
-      body: p.body,
-      mediaUrl: p.mediaUrl,
-      mediaType: p.mediaType,
-      author: p.author,
-      event: p.event,
-      createdAt: p.createdAt.toISOString(),
-      likeCount: p._count.likes,
-      repostCount: p._count.reposts,
-      replyCount: p._count.replies,
-      likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
-      repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
-    }));
+    posts = rawPosts.map(mapPost);
 
     const assetMap = new Map<string, { symbol: string; isStock: boolean; posts: number }>();
     for (const r of symbolRows) {

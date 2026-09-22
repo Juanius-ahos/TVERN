@@ -1,70 +1,34 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
-import { PostCard, type FeedPost } from "@/components/PostCard";
+import { PostCard } from "@/components/PostCard";
 import { ReloadComposer } from "@/components/ReloadComposer";
 import { BackButton } from "@/components/BackButton";
+import { postInclude, mapPost } from "@/lib/feedPost";
 
 export const dynamic = "force-dynamic";
-
-type Row = Awaited<ReturnType<typeof loadPost>>;
-
-async function loadPost(id: string, userId?: string) {
-  return prisma.post.findUnique({
-    where: { id },
-    include: {
-      author: { select: { address: true, username: true, avatarUrl: true } },
-      event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-      _count: { select: { likes: true, reposts: true, replies: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : false,
-      reposts: userId ? { where: { userId }, select: { id: true } } : false,
-    },
-  });
-}
-
-function toFeedPost(p: NonNullable<Row>): FeedPost {
-  return {
-    type: "post",
-    id: p.id,
-    body: p.body,
-    mediaUrl: p.mediaUrl,
-    mediaType: p.mediaType,
-    author: p.author,
-    event: p.event,
-    createdAt: p.createdAt.toISOString(),
-    likeCount: p._count.likes,
-    repostCount: p._count.reposts,
-    replyCount: p._count.replies,
-    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
-    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
-  };
-}
 
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await readSession();
   const userId = session?.userId;
 
-  const post = await loadPost(id, userId);
+  const post = await prisma.post.findUnique({ where: { id }, include: postInclude(userId) });
   if (!post) notFound();
 
   const [parent, replyRows] = await Promise.all([
-    post.parentId ? loadPost(post.parentId, userId) : Promise.resolve(null),
+    post.parentId
+      ? prisma.post.findUnique({ where: { id: post.parentId }, include: postInclude(userId) })
+      : Promise.resolve(null),
     prisma.post.findMany({
       where: { parentId: id },
       orderBy: { createdAt: "asc" },
       take: 100,
-      include: {
-        author: { select: { address: true, username: true, avatarUrl: true } },
-        event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-        _count: { select: { likes: true, reposts: true, replies: true } },
-        likes: userId ? { where: { userId }, select: { id: true } } : false,
-        reposts: userId ? { where: { userId }, select: { id: true } } : false,
-      },
+      include: postInclude(userId),
     }),
   ]);
 
-  const replies = replyRows.map((r) => toFeedPost(r as NonNullable<Row>));
+  const replies = replyRows.map(mapPost);
 
   return (
     <div>
@@ -76,12 +40,12 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       <div className="space-y-3 px-4 py-3">
         {parent && (
           <div className="relative">
-            <PostCard p={toFeedPost(parent)} canPost={!!session} />
+            <PostCard p={mapPost(parent)} canPost={!!session} />
             <div className="ml-9 h-3 border-l-2 hairline" />
           </div>
         )}
 
-        <PostCard p={toFeedPost(post)} canPost={!!session} />
+        <PostCard p={mapPost(post)} canPost={!!session} />
 
         {session ? (
           <ReloadComposer

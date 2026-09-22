@@ -7,6 +7,7 @@ import { WatchButton } from "@/components/WatchButton";
 import type { FeedPost } from "@/components/PostCard";
 import type { FeedEvent } from "@/components/EventCard";
 import { isStockTicker } from "@/lib/assets";
+import { postInclude, mapPost } from "@/lib/feedPost";
 
 export default async function AssetPage({ params }: { params: Promise<{ symbol: string }> }) {
   const { symbol: raw } = await params;
@@ -32,13 +33,7 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
       where: { parentId: null, body: { contains: `$${symbol}`, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
       take: 30,
-      include: {
-        author: { select: { address: true, username: true, avatarUrl: true } },
-        event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-        _count: { select: { likes: true, reposts: true, replies: true } },
-        likes: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-        reposts: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-      },
+      include: postInclude(session?.userId),
     }),
   ]);
 
@@ -57,21 +52,7 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
     commentCount: e._count.posts,
   }));
 
-  const posts: FeedPost[] = rawPosts.map((p) => ({
-    type: "post",
-    id: p.id,
-    body: p.body,
-    mediaUrl: p.mediaUrl,
-    mediaType: p.mediaType,
-    author: p.author,
-    event: p.event,
-    createdAt: p.createdAt.toISOString(),
-    likeCount: p._count.likes,
-    repostCount: p._count.reposts,
-    replyCount: p._count.replies,
-    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
-    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
-  }));
+  const posts: FeedPost[] = rawPosts.map(mapPost);
 
   return (
     <div>

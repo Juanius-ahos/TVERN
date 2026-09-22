@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Avatar } from "./Avatar";
 import { Icon } from "./Icon";
 import { TipButton } from "./TipButton";
+import { Poll } from "./Poll";
+import { PostMenu } from "./PostMenu";
 import { RichText } from "@/lib/richtext";
 import { shortAddr, timeAgo } from "@/lib/format";
 
@@ -21,6 +23,13 @@ export type FeedPost = {
   replyCount: number;
   likedByMe: boolean;
   repostedByMe: boolean;
+  bookmarkedByMe?: boolean;
+  poll?: {
+    id: string;
+    options: { id: string; text: string; votes: number }[];
+    totalVotes: number;
+    myOptionId: string | null;
+  } | null;
 };
 
 export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
@@ -28,6 +37,17 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
   const [likes, setLikes] = useState(p.likeCount);
   const [reposted, setReposted] = useState(p.repostedByMe);
   const [reposts, setReposts] = useState(p.repostCount);
+  const [bookmarked, setBookmarked] = useState(!!p.bookmarkedByMe);
+
+  async function bookmark() {
+    if (!canPost) return;
+    setBookmarked((v) => !v);
+    const r = await fetch(`/api/posts/${p.id}/bookmark`, { method: "POST" });
+    if (r.ok) {
+      const d = await r.json();
+      setBookmarked(d.bookmarked);
+    }
+  }
 
   async function like() {
     if (!canPost) return;
@@ -70,6 +90,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             <a href={`/post/${p.id}`} className="text-[var(--muted)] hover:underline">
               · {timeAgo(p.createdAt)}
             </a>
+            <PostMenu authorAddress={p.author.address} />
           </div>
 
           {p.body && (
@@ -77,6 +98,8 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
               <RichText text={p.body} />
             </p>
           )}
+
+          {p.poll && <Poll poll={p.poll} canVote={canPost} />}
 
           {p.mediaUrl && (
             <div className="mt-2 overflow-hidden rounded-xl border hairline">
@@ -113,6 +136,13 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
               className={`flex items-center gap-1.5 transition ${liked ? "text-rose-400" : "hover:text-rose-400"}`}
             >
               <Icon name="heart" size={16} fill={liked} /> {likes}
+            </button>
+            <button
+              onClick={bookmark}
+              className={`flex items-center gap-1.5 transition ${bookmarked ? "text-[var(--accent)]" : "hover:text-[var(--accent)]"}`}
+              aria-label="Bookmark"
+            >
+              <Icon name="bookmark" size={16} fill={bookmarked} />
             </button>
             <TipButton recipient={p.author.address} />
           </div>

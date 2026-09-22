@@ -4,10 +4,12 @@ import { Avatar, gradientFor } from "@/components/Avatar";
 import { EditProfile } from "@/components/EditProfile";
 import { TipButton } from "@/components/TipButton";
 import { FollowUserButton } from "@/components/FollowUserButton";
+import { PostMenu } from "@/components/PostMenu";
 import { ProfileTabs } from "@/components/ProfileTabs";
 import type { FeedPost } from "@/components/PostCard";
 import type { FeedEvent } from "@/components/EventCard";
 import { shortAddr } from "@/lib/format";
+import { postInclude, mapPost } from "@/lib/feedPost";
 
 export default async function ProfilePage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = await params;
@@ -33,13 +35,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
           where: { authorId: user.id, parentId: null },
           orderBy: { createdAt: "desc" },
           take: 30,
-          include: {
-            author: { select: { address: true, username: true, avatarUrl: true } },
-            event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-            _count: { select: { likes: true, reposts: true, replies: true } },
-            likes: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-            reposts: session ? { where: { userId: session.userId }, select: { id: true } } : false,
-          },
+          include: postInclude(session?.userId),
         })
       : Promise.resolve([] as never[]),
     prisma.event.findMany({
@@ -62,21 +58,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
       : Promise.resolve(null),
   ]);
 
-  const posts: FeedPost[] = rawPosts.map((p) => ({
-    type: "post",
-    id: p.id,
-    body: p.body,
-    mediaUrl: p.mediaUrl,
-    mediaType: p.mediaType,
-    author: p.author,
-    event: p.event,
-    createdAt: p.createdAt.toISOString(),
-    likeCount: p._count.likes,
-    repostCount: p._count.reposts,
-    replyCount: p._count.replies,
-    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
-    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
-  }));
+  const posts: FeedPost[] = rawPosts.map(mapPost);
 
   const events: FeedEvent[] = rawEvents.map((e) => ({
     type: "event",
@@ -123,6 +105,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
               <>
                 {user && <FollowUserButton userId={user.id} initialFollowing={!!isFollowing} />}
                 <TipButton recipient={addr} />
+                <PostMenu authorAddress={addr} />
               </>
             )}
           </div>

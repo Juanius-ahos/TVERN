@@ -13,10 +13,20 @@ export async function POST(req: Request) {
   const rl = await checkRateLimit(`post:${session.userId}`, 10, "1 m");
   if (!rl.ok) return NextResponse.json({ error: "you're posting too fast" }, { status: 429 });
 
-  const { body, parentId, eventId, mediaUrl, mediaType } = await req.json().catch(() => ({}));
+  const { body, parentId, eventId, mediaUrl, mediaType, poll } = await req.json().catch(() => ({}));
   const text = String(body ?? "").trim();
 
-  if (!text && !eventId && !mediaUrl) {
+  // Validate an optional poll: 2–4 non-empty options, replies can't be polls.
+  let pollOptions: string[] = [];
+  if (poll && Array.isArray(poll.options) && !parentId) {
+    pollOptions = poll.options
+      .map((o: unknown) => String(o ?? "").trim().slice(0, 60))
+      .filter((o: string) => o.length > 0)
+      .slice(0, 4);
+    if (pollOptions.length < 2) pollOptions = [];
+  }
+
+  if (!text && !eventId && !mediaUrl && pollOptions.length === 0) {
     return NextResponse.json({ error: "empty post" }, { status: 400 });
   }
   if (text.length > 500) {
@@ -31,6 +41,9 @@ export async function POST(req: Request) {
       mediaType: mediaType === "video" ? "video" : mediaUrl ? "image" : null,
       parentId: parentId ?? null,
       eventId: eventId ?? null,
+      ...(pollOptions.length >= 2
+        ? { poll: { create: { options: { create: pollOptions.map((t, i) => ({ text: t, idx: i })) } } } }
+        : {}),
     },
     include: { author: { select: { address: true, username: true, avatarUrl: true } } },
   });

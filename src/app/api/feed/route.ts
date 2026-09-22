@@ -3,10 +3,13 @@ import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
 import { KNOWN_TICKERS } from "@/lib/registry";
 import { cached } from "@/lib/redis";
+import { getHiddenAuthorIds } from "@/lib/moderation";
+import { postInclude, mapPost } from "@/lib/feedPost";
 
 export const dynamic = "force-dynamic";
 
 async function buildFeed(myId: string | undefined, filter: string | null) {
+  const hidden = myId ? await getHiddenAuthorIds(myId) : [];
   const where =
     filter === "whale"
       ? { kind: "WHALE" }
@@ -24,16 +27,10 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
     filter
       ? Promise.resolve([] as never[])
       : prisma.post.findMany({
-          where: { parentId: null },
+          where: { parentId: null, ...(hidden.length ? { authorId: { notIn: hidden } } : {}) },
           orderBy: { createdAt: "desc" },
           take: 40,
-          include: {
-            author: { select: { address: true, username: true, avatarUrl: true } },
-            event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
-            _count: { select: { likes: true, reposts: true, replies: true } },
-            likes: myId ? { where: { userId: myId }, select: { id: true } } : false,
-            reposts: myId ? { where: { userId: myId }, select: { id: true } } : false,
-          },
+          include: postInclude(myId),
         }),
   ]);
 
@@ -52,21 +49,7 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
     commentCount: e._count.posts,
   }));
 
-  const postItems = posts.map((p) => ({
-    type: "post" as const,
-    id: p.id,
-    body: p.body,
-    mediaUrl: p.mediaUrl,
-    mediaType: p.mediaType,
-    author: p.author,
-    event: p.event,
-    createdAt: p.createdAt,
-    likeCount: p._count.likes,
-    repostCount: p._count.reposts,
-    replyCount: p._count.replies,
-    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
-    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
-  }));
+  const postItems = posts.map(mapPost);
 
   return [...eventItems, ...postItems].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
