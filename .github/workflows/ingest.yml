@@ -1,0 +1,19 @@
+name: ingest
+
+# Keeps The Tavern's feed live by pinging the ingest endpoint on a schedule.
+# (Free — runs on GitHub's runners. Does not touch the landing page.)
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # every ~10 minutes (GitHub best-effort)
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ingest
+        run: |
+          curl -s -m 90 \
+            -H "x-ingest-secret: ${{ secrets.INGEST_SECRET }}" \
+            "https://web-iota-navy-29.vercel.app/api/ingest" || true
