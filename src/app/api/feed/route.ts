@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
+import { maybeAutoIngest } from "@/lib/ingest";
 import { KNOWN_TICKERS } from "@/lib/registry";
 import { cached } from "@/lib/redis";
 import { getHiddenAuthorIds } from "@/lib/moderation";
@@ -59,6 +61,10 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
 export async function GET(req: Request) {
   const session = await readSession();
   const filter = new URL(req.url).searchParams.get("filter");
+
+  // Keep the feed fresh off live traffic: after responding, one visitor per
+  // interval refreshes on-chain events (self-throttled; no cron/secret needed).
+  after(() => maybeAutoIngest());
 
   // Anonymous traffic (most of a launch-day spike) is served from an 8s cache.
   const items = session

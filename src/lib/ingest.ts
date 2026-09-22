@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { getActivePools, type Pool } from "./registry";
 import { formatUsd, shortAddr } from "./format";
+import { redis } from "./redis";
 
 const GT = "https://api.geckoterminal.com/api/v2";
 const NETWORK = "robinhood";
@@ -107,6 +108,37 @@ export async function runIngest(): Promise<{ pools: number; scanned: number; cre
   }
 
   return { pools: pools.length, scanned, created };
+}
+
+// How stale the feed may get before a page view triggers a refresh.
+const AUTO_INGEST_INTERVAL = Number(process.env.AUTO_INGEST_SECONDS ?? 240);
+let lastLocalIngest = 0; // fallback when Redis is unavailable
+
+/**
+ * Acquire a short lock and, if it's been long enough since the last run,
+ * refresh on-chain events. Meant to be fired via `after()` on hot routes so
+ * live traffic keeps the feed fresh — no external cron or secret required.
+ * Only one caller per interval wins the lock; everyone else is a no-op.
+ */
+export async function maybeAutoIngest(): Promise<void> {
+  const now = Date.now();
+  if (redis) {
+    try {
+      // NX+EX means exactly one request per interval acquires the lock.
+      const ok = await redis.set("ingest:auto-lock", now, { nx: true, ex: AUTO_INGEST_INTERVAL });
+      if (ok !== "OK") return;
+    } catch {
+      return; // if Redis errors, don't risk stampeding ingest
+    }
+  } else {
+    if (now - lastLocalIngest < AUTO_INGEST_INTERVAL * 1000) return;
+    lastLocalIngest = now;
+  }
+  try {
+    await runIngest();
+  } catch {
+    /* best-effort; never surfaces to the user */
+  }
 }
 
 // --- Demo seed: realistic sample events so the UI works before live data flows ---
