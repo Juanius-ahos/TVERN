@@ -8,8 +8,9 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL") // Neon POOLED url (runtime)
-  directUrl = env("DIRECT_URL")   // Neon DIRECT url (migrations / db push)
+  // Vercel Postgres (Neon) auto-injects these when you create the DB in Storage.
+  url       = env("POSTGRES_PRISMA_URL")      // pooled (runtime)
+  directUrl = env("POSTGRES_URL_NON_POOLING") // direct (migrations / db push)
 }
 
 // A person. Identity == wallet address. No passwords, no email.
