@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
-import { Avatar, gradientFor } from "@/components/Avatar";
+import { Avatar } from "@/components/Avatar";
+import { gradientFor } from "@/lib/gradient";
 import { EditProfile } from "@/components/EditProfile";
 import { TipButton } from "@/components/TipButton";
 import { FollowUserButton } from "@/components/FollowUserButton";
