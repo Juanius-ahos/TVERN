@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
+import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { buildSiweMessage } from "@/lib/siwe";
 import { useSession } from "@/lib/useSession";
 import { shortAddr } from "@/lib/format";
@@ -11,6 +11,7 @@ import { Icon } from "./Icon";
 export function LoginPanel() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
   const { connect, connectors, isPending: connecting } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
@@ -39,7 +40,7 @@ export function LoginPanel() {
         address,
         nonce,
         issuedAt: new Date().toISOString(),
-        chainId: 4663,
+        chainId: chainId || 1, // sign on the wallet's current chain — no network switch
       });
       const signature = await signMessageAsync({ message });
       const res = await fetch("/api/auth/verify", {
@@ -137,6 +138,10 @@ export function LoginPanel() {
           <div className="mt-3 rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[12px] leading-relaxed text-neutral-400">
             Sign in to The Tavern — no transaction, no gas.
           </div>
+          <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+            Your wallet may show a routine “signature request” caution — that’s normal for any
+            sign-in. It’s <b>just a signature</b>: it can’t move funds or approve anything.
+          </p>
 
           <button onClick={signIn} disabled={busy} className="btn-accent mt-4 w-full rounded-full py-3 text-[15px] disabled:opacity-50">
             {busy ? "Check your wallet…" : "Sign in"}
