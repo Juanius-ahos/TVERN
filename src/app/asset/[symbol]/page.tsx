@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
 import { EventCard, type FeedEvent } from "@/components/EventCard";
+import { AssetChart } from "@/components/AssetChart";
 import { KNOWN_TICKERS } from "@/lib/registry";
 
 export default async function AssetPage({
@@ -51,6 +52,7 @@ export default async function AssetPage({
       </header>
 
       <div className="space-y-3 px-4 py-3">
+        <AssetChart symbol={symbol} />
         {items.length === 0 && (
           <div className="py-10 text-center text-[var(--muted)]">No indexed activity for ${symbol} yet.</div>
         )}

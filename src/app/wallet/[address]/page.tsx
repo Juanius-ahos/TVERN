@@ -1,41 +1,84 @@
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
-import { Avatar } from "@/components/Avatar";
-import { EventCard, type FeedEvent } from "@/components/EventCard";
-import { FollowWalletButton } from "@/components/FollowWalletButton";
+import { Avatar, gradientFor } from "@/components/Avatar";
 import { EditProfile } from "@/components/EditProfile";
 import { TipButton } from "@/components/TipButton";
+import { FollowUserButton } from "@/components/FollowUserButton";
+import { ProfileTabs } from "@/components/ProfileTabs";
+import type { FeedPost } from "@/components/PostCard";
+import type { FeedEvent } from "@/components/EventCard";
 import { shortAddr } from "@/lib/format";
 
-export default async function WalletPage({
-  params,
-}: {
-  params: Promise<{ address: string }>;
-}) {
+export default async function ProfilePage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = await params;
   const addr = address.toLowerCase();
   const session = await readSession();
+  const isMe = session?.address === addr;
 
-  const [events, user, firstEvent, eventCount] = await Promise.all([
+  const user = await prisma.user.findUnique({
+    where: { address: addr },
+    select: {
+      id: true,
+      username: true,
+      bio: true,
+      avatarUrl: true,
+      createdAt: true,
+      _count: { select: { posts: true, followers: true, following: true } },
+    },
+  });
+
+  const [rawPosts, rawEvents, eventCount, firstEvent, isFollowing] = await Promise.all([
+    user
+      ? prisma.post.findMany({
+          where: { authorId: user.id, parentId: null },
+          orderBy: { createdAt: "desc" },
+          take: 30,
+          include: {
+            author: { select: { address: true, username: true, avatarUrl: true } },
+            event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
+            _count: { select: { likes: true, reposts: true, replies: true } },
+            likes: session ? { where: { userId: session.userId }, select: { id: true } } : false,
+            reposts: session ? { where: { userId: session.userId }, select: { id: true } } : false,
+          },
+        })
+      : Promise.resolve([] as never[]),
     prisma.event.findMany({
       where: { OR: [{ fromAddr: addr }, { toAddr: addr }] },
-      orderBy: { createdAt: "desc" },
+      orderBy: { blockTs: "desc" },
       take: 30,
       include: { _count: { select: { posts: true } } },
     }),
-    prisma.user.findUnique({
-      where: { address: addr },
-      select: { username: true, bio: true, avatarUrl: true, createdAt: true },
-    }),
+    prisma.event.count({ where: { OR: [{ fromAddr: addr }, { toAddr: addr }] } }),
     prisma.event.findFirst({
       where: { OR: [{ fromAddr: addr }, { toAddr: addr }] },
       orderBy: { blockTs: "asc" },
       select: { blockTs: true },
     }),
-    prisma.event.count({ where: { OR: [{ fromAddr: addr }, { toAddr: addr }] } }),
+    session && user
+      ? prisma.follow.findUnique({
+          where: { followerId_followingId: { followerId: session.userId, followingId: user.id } },
+          select: { id: true },
+        })
+      : Promise.resolve(null),
   ]);
 
-  const items: FeedEvent[] = events.map((e) => ({
+  const posts: FeedPost[] = rawPosts.map((p) => ({
+    type: "post",
+    id: p.id,
+    body: p.body,
+    mediaUrl: p.mediaUrl,
+    mediaType: p.mediaType,
+    author: p.author,
+    event: p.event,
+    createdAt: p.createdAt.toISOString(),
+    likeCount: p._count.likes,
+    repostCount: p._count.reposts,
+    replyCount: p._count.replies,
+    likedByMe: Array.isArray(p.likes) ? p.likes.length > 0 : false,
+    repostedByMe: Array.isArray(p.reposts) ? p.reposts.length > 0 : false,
+  }));
+
+  const events: FeedEvent[] = rawEvents.map((e) => ({
     type: "event",
     id: e.id,
     kind: e.kind,
@@ -46,59 +89,76 @@ export default async function WalletPage({
     toAddr: e.toAddr,
     usdValue: e.usdValue,
     txHash: e.txHash,
-    createdAt: e.createdAt.toISOString(),
+    createdAt: e.blockTs.toISOString(),
     commentCount: e._count.posts,
   }));
 
+  const name = user?.username ?? shortAddr(addr);
+  const joined = user?.createdAt ?? firstEvent?.blockTs;
+
   return (
-    <div className="px-4 py-4">
-      <div className="mb-6 flex items-start gap-4 rounded-2xl border hairline bg-[var(--panel)] p-5">
-        <Avatar address={addr} src={user?.avatarUrl} size={64} />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <h1 className="truncate text-lg font-bold">
-              {user?.username ?? shortAddr(addr)}
-            </h1>
-            {session?.address === addr ? (
-              <EditProfile />
-            ) : (
-              <div className="flex shrink-0 items-center gap-2">
-                <FollowWalletButton address={addr} />
-                <TipButton recipient={addr} />
-              </div>
-            )}
-          </div>
-          <p className="mt-1 break-all font-mono text-xs text-neutral-500">{addr}</p>
-          <div className="mt-3 flex gap-4 text-sm text-neutral-400">
-            <span>
-              <span className="font-semibold text-neutral-200">{eventCount}</span> events
-            </span>
-            {firstEvent && (
-              <span>
-                first seen{" "}
-                <span className="font-semibold text-neutral-200">
-                  {firstEvent.blockTs.toISOString().slice(0, 10)}
-                </span>
-              </span>
-            )}
-            {user && (
-              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-xs text-emerald-300">
-                on WTF
-              </span>
-            )}
-          </div>
-          {user?.bio && <p className="mt-2 text-sm text-neutral-300">{user.bio}</p>}
+    <div>
+      {/* header bar */}
+      <div className="sticky top-0 z-20 flex items-center gap-4 border-b hairline bg-[var(--bg)]/85 px-4 py-2 backdrop-blur-xl">
+        <a href="/" className="text-[var(--muted)] hover:text-[var(--text)]">←</a>
+        <div>
+          <div className="text-[16px] font-bold leading-tight">{name}</div>
+          <div className="text-[12px] text-[var(--muted)]">{eventCount} on-chain events</div>
         </div>
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-neutral-400">Activity</h2>
-      <div className="space-y-3">
-        {items.length === 0 && (
-          <div className="py-8 text-center text-neutral-500">No indexed activity yet.</div>
-        )}
-        {items.map((e) => (
-          <EventCard key={e.id} e={e} canPost={!!session} />
-        ))}
+      {/* banner */}
+      <div className="h-36 w-full" style={{ backgroundImage: gradientFor(addr), opacity: 0.9 }} />
+
+      {/* identity */}
+      <div className="px-4">
+        <div className="-mt-10 flex items-end justify-between">
+          <div className="rounded-full ring-4 ring-[var(--bg)]">
+            <Avatar address={addr} src={user?.avatarUrl} size={84} />
+          </div>
+          <div className="mb-1 flex items-center gap-2">
+            {isMe ? (
+              <EditProfile />
+            ) : (
+              <>
+                {user && <FollowUserButton userId={user.id} initialFollowing={!!isFollowing} />}
+                <TipButton recipient={addr} />
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-2">
+          <h1 className="text-xl font-extrabold">{name}</h1>
+          <p className="break-all font-mono text-[13px] text-[var(--muted)]">{addr}</p>
+        </div>
+
+        {user?.bio && <p className="mt-2 text-[15px] leading-normal">{user.bio}</p>}
+
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-[var(--muted)]">
+          {joined && <span>Joined {new Date(joined).toISOString().slice(0, 10)}</span>}
+          {user && (
+            <span className="rounded bg-[color:var(--accent)]/12 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
+              on The Tavern
+            </span>
+          )}
+        </div>
+
+        <div className="mt-3 flex gap-5 text-[14px]">
+          <span>
+            <span className="font-bold">{posts.length}</span> <span className="text-[var(--muted)]">Posts</span>
+          </span>
+          <span>
+            <span className="font-bold">{user?._count.followers ?? 0}</span> <span className="text-[var(--muted)]">Followers</span>
+          </span>
+          <span>
+            <span className="font-bold">{user?._count.following ?? 0}</span> <span className="text-[var(--muted)]">Following</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <ProfileTabs posts={posts} events={events} canPost={!!session} />
       </div>
     </div>
   );
