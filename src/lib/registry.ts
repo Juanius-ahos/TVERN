@@ -1,6 +1,7 @@
 // Data sources that work keyless from a normal IP (Blockscout is Cloudflare-gated):
 //  - GeckoTerminal: top pools + recent trades for network "robinhood"
 //  - DexScreener also indexes chainId "robinhood" (used as a fallback price source)
+import { liveCached } from "./redis";
 
 export const WETH = "0x0bd7d308f8e1639fab988df18a8011f41eacad73";
 export const USDG = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
@@ -33,56 +34,31 @@ export type Pool = {
   isStock: boolean;
 };
 
-let cache: { at: number; pools: Pool[] } | null = null;
-const TTL = 3 * 60 * 1000;
-
-export async function getActivePools(force = false): Promise<Pool[]> {
-  if (!force && cache && Date.now() - cache.at < TTL) return cache.pools;
-
-  const pools: Pool[] = [];
-  try {
-    const url = `${GT}/networks/${NETWORK}/pools?page=1&sort=h24_volume_usd_desc&include=base_token,quote_token`;
-    const res = await fetch(url, { headers: { accept: "application/json" } });
-    if (res.ok) {
-      const data = await res.json();
-      const tokenById = new Map<string, { symbol: string; address: string }>();
-      for (const inc of data.included ?? []) {
-        if (inc.type === "token") {
-          tokenById.set(inc.id, {
-            symbol: String(inc.attributes?.symbol ?? "").toUpperCase(),
-            address: String(inc.attributes?.address ?? "").toLowerCase(),
+export async function getActivePools(): Promise<Pool[]> {
+  return liveCached(
+    "gt:pools:active",
+    45,
+    async () => {
+      const pools: Pool[] = [];
+      const url = `${GT}/networks/${NETWORK}/pools?page=1&sort=h24_volume_usd_desc&include=base_token,quote_token`;
+      const res = await fetch(url, { headers: { accept: "application/json" } });
+      if (res.ok) {
+        for (const p of parsePools(await res.json())) {
+          pools.push({
+            poolAddress: p.poolAddress,
+            baseSymbol: p.baseSymbol,
+            baseAddress: p.baseAddress,
+            quoteSymbol: p.quoteSymbol,
+            priceUsd: p.priceUsd,
+            volume24: p.volume24,
+            isStock: p.isStock,
           });
         }
       }
-      for (const p of data.data ?? []) {
-        const a = p.attributes ?? {};
-        const baseId = p.relationships?.base_token?.data?.id;
-        const quoteId = p.relationships?.quote_token?.data?.id;
-        const base = baseId ? tokenById.get(baseId) : undefined;
-        const quote = quoteId ? tokenById.get(quoteId) : undefined;
-        const baseSymbol = (base?.symbol || String(a.name ?? "").split(" / ")[0] || "").toUpperCase();
-        const quoteSymbol = (quote?.symbol || String(a.name ?? "").split(" / ")[1] || "").toUpperCase();
-        if (!baseSymbol) continue;
-        // We report the BASE token as the asset — if it's a stable/wrapped, it's not
-        // interesting content (e.g. "sold $X of USDB"). Skip those pools entirely.
-        if (PLUMBING.has(baseSymbol)) continue;
-        pools.push({
-          poolAddress: String(a.address ?? "").toLowerCase(),
-          baseSymbol,
-          baseAddress: base?.address ?? "",
-          quoteSymbol,
-          priceUsd: Number(a.base_token_price_usd ?? 0),
-          volume24: Number(a.volume_usd?.h24 ?? 0),
-          isStock: KNOWN_TICKERS.has(baseSymbol),
-        });
-      }
-    }
-  } catch {
-    // ignore
-  }
-
-  cache = { at: Date.now(), pools };
-  return pools;
+      return pools;
+    },
+    (p) => p.length === 0
+  );
 }
 
 // A richer view of a pool for discovery (new launches / trending movers).
@@ -140,81 +116,64 @@ function parsePools(data: unknown): DiscoverPool[] {
   return out;
 }
 
-async function fetchPools(path: string): Promise<DiscoverPool[]> {
-  try {
-    const res = await fetch(`${GT}/networks/${NETWORK}/${path}`, { headers: { accept: "application/json" } });
-    if (!res.ok) return [];
-    return parsePools(await res.json());
-  } catch {
-    return [];
-  }
+// Raw GeckoTerminal GET → parsed pools, through the shared last-known-good cache.
+async function fetchPoolsCached(key: string, url: string, ttl = 45): Promise<DiscoverPool[]> {
+  return liveCached(
+    key,
+    ttl,
+    async () => {
+      const res = await fetch(url, { headers: { accept: "application/json" } });
+      if (!res.ok) throw new Error(`gt ${res.status}`);
+      return parsePools(await res.json());
+    },
+    (p) => p.length === 0
+  );
 }
-
-let newCache: { at: number; pools: DiscoverPool[] } | null = null;
-let trendCache: { at: number; pools: DiscoverPool[] } | null = null;
-const DISCOVER_TTL = 60 * 1000;
 
 // Freshly created pools = new token launches.
 export async function getNewPools(): Promise<DiscoverPool[]> {
-  if (newCache && Date.now() - newCache.at < DISCOVER_TTL) return newCache.pools;
-  const pools = await fetchPools("new_pools?include=base_token,quote_token");
-  newCache = { at: Date.now(), pools };
-  return pools;
+  return fetchPoolsCached(
+    "gt:new_pools",
+    `${GT}/networks/${NETWORK}/new_pools?include=base_token,quote_token`,
+    30
+  );
 }
 
 // Trending pools = what's hot right now.
 export async function getTrendingPools(): Promise<DiscoverPool[]> {
-  if (trendCache && Date.now() - trendCache.at < DISCOVER_TTL) return trendCache.pools;
-  const pools = await fetchPools("trending_pools?duration=1h&include=base_token,quote_token");
-  trendCache = { at: Date.now(), pools };
-  return pools;
+  return fetchPoolsCached(
+    "gt:trending",
+    `${GT}/networks/${NETWORK}/trending_pools?duration=1h&include=base_token,quote_token`,
+    30
+  );
 }
 
-const resolveCache = new Map<string, { at: number; pool: DiscoverPool | null }>();
+// Live search results for a query (cached briefly, shared).
+async function searchPoolsCached(query: string): Promise<DiscoverPool[]> {
+  const q = query.trim();
+  if (!q) return [];
+  return fetchPoolsCached(
+    `gt:search:${q.toLowerCase()}`,
+    `${GT}/search/pools?query=${encodeURIComponent(q)}&network=${NETWORK}&include=base_token,quote_token`,
+    120
+  );
+}
 
-// Resolve ANY Robinhood-Chain token by symbol to its top pool + live market data,
-// via GeckoTerminal search — works even for tokens we've never indexed a trade for.
+// Resolve ANY Robinhood-Chain token by symbol to its top pool + live market data.
 export async function resolvePool(symbol: string): Promise<DiscoverPool | null> {
   const sym = symbol.toUpperCase();
-  const hit = resolveCache.get(sym);
-  if (hit && Date.now() - hit.at < DISCOVER_TTL) return hit.pool;
-
-  let best: DiscoverPool | null = null;
-  try {
-    const res = await fetch(
-      `${GT}/search/pools?query=${encodeURIComponent(sym)}&network=${NETWORK}&include=base_token,quote_token`,
-      { headers: { accept: "application/json" } }
-    );
-    if (res.ok) {
-      const matches = parsePools(await res.json())
-        .filter((p) => p.baseSymbol === sym && p.priceUsd > 0)
-        .sort((a, b) => b.volume24 - a.volume24);
-      best = matches[0] ?? null;
-    }
-  } catch {
-    // ignore
-  }
-  resolveCache.set(sym, { at: Date.now(), pool: best });
-  return best;
+  const matches = (await searchPoolsCached(sym))
+    .filter((p) => p.baseSymbol === sym && p.priceUsd > 0)
+    .sort((a, b) => b.volume24 - a.volume24);
+  return matches[0] ?? null;
 }
 
 // Live token search by symbol/name — one entry per base token, ranked by volume.
 export async function searchTokens(query: string): Promise<DiscoverPool[]> {
-  const q = query.trim();
-  if (!q) return [];
-  try {
-    const res = await fetch(
-      `${GT}/search/pools?query=${encodeURIComponent(q)}&network=${NETWORK}&include=base_token,quote_token`,
-      { headers: { accept: "application/json" } }
-    );
-    if (!res.ok) return [];
-    const pools = parsePools(await res.json());
-    const bySymbol = new Map<string, DiscoverPool>();
-    for (const p of pools.sort((a, b) => b.volume24 - a.volume24)) {
-      if (!bySymbol.has(p.baseSymbol)) bySymbol.set(p.baseSymbol, p);
-    }
-    return [...bySymbol.values()];
-  } catch {
-    return [];
+  const pools = await searchPoolsCached(query);
+  const bySymbol = new Map<string, DiscoverPool>();
+  for (const p of pools.sort((a, b) => b.volume24 - a.volume24)) {
+    if (!bySymbol.has(p.baseSymbol)) bySymbol.set(p.baseSymbol, p);
   }
+  return [...bySymbol.values()];
 }

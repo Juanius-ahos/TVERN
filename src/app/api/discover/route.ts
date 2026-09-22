@@ -22,8 +22,9 @@ export async function GET() {
   const [trend, fresh] = await Promise.all([getTrendingPools(), getNewPools()]);
   const data = {
     trending: trend.slice(0, 10).map(trim),
+    // new_pools comes newest-first; keep the freshest that aren't dead-on-arrival.
     launches: fresh
-      .filter((p) => p.liquidityUsd >= 1000 || p.volume24 >= 500)
+      .filter((p) => p.liquidityUsd >= 300 || p.volume24 >= 50)
       .slice(0, 10)
       .map(trim),
   };
