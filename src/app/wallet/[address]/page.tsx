@@ -25,15 +25,33 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
       username: true,
       bio: true,
       avatarUrl: true,
+      bannerUrl: true,
+      website: true,
       createdAt: true,
       _count: { select: { posts: true, followers: true, following: true } },
     },
   });
 
-  const [rawPosts, rawEvents, eventCount, firstEvent, isFollowing] = await Promise.all([
+  const [rawPosts, rawReplies, rawMedia, rawEvents, eventCount, firstEvent, isFollowing] = await Promise.all([
     user
       ? prisma.post.findMany({
           where: { authorId: user.id, parentId: null },
+          orderBy: { createdAt: "desc" },
+          take: 30,
+          include: postInclude(session?.userId),
+        })
+      : Promise.resolve([] as never[]),
+    user
+      ? prisma.post.findMany({
+          where: { authorId: user.id, parentId: { not: null } },
+          orderBy: { createdAt: "desc" },
+          take: 30,
+          include: postInclude(session?.userId),
+        })
+      : Promise.resolve([] as never[]),
+    user
+      ? prisma.post.findMany({
+          where: { authorId: user.id, mediaUrl: { not: null } },
           orderBy: { createdAt: "desc" },
           take: 30,
           include: postInclude(session?.userId),
@@ -60,6 +78,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
   ]);
 
   const posts: FeedPost[] = rawPosts.map(mapPost);
+  const replies: FeedPost[] = rawReplies.map(mapPost);
+  const media: FeedPost[] = rawMedia.map(mapPost);
 
   const events: FeedEvent[] = rawEvents.map((e) => ({
     type: "event",
@@ -91,7 +111,14 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
       </div>
 
       {/* banner */}
-      <div className="h-36 w-full" style={{ backgroundImage: gradientFor(addr), opacity: 0.9 }} />
+      <div
+        className="h-36 w-full bg-cover bg-center"
+        style={
+          user?.bannerUrl
+            ? { backgroundImage: `url(${user.bannerUrl})` }
+            : { backgroundImage: gradientFor(addr), opacity: 0.9 }
+        }
+      />
 
       {/* identity */}
       <div className="px-4">
@@ -105,6 +132,14 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
             ) : (
               <>
                 {user && <FollowUserButton userId={user.id} initialFollowing={!!isFollowing} />}
+                {user && (
+                  <a
+                    href={`/messages/${addr}`}
+                    className="rounded-full border hairline px-4 py-1.5 text-[14px] font-semibold transition hover:border-[color:var(--accent)]/50 hover:text-[var(--accent)]"
+                  >
+                    Message
+                  </a>
+                )}
                 <TipButton recipient={addr} />
                 <PostMenu authorAddress={addr} />
               </>
@@ -120,6 +155,16 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
         {user?.bio && <p className="mt-2 text-[15px] leading-normal">{user.bio}</p>}
 
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-[var(--muted)]">
+          {user?.website && (
+            <a
+              href={user.website}
+              target="_blank"
+              rel="noreferrer nofollow"
+              className="font-semibold text-[var(--accent)] hover:underline"
+            >
+              {user.website.replace(/^https?:\/\//, "")}
+            </a>
+          )}
           {joined && <span>Joined {new Date(joined).toISOString().slice(0, 10)}</span>}
           {user && (
             <span className="rounded bg-[color:var(--accent)]/12 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
@@ -142,7 +187,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
       </div>
 
       <div className="mt-4">
-        <ProfileTabs posts={posts} events={events} canPost={!!session} />
+        <ProfileTabs posts={posts} replies={replies} media={media} events={events} canPost={!!session} />
       </div>
     </div>
   );

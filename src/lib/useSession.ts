@@ -8,6 +8,8 @@ export type Me = {
   username: string | null;
   bio?: string | null;
   avatarUrl?: string | null;
+  bannerUrl?: string | null;
+  website?: string | null;
 } | null;
 
 export function useSession() {

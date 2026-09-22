@@ -20,6 +20,8 @@ model User {
   username  String?  @unique
   bio       String?
   avatarUrl String?  // custom PFP; falls back to gradient when null
+  bannerUrl String?  // profile banner image; falls back to gradient when null
+  website   String?  // optional link on profile
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -40,6 +42,8 @@ model User {
   mutedBy       Mute[]  @relation("muted")
   communitiesCreated Community[]  @relation("communityCreator")
   memberships   Membership[]
+  messagesSent     Message[] @relation("msgSender")
+  messagesReceived Message[] @relation("msgRecipient")
 }
 
 // A user watches an asset ($ticker) to keep it in their watchlist.
@@ -182,6 +186,23 @@ model Membership {
 
   @@unique([communityId, userId])
   @@index([userId])
+}
+
+// A 1:1 direct message between two users.
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  recipientId String
+  body        String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender    User @relation("msgSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User @relation("msgRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, senderId, createdAt])
+  @@index([recipientId, read])
 }
 
 // User A follows User B.

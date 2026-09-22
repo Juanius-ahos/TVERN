@@ -19,16 +19,22 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
   const [unread, setUnread] = useState(0);
+  const [dmUnread, setDmUnread] = useState(0);
 
   useEffect(() => {
     if (!user) {
       setUnread(0);
+      setDmUnread(0);
       return;
     }
     const load = async () => {
       try {
-        const d = await fetch("/api/notifications").then((r) => r.json());
-        setUnread(d.unread ?? 0);
+        const [n, m] = await Promise.all([
+          fetch("/api/notifications").then((r) => r.json()),
+          fetch("/api/messages").then((r) => r.json()),
+        ]);
+        setUnread(n.unread ?? 0);
+        setDmUnread(m.unread ?? 0);
       } catch {}
     };
     load();
@@ -39,6 +45,7 @@ export function Sidebar() {
   const items = user
     ? [
         ...baseNav,
+        { href: "/messages", label: "Messages", icon: "mail", badge: dmUnread },
         { href: "/watchlist", label: "Watchlist", icon: "star" },
         { href: "/bookmarks", label: "Bookmarks", icon: "bookmark" },
         { href: "/notifications", label: "Notifications", icon: "bell", badge: unread },
