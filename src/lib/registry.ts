@@ -169,3 +169,52 @@ export async function getTrendingPools(): Promise<DiscoverPool[]> {
   trendCache = { at: Date.now(), pools };
   return pools;
 }
+
+const resolveCache = new Map<string, { at: number; pool: DiscoverPool | null }>();
+
+// Resolve ANY Robinhood-Chain token by symbol to its top pool + live market data,
+// via GeckoTerminal search — works even for tokens we've never indexed a trade for.
+export async function resolvePool(symbol: string): Promise<DiscoverPool | null> {
+  const sym = symbol.toUpperCase();
+  const hit = resolveCache.get(sym);
+  if (hit && Date.now() - hit.at < DISCOVER_TTL) return hit.pool;
+
+  let best: DiscoverPool | null = null;
+  try {
+    const res = await fetch(
+      `${GT}/search/pools?query=${encodeURIComponent(sym)}&network=${NETWORK}&include=base_token,quote_token`,
+      { headers: { accept: "application/json" } }
+    );
+    if (res.ok) {
+      const matches = parsePools(await res.json())
+        .filter((p) => p.baseSymbol === sym && p.priceUsd > 0)
+        .sort((a, b) => b.volume24 - a.volume24);
+      best = matches[0] ?? null;
+    }
+  } catch {
+    // ignore
+  }
+  resolveCache.set(sym, { at: Date.now(), pool: best });
+  return best;
+}
+
+// Live token search by symbol/name — one entry per base token, ranked by volume.
+export async function searchTokens(query: string): Promise<DiscoverPool[]> {
+  const q = query.trim();
+  if (!q) return [];
+  try {
+    const res = await fetch(
+      `${GT}/search/pools?query=${encodeURIComponent(q)}&network=${NETWORK}&include=base_token,quote_token`,
+      { headers: { accept: "application/json" } }
+    );
+    if (!res.ok) return [];
+    const pools = parsePools(await res.json());
+    const bySymbol = new Map<string, DiscoverPool>();
+    for (const p of pools.sort((a, b) => b.volume24 - a.volume24)) {
+      if (!bySymbol.has(p.baseSymbol)) bySymbol.set(p.baseSymbol, p);
+    }
+    return [...bySymbol.values()];
+  } catch {
+    return [];
+  }
+}

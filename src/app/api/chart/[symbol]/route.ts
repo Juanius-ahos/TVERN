@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { resolvePool } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -10,25 +11,33 @@ export async function GET(_req: Request, { params }: { params: Promise<{ symbol:
   const { symbol } = await params;
   const sym = symbol.toUpperCase();
 
-  // token address: from an indexed event (fallback), else nothing
-  const ev = await prisma.event.findFirst({
-    where: { assetSymbol: sym, assetAddress: { not: "" } },
-    select: { assetAddress: true },
-  });
-  const tokenAddr = ev?.assetAddress;
-  if (!tokenAddr) return NextResponse.json({ points: [], pool: null });
+  // Resolve the token's top pool live (works for any token), else fall back to an indexed event.
+  let poolAddr: string | null = null;
+  const resolved = await resolvePool(sym);
+  if (resolved?.poolAddress) {
+    poolAddr = resolved.poolAddress;
+  } else {
+    const ev = await prisma.event.findFirst({
+      where: { assetSymbol: sym, assetAddress: { not: "" } },
+      select: { assetAddress: true },
+    });
+    if (ev?.assetAddress) {
+      try {
+        const pr = await fetch(`${GT}/networks/${NETWORK}/tokens/${ev.assetAddress}/pools`, {
+          headers: { accept: "application/json" },
+        });
+        const pd = await pr.json();
+        poolAddr = pd.data?.[0]?.attributes?.address ?? null;
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  if (!poolAddr) return NextResponse.json({ points: [], pool: null });
 
   try {
-    // find the token's top pool
-    const pr = await fetch(`${GT}/networks/${NETWORK}/tokens/${tokenAddr}/pools`, {
-      headers: { accept: "application/json" },
-    });
-    const pd = await pr.json();
-    const pool = pd.data?.[0]?.attributes?.address;
-    if (!pool) return NextResponse.json({ points: [], pool: null });
-
-    // hourly OHLCV
-    const or = await fetch(`${GT}/networks/${NETWORK}/pools/${pool}/ohlcv/hour?aggregate=1&limit=72&currency=usd`, {
+    const or = await fetch(`${GT}/networks/${NETWORK}/pools/${poolAddr}/ohlcv/hour?aggregate=1&limit=72&currency=usd`, {
       headers: { accept: "application/json" },
     });
     const od = await or.json();
@@ -39,12 +48,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ symbol:
       .filter((p) => isFinite(p.c))
       .reverse();
 
-    const last = points.at(-1)?.c ?? null;
+    const last = points.at(-1)?.c ?? resolved?.priceUsd ?? null;
     const dayAgo = points.length > 24 ? points[points.length - 25].c : points[0]?.c;
-    const change24 = last && dayAgo ? ((last - dayAgo) / dayAgo) * 100 : null;
+    const change24 =
+      last && dayAgo ? ((last - dayAgo) / dayAgo) * 100 : resolved?.change24h ?? null;
 
-    return NextResponse.json({ points, pool, last, change24 });
+    return NextResponse.json({ points, pool: poolAddr, last, change24 });
   } catch {
-    return NextResponse.json({ points: [], pool: null });
+    return NextResponse.json({ points: [], pool: poolAddr });
   }
 }

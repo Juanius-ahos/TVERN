@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { KNOWN_TICKERS } from "@/lib/registry";
+import { KNOWN_TICKERS, searchTokens } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   const bare = q.replace(/^[$@]/, "");
   const isAddr = /^0x[0-9a-fA-F]{4,40}$/.test(q);
 
-  const [users, posts, symbolRows] = await Promise.all([
+  const [users, posts, symbolRows, liveTokens] = await Promise.all([
     prisma.user.findMany({
       where: isAddr
         ? { address: { contains: q.toLowerCase() } }
@@ -81,6 +81,7 @@ export async function GET(req: NextRequest) {
       orderBy: { _count: { assetSymbol: "desc" } },
       take: limit,
     }),
+    isAddr ? Promise.resolve([]) : searchTokens(bare),
   ]);
 
   // Merge indexed symbols with known tickers that match the query.
@@ -95,7 +96,21 @@ export async function GET(req: NextRequest) {
       if (t.includes(up) && !assetMap.has(t)) assetMap.set(t, { symbol: t, isStock: true, posts: 0 });
     }
   }
-  const assets = [...assetMap.values()].sort((a, b) => b.posts - a.posts).slice(0, limit);
+  // Merge in live tokens from the chain (finds anything, even with no posts/events yet).
+  for (const p of liveTokens) {
+    const existing = assetMap.get(p.baseSymbol);
+    if (existing) existing.isStock = existing.isStock || p.isStock;
+    else assetMap.set(p.baseSymbol, { symbol: p.baseSymbol, isStock: p.isStock, posts: 0 });
+  }
+  // Rank: exact symbol match first, then by post count.
+  const assets = [...assetMap.values()]
+    .sort((a, b) => {
+      const ax = a.symbol === up ? 1 : 0;
+      const bx = b.symbol === up ? 1 : 0;
+      if (ax !== bx) return bx - ax;
+      return b.posts - a.posts;
+    })
+    .slice(0, limit);
 
   const results: SearchResults = {
     users: users.map((u) => ({

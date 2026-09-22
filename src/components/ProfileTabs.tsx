@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PostCard, type FeedPost } from "./PostCard";
 import { EventCard, type FeedEvent } from "./EventCard";
+import { Icon } from "./Icon";
 
 type TabKey = "posts" | "replies" | "media" | "activity";
 
@@ -13,6 +14,8 @@ export function ProfileTabs({
   media,
   canPost,
   postsLabel = "Posts",
+  isOwn = false,
+  displayName,
 }: {
   posts: FeedPost[];
   events: FeedEvent[];
@@ -20,8 +23,11 @@ export function ProfileTabs({
   media?: FeedPost[];
   canPost: boolean;
   postsLabel?: string;
+  isOwn?: boolean;
+  displayName?: string;
 }) {
   const [tab, setTab] = useState<TabKey>("posts");
+  const who = displayName ?? "This wallet";
 
   const tabs: { key: TabKey; label: string; show: boolean }[] = [
     { key: "posts", label: postsLabel, show: true },
@@ -31,9 +37,25 @@ export function ProfileTabs({
   ];
   const visible = tabs.filter((t) => t.show);
 
-  function List({ items, empty }: { items: FeedPost[]; empty: string }) {
-    if (items.length === 0)
-      return <div className="py-12 text-center text-[14px] text-[var(--muted)]">{empty}</div>;
+  function Empty({ title, sub, cta }: { title: string; sub?: string; cta?: boolean }) {
+    return (
+      <div className="mx-4 rounded-2xl border hairline px-6 py-12 text-center">
+        <div className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-[color:var(--accent)]/12 text-[var(--accent)]">
+          <Icon name="bolt" size={20} />
+        </div>
+        <p className="text-[15px] font-semibold">{title}</p>
+        {sub && <p className="mx-auto mt-1 max-w-xs text-[13px] text-[var(--muted)]">{sub}</p>}
+        {cta && (
+          <a href="/" className="btn-accent mt-4 inline-block rounded-full px-5 py-1.5 text-[14px] font-semibold">
+            Write your first post
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  function List({ items, empty }: { items: FeedPost[]; empty: React.ReactNode }) {
+    if (items.length === 0) return <>{empty}</>;
     return (
       <div className="space-y-3">
         {items.map((p) => (
@@ -63,12 +85,36 @@ export function ProfileTabs({
       </div>
 
       <div className="space-y-3 py-3">
-        {tab === "posts" && <List items={posts} empty="No posts yet." />}
-        {tab === "replies" && <List items={replies ?? []} empty="No replies yet." />}
-        {tab === "media" && <List items={media ?? []} empty="No media yet." />}
+        {tab === "posts" && (
+          <List
+            items={posts}
+            empty={
+              isOwn ? (
+                <Empty title="Your posts will live here" sub="Share a take, a chart, or a $ticker — pull up a stool." cta />
+              ) : (
+                <Empty title={`${who} hasn't posted yet`} sub="Follow them to catch it when they do." />
+              )
+            }
+          />
+        )}
+        {tab === "replies" && (
+          <List
+            items={replies ?? []}
+            empty={<Empty title={isOwn ? "You haven't replied yet" : `${who} hasn't replied yet`} />}
+          />
+        )}
+        {tab === "media" && (
+          <List
+            items={media ?? []}
+            empty={<Empty title={isOwn ? "No photos or videos yet" : `${who} hasn't posted media yet`} />}
+          />
+        )}
         {tab === "activity" &&
           (events.length === 0 ? (
-            <div className="py-12 text-center text-[14px] text-[var(--muted)]">No on-chain activity indexed yet.</div>
+            <Empty
+              title="No on-chain activity yet"
+              sub="Buys, sells and whale moves for this wallet on Robinhood Chain will appear here."
+            />
           ) : (
             events.map((e) => <EventCard key={e.id} e={e} canPost={canPost} />)
           ))}

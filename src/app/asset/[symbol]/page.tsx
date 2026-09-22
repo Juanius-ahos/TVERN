@@ -8,6 +8,16 @@ import type { FeedPost } from "@/components/PostCard";
 import type { FeedEvent } from "@/components/EventCard";
 import { isStockTicker } from "@/lib/assets";
 import { postInclude, mapPost } from "@/lib/feedPost";
+import { resolvePool } from "@/lib/registry";
+import { formatUsd } from "@/lib/format";
+
+function fmtPrice(n: number): string {
+  if (!n) return "—";
+  if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  if (n >= 1) return `$${n.toFixed(2)}`;
+  if (n >= 0.01) return `$${n.toFixed(4)}`;
+  return `$${n.toPrecision(3)}`;
+}
 
 export default async function AssetPage({ params }: { params: Promise<{ symbol: string }> }) {
   const { symbol: raw } = await params;
@@ -22,7 +32,8 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
       }))
     : false;
 
-  const [rawEvents, rawPosts] = await Promise.all([
+  const [market, rawEvents, rawPosts] = await Promise.all([
+    resolvePool(symbol),
     prisma.event.findMany({
       where: { assetSymbol: symbol },
       orderBy: { blockTs: "desc" },
@@ -75,8 +86,39 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
         </div>
       </header>
 
+      {market && (
+        <div className="grid grid-cols-2 gap-px border-b hairline bg-white/[0.04] sm:grid-cols-4">
+          {[
+            { label: "Price", value: fmtPrice(market.priceUsd) },
+            {
+              label: "24h",
+              value: `${market.change24h > 0 ? "+" : ""}${market.change24h.toFixed(2)}%`,
+              tone: market.change24h > 0 ? "up" : market.change24h < 0 ? "down" : "",
+            },
+            { label: "24h Volume", value: formatUsd(market.volume24) },
+            { label: "Liquidity", value: formatUsd(market.liquidityUsd) },
+          ].map((s) => (
+            <div key={s.label} className="bg-[var(--bg)] px-4 py-2.5">
+              <div className="text-[11px] uppercase tracking-wide text-[var(--muted)]">{s.label}</div>
+              <div
+                className={`text-[15px] font-bold tabular-nums ${
+                  s.tone === "up" ? "text-emerald-400" : s.tone === "down" ? "text-rose-400" : ""
+                }`}
+              >
+                {s.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-3 px-4 py-3">
         <AssetChart symbol={symbol} />
+        {market?.quoteSymbol && (
+          <p className="text-[12px] text-[var(--muted)]">
+            Pair: {symbol}/{market.quoteSymbol} on Robinhood Chain
+          </p>
+        )}
         {session && <ReloadComposer initialText={`$${symbol} `} placeholder={`Share your take on $${symbol}…`} />}
       </div>
 

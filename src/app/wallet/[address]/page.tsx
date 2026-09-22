@@ -186,8 +186,29 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
         </div>
       </div>
 
+      {isMe && (!user?.username || !user?.bio) && (
+        <div className="mx-4 mt-4 flex flex-col gap-3 rounded-2xl border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[15px] font-bold">Finish setting up your profile</p>
+            <p className="text-[13px] text-[var(--muted)]">
+              Add a {(!user?.username && "username") || ""}{!user?.username && !user?.bio ? " and " : ""}
+              {(!user?.bio && "bio") || ""} so people know who you are.
+            </p>
+          </div>
+          <EditProfile />
+        </div>
+      )}
+
       <div className="mt-4">
-        <ProfileTabs posts={posts} replies={replies} media={media} events={events} canPost={!!session} />
+        <ProfileTabs
+          posts={posts}
+          replies={replies}
+          media={media}
+          events={events}
+          canPost={!!session}
+          isOwn={isMe}
+          displayName={name}
+        />
       </div>
     </div>
   );
