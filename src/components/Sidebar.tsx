@@ -10,6 +10,7 @@ import { useSession } from "@/lib/useSession";
 const baseNav = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/search", label: "Search", icon: "search" },
+  { href: "/explore", label: "Explore", icon: "trending" },
   { href: "/communities", label: "Communities", icon: "users" },
   { href: "/whales", label: "Whales", icon: "waves" },
   { href: "/stocks", label: "Stocks", icon: "trending" },
