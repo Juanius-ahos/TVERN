@@ -122,7 +122,13 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
         {session && <ReloadComposer initialText={`$${symbol} `} placeholder={`Share your take on $${symbol}…`} />}
       </div>
 
-      <ProfileTabs posts={posts} events={events} canPost={!!session} postsLabel="Discussion" />
+      <ProfileTabs
+        posts={posts}
+        events={events}
+        canPost={!!session}
+        postsLabel="Discussion"
+        postsEmpty={{ title: `No posts about $${symbol} yet`, sub: "Be the first to share a take." }}
+      />
     </div>
   );
 }

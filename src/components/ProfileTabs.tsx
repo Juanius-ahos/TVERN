@@ -16,6 +16,7 @@ export function ProfileTabs({
   postsLabel = "Posts",
   isOwn = false,
   displayName,
+  postsEmpty,
 }: {
   posts: FeedPost[];
   events: FeedEvent[];
@@ -25,6 +26,7 @@ export function ProfileTabs({
   postsLabel?: string;
   isOwn?: boolean;
   displayName?: string;
+  postsEmpty?: { title: string; sub?: string };
 }) {
   const [tab, setTab] = useState<TabKey>("posts");
   const who = displayName ?? "This wallet";
@@ -89,7 +91,9 @@ export function ProfileTabs({
           <List
             items={posts}
             empty={
-              isOwn ? (
+              postsEmpty ? (
+                <Empty title={postsEmpty.title} sub={postsEmpty.sub} />
+              ) : isOwn ? (
                 <Empty title="Your posts will live here" sub="Share a take, a chart, or a $ticker — pull up a stool." cta />
               ) : (
                 <Empty title={`${who} hasn't posted yet`} sub="Follow them to catch it when they do." />
