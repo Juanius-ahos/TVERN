@@ -102,7 +102,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
   return (
     <div>
       {/* header bar */}
-      <div className="sticky top-0 z-20 flex items-center gap-4 border-b hairline bg-[var(--bg)]/85 px-4 py-2 backdrop-blur-xl">
+      <div className="flex items-center gap-4 border-b hairline bg-[var(--bg)]/85 px-4 py-2 backdrop-blur-xl">
         <a href="/" className="text-[var(--muted)] hover:text-[var(--text)]">←</a>
         <div>
           <div className="text-[16px] font-bold leading-tight">{name}</div>

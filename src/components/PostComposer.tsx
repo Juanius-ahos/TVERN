@@ -97,10 +97,10 @@ export function PostComposer({
           {media && (
             <div className="relative mt-2 overflow-hidden rounded-xl border hairline">
               {media.type === "video" ? (
-                <video src={media.url} controls className="max-h-80 w-full" />
+                <video src={media.url} controls className="mx-auto max-h-80 w-auto max-w-full" />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={media.url} alt="" className="max-h-80 w-full object-cover" />
+                <img src={media.url} alt="" className="mx-auto max-h-80 w-auto max-w-full object-contain" />
               )}
               <button
                 onClick={() => setMedia(null)}

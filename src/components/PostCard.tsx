@@ -110,16 +110,20 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
 
           {p.poll && <Poll poll={p.poll} canVote={canPost} />}
 
-          {p.mediaUrl && (
-            <div className="mt-2 overflow-hidden rounded-xl border hairline">
-              {p.mediaType === "video" ? (
-                <video src={p.mediaUrl} controls className="max-h-[420px] w-full" />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.mediaUrl} alt="" className="max-h-[420px] w-full object-cover" />
-              )}
-            </div>
-          )}
+          {p.mediaUrl &&
+            (p.mediaType === "video" ? (
+              <div className="mt-2 overflow-hidden rounded-xl border hairline bg-black/40">
+                <video src={p.mediaUrl} controls className="mx-auto max-h-[520px] w-auto max-w-full" />
+              </div>
+            ) : (
+              <a
+                href={`/post/${p.id}`}
+                className="mt-2 flex justify-center overflow-hidden rounded-xl border hairline bg-black/40"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.mediaUrl} alt="" className="max-h-[520px] w-auto max-w-full object-contain" />
+              </a>
+            ))}
 
           {p.event && (
             <div className="mt-2 rounded-xl border hairline bg-black/30 px-3 py-2.5 text-[14px] text-[var(--text)]">
