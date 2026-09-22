@@ -10,6 +10,7 @@ export function postInclude(myId?: string): Prisma.PostInclude {
   return {
     author: { select: { address: true, username: true, avatarUrl: true } },
     event: { select: { id: true, title: true, assetSymbol: true, kind: true } },
+    community: { select: { slug: true, name: true } },
     _count: { select: { likes: true, reposts: true, replies: true } },
     likes: mine,
     reposts: mine,
@@ -52,6 +53,7 @@ export function mapPost(p: any): FeedPost {
     mediaType: p.mediaType,
     author: p.author,
     event: p.event,
+    community: p.community ?? null,
     createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt,
     likeCount: p._count.likes,
     repostCount: p._count.reposts,

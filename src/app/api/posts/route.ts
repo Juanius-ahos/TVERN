@@ -13,8 +13,19 @@ export async function POST(req: Request) {
   const rl = await checkRateLimit(`post:${session.userId}`, 10, "1 m");
   if (!rl.ok) return NextResponse.json({ error: "you're posting too fast" }, { status: 429 });
 
-  const { body, parentId, eventId, mediaUrl, mediaType, poll } = await req.json().catch(() => ({}));
+  const { body, parentId, eventId, mediaUrl, mediaType, poll, communityId } = await req.json().catch(() => ({}));
   const text = String(body ?? "").trim();
+
+  // If posting to a community, the author must be a member.
+  let communityIdToUse: string | null = null;
+  if (communityId && !parentId) {
+    const member = await prisma.membership.findUnique({
+      where: { communityId_userId: { communityId: String(communityId), userId: session.userId } },
+      select: { id: true },
+    });
+    if (!member) return NextResponse.json({ error: "join the community to post" }, { status: 403 });
+    communityIdToUse = String(communityId);
+  }
 
   // Validate an optional poll: 2–4 non-empty options, replies can't be polls.
   let pollOptions: string[] = [];
@@ -41,6 +52,7 @@ export async function POST(req: Request) {
       mediaType: mediaType === "video" ? "video" : mediaUrl ? "image" : null,
       parentId: parentId ?? null,
       eventId: eventId ?? null,
+      communityId: communityIdToUse,
       ...(pollOptions.length >= 2
         ? { poll: { create: { options: { create: pollOptions.map((t, i) => ({ text: t, idx: i })) } } } }
         : {}),

@@ -38,6 +38,8 @@ model User {
   blockedBy     Block[] @relation("blocked")
   muting        Mute[]  @relation("muter")
   mutedBy       Mute[]  @relation("muted")
+  communitiesCreated Community[]  @relation("communityCreator")
+  memberships   Membership[]
 }
 
 // A user watches an asset ($ticker) to keep it in their watchlist.
@@ -151,6 +153,37 @@ model Mute {
   @@index([muterId])
 }
 
+// A community (group) scoped to a topic on Robinhood Chain.
+model Community {
+  id          String   @id @default(cuid())
+  slug        String   @unique // url handle, lowercased
+  name        String
+  description String?
+  iconUrl     String?
+  creatorId   String
+  createdAt   DateTime @default(now())
+
+  creator User         @relation("communityCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members Membership[]
+  posts   Post[]
+
+  @@index([createdAt])
+}
+
+model Membership {
+  id          String   @id @default(cuid())
+  communityId String
+  userId      String
+  role        String   @default("member") // member | admin
+  createdAt   DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([userId])
+}
+
 // User A follows User B.
 model Follow {
   id          String   @id @default(cuid())
@@ -185,8 +218,10 @@ model Post {
   mediaType String?  // "image" | "video"
   parentId  String?  // reply-to another post
   eventId   String?  // references a WTF Event (quote/commentary on an on-chain event)
+  communityId String? // posted inside a community, if any
   createdAt DateTime @default(now())
 
+  community Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
   author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   parent  Post?   @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
   replies Post[]  @relation("replies")
@@ -199,6 +234,7 @@ model Post {
   @@index([createdAt])
   @@index([parentId])
   @@index([eventId])
+  @@index([communityId])
 }
 
 model Like {

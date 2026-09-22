@@ -22,6 +22,14 @@ const paths: Record<string, React.ReactNode> = {
       <path d="M5.5 21a6.5 6.5 0 0 1 13 0" />
     </>
   ),
+  users: (
+    <>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+      <path d="M16 5.2a3.5 3.5 0 0 1 0 6.6" />
+      <path d="M17.5 14.3a5.5 5.5 0 0 1 3 5.2" />
+    </>
+  ),
   comment: <path d="M21 11.5a8.5 8.5 0 0 1-11.5 8L3 21l1.5-6.5A8.5 8.5 0 1 1 21 11.5z" />,
   repost: (
     <>

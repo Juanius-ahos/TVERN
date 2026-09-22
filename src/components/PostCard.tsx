@@ -17,6 +17,7 @@ export type FeedPost = {
   mediaType?: string | null;
   author: { address: string; username: string | null; avatarUrl?: string | null };
   event: { id: string; title: string; assetSymbol: string; kind: string } | null;
+  community?: { slug: string; name: string } | null;
   createdAt: string;
   likeCount: number;
   repostCount: number;
@@ -90,6 +91,14 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             <a href={`/post/${p.id}`} className="text-[var(--muted)] hover:underline">
               · {timeAgo(p.createdAt)}
             </a>
+            {p.community && (
+              <a
+                href={`/c/${p.community.slug}`}
+                className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--muted)] transition hover:text-[var(--accent)]"
+              >
+                {p.community.name}
+              </a>
+            )}
             <PostMenu authorAddress={p.author.address} />
           </div>
 

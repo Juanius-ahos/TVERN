@@ -10,12 +10,14 @@ export function PostComposer({
   initialText = "",
   placeholder = "what's happening on-chain?",
   parentId,
+  communityId,
   submitLabel = "Post",
 }: {
   onPosted?: () => void;
   initialText?: string;
   placeholder?: string;
   parentId?: string;
+  communityId?: string;
   submitLabel?: string;
 }) {
   const { user } = useSession();
@@ -67,6 +69,7 @@ export function PostComposer({
         mediaUrl: media?.url,
         mediaType: media?.type,
         parentId,
+        communityId,
         poll: validPoll ? { options: pollOpts } : undefined,
       }),
     });
