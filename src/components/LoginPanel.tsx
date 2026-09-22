@@ -125,9 +125,6 @@ export function LoginPanel() {
             ))}
           </div>
           {Safety}
-          <a href="/" className="mt-4 block text-center text-[13px] text-neutral-500 hover:text-neutral-300">
-            or keep browsing as a guest
-          </a>
         </div>
       ) : (
         /* Step 2: sign the message */

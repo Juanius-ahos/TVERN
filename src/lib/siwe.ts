@@ -1,4 +1,5 @@
-// Minimal EIP-4361 (Sign-In With Ethereum) message. Kept simple on purpose.
+import { createSiweMessage } from "viem/siwe";
+import { getAddress } from "viem";
 
 export type SiweParams = {
   domain: string;
@@ -9,19 +10,18 @@ export type SiweParams = {
   chainId: number;
 };
 
+// Build a strictly EIP-4361-compliant message (wallets like MetaMask validate this).
 export function buildSiweMessage(p: SiweParams): string {
-  return [
-    `${p.domain} wants you to sign in with your Ethereum account:`,
-    p.address,
-    ``,
-    `Sign in to The Tavern — no transaction, no gas.`,
-    ``,
-    `URI: ${p.uri}`,
-    `Version: 1`,
-    `Chain ID: ${p.chainId}`,
-    `Nonce: ${p.nonce}`,
-    `Issued At: ${p.issuedAt}`,
-  ].join("\n");
+  return createSiweMessage({
+    address: getAddress(p.address),
+    chainId: p.chainId,
+    domain: p.domain,
+    nonce: p.nonce,
+    uri: p.uri,
+    version: "1",
+    statement: "Sign in to The Tavern. This only proves you own this wallet — no transaction, no gas.",
+    issuedAt: new Date(p.issuedAt),
+  });
 }
 
 export function extractNonce(message: string): string | null {
@@ -30,7 +30,7 @@ export function extractNonce(message: string): string | null {
 }
 
 export function extractAddress(message: string): string | null {
-  // second line of the message is the address
+  // EIP-4361: the address is on line 2.
   const lines = message.split("\n");
   return lines[1]?.trim().toLowerCase() ?? null;
 }
