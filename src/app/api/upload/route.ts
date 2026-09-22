@@ -36,10 +36,16 @@ export async function POST(req: Request) {
   const name = `${randomBytes(12).toString("hex")}.${ext}`;
   const type = file.type.startsWith("video/") ? "video" : "image";
 
-  // Production: Vercel Blob (persistent, CDN-served).
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(`uploads/${name}`, file, { access: "public", contentType: file.type });
-    return NextResponse.json({ url: blob.url, type });
+  // Production: Vercel Blob (persistent, CDN-served). Works with either a static
+  // BLOB_READ_WRITE_TOKEN or, on Vercel, OIDC auth from a connected store (BLOB_STORE_ID).
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+    try {
+      const blob = await put(`uploads/${name}`, file, { access: "public", contentType: file.type });
+      return NextResponse.json({ url: blob.url, type });
+    } catch (e) {
+      console.error("blob upload failed", e);
+      return NextResponse.json({ error: "upload failed" }, { status: 500 });
+    }
   }
 
   // On Vercel without Blob configured yet: fail cleanly (fs is read-only there).
