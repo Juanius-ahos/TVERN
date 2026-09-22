@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import { getActivePools, type Pool } from "./registry";
+import { getActivePools, getNewPools, type Pool } from "./registry";
 import { formatUsd, shortAddr } from "./format";
 import { redis } from "./redis";
 
@@ -8,6 +8,7 @@ const NETWORK = "robinhood";
 const MIN_USD = Number(process.env.MIN_EVENT_USD ?? 5000);
 const MAX_POOLS = Number(process.env.MAX_POOLS ?? 18);
 const MAX_TRADES_PER_POOL = Number(process.env.MAX_TRADES_PER_POOL ?? 6);
+const MIN_LAUNCH_LIQ = Number(process.env.MIN_LAUNCH_LIQ ?? 2000);
 
 type Trade = {
   txHash: string;
@@ -105,6 +106,46 @@ export async function runIngest(): Promise<{ pools: number; scanned: number; cre
         // dup / race
       }
     }
+  }
+
+  // --- New token launches: freshly created pools with real liquidity ---
+  try {
+    const fresh = (await getNewPools())
+      .filter((p) => p.poolAddress && p.baseSymbol && p.liquidityUsd >= MIN_LAUNCH_LIQ)
+      .slice(0, 20);
+    for (const p of fresh) {
+      const ts = p.createdAt ? new Date(p.createdAt) : new Date();
+      const pairNote = p.quoteSymbol ? ` (${p.baseSymbol}/${p.quoteSymbol})` : "";
+      const title = `$${p.baseSymbol} just launched${pairNote} · ${formatUsd(p.liquidityUsd)} liquidity`;
+      try {
+        await prisma.event.upsert({
+          // Synthetic id: one launch event per pool, ever.
+          where: { txHash_logIndex: { txHash: `launch:${p.poolAddress}`, logIndex: 0 } },
+          create: {
+            kind: "LAUNCH",
+            txHash: `launch:${p.poolAddress}`,
+            logIndex: 0,
+            blockNumber: 0,
+            blockTs: ts,
+            assetSymbol: p.baseSymbol,
+            assetAddress: p.baseAddress,
+            fromAddr: p.poolAddress,
+            toAddr: "",
+            amountRaw: "0",
+            amountUi: 0,
+            usdValue: p.liquidityUsd,
+            severity: (p.isStock ? 3 : 1) * (p.liquidityUsd + 25_000), // launches rank prominently
+            title,
+          },
+          update: {},
+        });
+        created++;
+      } catch {
+        // dup / race
+      }
+    }
+  } catch {
+    // launches are best-effort
   }
 
   return { pools: pools.length, scanned, created };

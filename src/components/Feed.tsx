@@ -7,10 +7,11 @@ import { PostCard, type FeedPost } from "./PostCard";
 import { PostComposer } from "./PostComposer";
 
 type Item = FeedEvent | FeedPost;
-type Filter = "" | "whale" | "stock";
+type Filter = "" | "launch" | "whale" | "stock";
 
 const TABS: { key: Filter; label: string }[] = [
   { key: "", label: "Latest" },
+  { key: "launch", label: "Launches" },
   { key: "whale", label: "Whales" },
   { key: "stock", label: "Stocks" },
 ];
@@ -98,6 +99,8 @@ export function Feed({
           <div className="rounded-2xl border hairline py-12 text-center text-[14px] text-[var(--muted)]">
             {filter === "stock"
               ? "No tokenized-stock moves yet. Stock volume is quiet — check back."
+              : filter === "launch"
+              ? "No new launches indexed yet — refreshing from the chain."
               : "Nothing here yet."}
           </div>
         )}

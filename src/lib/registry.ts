@@ -84,3 +84,88 @@ export async function getActivePools(force = false): Promise<Pool[]> {
   cache = { at: Date.now(), pools };
   return pools;
 }
+
+// A richer view of a pool for discovery (new launches / trending movers).
+export type DiscoverPool = {
+  poolAddress: string;
+  baseSymbol: string;
+  baseAddress: string;
+  quoteSymbol: string;
+  priceUsd: number;
+  volume24: number;
+  liquidityUsd: number;
+  change1h: number;
+  change24h: number;
+  createdAt: string | null;
+  isStock: boolean;
+};
+
+// Parse any GeckoTerminal "pools" style response into DiscoverPool[].
+function parsePools(data: unknown): DiscoverPool[] {
+  const out: DiscoverPool[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d = data as any;
+  const tokenById = new Map<string, { symbol: string; address: string }>();
+  for (const inc of d?.included ?? []) {
+    if (inc.type === "token") {
+      tokenById.set(inc.id, {
+        symbol: String(inc.attributes?.symbol ?? "").toUpperCase(),
+        address: String(inc.attributes?.address ?? "").toLowerCase(),
+      });
+    }
+  }
+  for (const p of d?.data ?? []) {
+    const a = p.attributes ?? {};
+    const baseId = p.relationships?.base_token?.data?.id;
+    const quoteId = p.relationships?.quote_token?.data?.id;
+    const base = baseId ? tokenById.get(baseId) : undefined;
+    const quote = quoteId ? tokenById.get(quoteId) : undefined;
+    const baseSymbol = (base?.symbol || String(a.name ?? "").split(" / ")[0] || "").toUpperCase();
+    const quoteSymbol = (quote?.symbol || String(a.name ?? "").split(" / ")[1] || "").split(" ")[0].toUpperCase();
+    if (!baseSymbol || PLUMBING.has(baseSymbol)) continue;
+    out.push({
+      poolAddress: String(a.address ?? "").toLowerCase(),
+      baseSymbol,
+      baseAddress: base?.address ?? "",
+      quoteSymbol,
+      priceUsd: Number(a.base_token_price_usd ?? 0),
+      volume24: Number(a.volume_usd?.h24 ?? 0),
+      liquidityUsd: Number(a.reserve_in_usd ?? 0),
+      change1h: Number(a.price_change_percentage?.h1 ?? 0),
+      change24h: Number(a.price_change_percentage?.h24 ?? 0),
+      createdAt: a.pool_created_at ?? null,
+      isStock: KNOWN_TICKERS.has(baseSymbol),
+    });
+  }
+  return out;
+}
+
+async function fetchPools(path: string): Promise<DiscoverPool[]> {
+  try {
+    const res = await fetch(`${GT}/networks/${NETWORK}/${path}`, { headers: { accept: "application/json" } });
+    if (!res.ok) return [];
+    return parsePools(await res.json());
+  } catch {
+    return [];
+  }
+}
+
+let newCache: { at: number; pools: DiscoverPool[] } | null = null;
+let trendCache: { at: number; pools: DiscoverPool[] } | null = null;
+const DISCOVER_TTL = 60 * 1000;
+
+// Freshly created pools = new token launches.
+export async function getNewPools(): Promise<DiscoverPool[]> {
+  if (newCache && Date.now() - newCache.at < DISCOVER_TTL) return newCache.pools;
+  const pools = await fetchPools("new_pools?include=base_token,quote_token");
+  newCache = { at: Date.now(), pools };
+  return pools;
+}
+
+// Trending pools = what's hot right now.
+export async function getTrendingPools(): Promise<DiscoverPool[]> {
+  if (trendCache && Date.now() - trendCache.at < DISCOVER_TTL) return trendCache.pools;
+  const pools = await fetchPools("trending_pools?duration=1h&include=base_token,quote_token");
+  trendCache = { at: Date.now(), pools };
+  return pools;
+}

@@ -28,6 +28,7 @@ const kindStyle: Record<
   BUY: { label: "Buy", icon: "arrowUp", text: "text-emerald-300", bg: "bg-emerald-400/10" },
   SELL: { label: "Sell", icon: "arrowDown", text: "text-rose-300", bg: "bg-rose-400/10" },
   TRANSFER: { label: "Transfer", icon: "external", text: "text-neutral-300", bg: "bg-white/[0.06]" },
+  LAUNCH: { label: "New launch", icon: "bolt", text: "text-[var(--accent)]", bg: "bg-[color:var(--accent)]/12" },
 };
 
 export function EventCard({
@@ -68,13 +69,22 @@ export function EventCard({
   }
 
   const k = kindStyle[e.kind] ?? kindStyle.TRANSFER;
+  const isLaunch = e.kind === "LAUNCH";
+  // For launches, `fromAddr` is the pool, not a wallet — key the visuals off the asset.
+  const avatarSeed = isLaunch ? e.assetAddress || e.assetSymbol : e.fromAddr;
 
   return (
     <article className="animate-in card-hover rounded-2xl border hairline p-4">
       <div className="flex items-start gap-3">
-        <a href={`/wallet/${e.fromAddr}`} className="transition hover:opacity-90">
-          <Avatar address={e.fromAddr} size={42} />
-        </a>
+        {isLaunch ? (
+          <a href={`/asset/${e.assetSymbol}`} className="transition hover:opacity-90">
+            <Avatar address={avatarSeed} size={42} />
+          </a>
+        ) : (
+          <a href={`/wallet/${e.fromAddr}`} className="transition hover:opacity-90">
+            <Avatar address={e.fromAddr} size={42} />
+          </a>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-[13px]">
             <span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-semibold ${k.text} ${k.bg}`}>
@@ -87,12 +97,16 @@ export function EventCard({
             <span className="text-[var(--muted)]">· {timeAgo(e.createdAt)}</span>
           </div>
 
-          <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">
-            <a href={`/wallet/${e.fromAddr}`} className="font-mono font-semibold hover:underline">
-              {shortAddr(e.fromAddr)}
-            </a>{" "}
-            {e.title.replace(new RegExp(`^${shortAddr(e.fromAddr)}\\s*`), "")}
-          </p>
+          {isLaunch ? (
+            <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">{e.title}</p>
+          ) : (
+            <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">
+              <a href={`/wallet/${e.fromAddr}`} className="font-mono font-semibold hover:underline">
+                {shortAddr(e.fromAddr)}
+              </a>{" "}
+              {e.title.replace(new RegExp(`^${shortAddr(e.fromAddr)}\\s*`), "")}
+            </p>
+          )}
 
           <div className="mt-3 flex items-center gap-6 text-[13px] text-[var(--muted)]">
             {canPost && (
@@ -101,21 +115,32 @@ export function EventCard({
                 {e.commentCount > 0 ? e.commentCount : ""}
               </button>
             )}
-            <button
-              onClick={followWallet}
-              className={`flex items-center gap-1.5 transition hover:text-[var(--accent)] ${followed ? "text-[var(--accent)]" : ""}`}
-            >
-              <Icon name={followed ? "check" : "plus"} size={16} />
-              {followed ? "Following" : "Follow"}
-            </button>
-            <a
-              href={`https://robinhoodchain.blockscout.com/tx/${e.txHash}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
-            >
-              <Icon name="external" size={16} />
-            </a>
+            {isLaunch ? (
+              <a
+                href={`/asset/${e.assetSymbol}`}
+                className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+              >
+                <Icon name="trending" size={16} /> View token
+              </a>
+            ) : (
+              <>
+                <button
+                  onClick={followWallet}
+                  className={`flex items-center gap-1.5 transition hover:text-[var(--accent)] ${followed ? "text-[var(--accent)]" : ""}`}
+                >
+                  <Icon name={followed ? "check" : "plus"} size={16} />
+                  {followed ? "Following" : "Follow"}
+                </button>
+                <a
+                  href={`https://robinhoodchain.blockscout.com/tx/${e.txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+                >
+                  <Icon name="external" size={16} />
+                </a>
+              </>
+            )}
           </div>
 
           {open && (

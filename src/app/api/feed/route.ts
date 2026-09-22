@@ -15,6 +15,8 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
   const where =
     filter === "whale"
       ? { kind: "WHALE" }
+      : filter === "launch"
+      ? { kind: "LAUNCH" }
       : filter === "stock"
       ? { assetSymbol: { in: [...KNOWN_TICKERS] } }
       : {};
