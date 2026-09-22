@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/useSession";
 
-export function PostMenu({ authorAddress }: { authorAddress: string }) {
+export function PostMenu({ authorAddress, postId }: { authorAddress: string; postId?: string }) {
   const { user } = useSession();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -17,8 +19,22 @@ export function PostMenu({ authorAddress }: { authorAddress: string }) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  // Don't show the menu on your own posts.
-  if (user && user.address === authorAddress) return null;
+  const isMine = !!user && user.address === authorAddress;
+
+  // On your own content: offer delete (only where there's a post to delete).
+  // On your own profile header (no postId): nothing to show.
+  if (isMine && !postId) return null;
+
+  async function del() {
+    if (!postId) return;
+    setOpen(false);
+    if (!confirm("Delete this post? This can't be undone.")) return;
+    const r = await fetch(`/api/posts/${postId}`, { method: "DELETE" });
+    if (r.ok) {
+      setDone("Deleted");
+      router.refresh();
+    }
+  }
 
   async function act(action: "mute" | "block") {
     if (!user) {
@@ -51,18 +67,29 @@ export function PostMenu({ authorAddress }: { authorAddress: string }) {
       )}
       {open && (
         <div className="absolute right-0 top-8 z-50 w-40 overflow-hidden rounded-xl border hairline bg-[var(--panel)] py-1 shadow-2xl shadow-black/50">
-          <button
-            onClick={() => act("mute")}
-            className="block w-full px-4 py-2 text-left text-[14px] transition hover:bg-white/[0.05]"
-          >
-            Mute user
-          </button>
-          <button
-            onClick={() => act("block")}
-            className="block w-full px-4 py-2 text-left text-[14px] text-rose-400 transition hover:bg-white/[0.05]"
-          >
-            Block user
-          </button>
+          {isMine ? (
+            <button
+              onClick={del}
+              className="block w-full px-4 py-2 text-left text-[14px] text-rose-400 transition hover:bg-white/[0.05]"
+            >
+              Delete post
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => act("mute")}
+                className="block w-full px-4 py-2 text-left text-[14px] transition hover:bg-white/[0.05]"
+              >
+                Mute user
+              </button>
+              <button
+                onClick={() => act("block")}
+                className="block w-full px-4 py-2 text-left text-[14px] text-rose-400 transition hover:bg-white/[0.05]"
+              >
+                Block user
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

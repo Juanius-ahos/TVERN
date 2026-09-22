@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getNewPools, getTrendingPools, type DiscoverPool } from "@/lib/registry";
-import { cached } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -18,17 +17,15 @@ function trim(p: DiscoverPool) {
   };
 }
 
-// GET → { trending, launches } — live from GeckoTerminal, cached ~60s.
+// GET → { trending, launches } — live from GeckoTerminal (registry caches ~60s).
 export async function GET() {
-  const data = await cached("discover:v1", 60, async () => {
-    const [trend, fresh] = await Promise.all([getTrendingPools(), getNewPools()]);
-    return {
-      trending: trend.slice(0, 10).map(trim),
-      launches: fresh
-        .filter((p) => p.liquidityUsd >= 1000)
-        .slice(0, 10)
-        .map(trim),
-    };
-  });
+  const [trend, fresh] = await Promise.all([getTrendingPools(), getNewPools()]);
+  const data = {
+    trending: trend.slice(0, 10).map(trim),
+    launches: fresh
+      .filter((p) => p.liquidityUsd >= 1000 || p.volume24 >= 500)
+      .slice(0, 10)
+      .map(trim),
+  };
   return NextResponse.json(data);
 }

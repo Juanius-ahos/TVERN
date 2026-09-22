@@ -99,7 +99,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
                 {p.community.name}
               </a>
             )}
-            <PostMenu authorAddress={p.author.address} />
+            <PostMenu authorAddress={p.author.address} postId={p.id} />
           </div>
 
           {p.body && (

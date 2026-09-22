@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getActivePools } from "@/lib/registry";
+import { getTrendingPools, getActivePools } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -7,26 +7,29 @@ export const revalidate = 0;
 export type TickerItem = {
   symbol: string;
   priceUsd: number;
-  volume24: number;
+  change24h: number;
   isStock: boolean;
 };
 
-// Top RH-Chain movers by 24h volume, deduped to one row per asset.
+// The carousel = biggest movers on Robinhood Chain right now (by 24h price change),
+// drawn from trending pools, deduped to one row per asset.
 export async function GET() {
-  const pools = await getActivePools();
+  let pools = await getTrendingPools();
+  if (pools.length === 0) pools = (await getActivePools()).map((p) => ({ ...p, change24h: 0 } as never));
+
   const seen = new Set<string>();
   const items: TickerItem[] = [];
   for (const p of pools) {
-    if (seen.has(p.baseSymbol)) continue;
-    if (p.priceUsd <= 0) continue;
+    if (seen.has(p.baseSymbol) || p.priceUsd <= 0) continue;
     seen.add(p.baseSymbol);
     items.push({
       symbol: p.baseSymbol,
       priceUsd: p.priceUsd,
-      volume24: p.volume24,
+      change24h: p.change24h ?? 0,
       isStock: p.isStock,
     });
-    if (items.length >= 20) break;
   }
-  return NextResponse.json({ items });
+  // Rank by absolute 24h move — the biggest movers lead the carousel.
+  items.sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
+  return NextResponse.json({ items: items.slice(0, 20) });
 }

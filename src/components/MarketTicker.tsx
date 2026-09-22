@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Item = { symbol: string; priceUsd: number; volume24: number; isStock: boolean };
+type Item = { symbol: string; priceUsd: number; change24h: number; isStock: boolean };
 
 function fmtPrice(n: number): string {
   if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -45,7 +45,13 @@ export function MarketTicker() {
                 STOCK
               </span>
             )}
-            <span className="tabular-nums text-[var(--accent)]">{fmtPrice(it.priceUsd)}</span>
+            <span className="tabular-nums text-[var(--muted)]">{fmtPrice(it.priceUsd)}</span>
+            {it.change24h !== 0 && (
+              <span className={`tabular-nums font-semibold ${it.change24h > 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                {it.change24h > 0 ? "▲" : "▼"}
+                {Math.abs(it.change24h).toFixed(1)}%
+              </span>
+            )}
           </a>
         ))}
       </div>

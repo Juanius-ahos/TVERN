@@ -50,6 +50,7 @@ export function Sidebar() {
         { href: "/bookmarks", label: "Bookmarks", icon: "bookmark" },
         { href: "/notifications", label: "Notifications", icon: "bell", badge: unread },
         { href: `/wallet/${user.address}`, label: "Profile", icon: "user" },
+        { href: "/settings", label: "Settings", icon: "gear" },
       ]
     : baseNav;
 

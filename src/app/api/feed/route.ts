@@ -21,13 +21,17 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
       ? { assetSymbol: { in: [...KNOWN_TICKERS] } }
       : {};
 
+  // "Latest" (no filter) is the social feed: people's posts only.
+  // The on-chain tabs (launch/whale/stock) show events only.
   const [events, posts] = await Promise.all([
-    prisma.event.findMany({
-      where,
-      orderBy: { blockTs: "desc" },
-      take: 40,
-      include: { _count: { select: { posts: true } } },
-    }),
+    filter
+      ? prisma.event.findMany({
+          where,
+          orderBy: { blockTs: "desc" },
+          take: 40,
+          include: { _count: { select: { posts: true } } },
+        })
+      : Promise.resolve([] as never[]),
     filter
       ? Promise.resolve([] as never[])
       : prisma.post.findMany({

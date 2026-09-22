@@ -8,7 +8,7 @@ const NETWORK = "robinhood";
 const MIN_USD = Number(process.env.MIN_EVENT_USD ?? 5000);
 const MAX_POOLS = Number(process.env.MAX_POOLS ?? 18);
 const MAX_TRADES_PER_POOL = Number(process.env.MAX_TRADES_PER_POOL ?? 6);
-const MIN_LAUNCH_LIQ = Number(process.env.MIN_LAUNCH_LIQ ?? 2000);
+const MIN_LAUNCH_LIQ = Number(process.env.MIN_LAUNCH_LIQ ?? 1000);
 
 type Trade = {
   txHash: string;
@@ -111,7 +111,12 @@ export async function runIngest(): Promise<{ pools: number; scanned: number; cre
   // --- New token launches: freshly created pools with real liquidity ---
   try {
     const fresh = (await getNewPools())
-      .filter((p) => p.poolAddress && p.baseSymbol && p.liquidityUsd >= MIN_LAUNCH_LIQ)
+      .filter(
+        (p) =>
+          p.poolAddress &&
+          p.baseSymbol &&
+          (p.liquidityUsd >= MIN_LAUNCH_LIQ || p.volume24 >= 1000)
+      )
       .slice(0, 20);
     for (const p of fresh) {
       const ts = p.createdAt ? new Date(p.createdAt) : new Date();
