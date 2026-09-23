@@ -1,14 +1,13 @@
 import { Redis } from "@upstash/redis";
 
+// Vercel Storage injects KV_* names for the Upstash store; manual setups use UPSTASH_*.
+// Either wiring works — prefer UPSTASH_* if both are present.
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+
 // Upstash Redis for feed caching + rate limiting. Null (disabled) when env is unset,
 // so the app runs fine locally without it.
-export const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : null;
+export const redis = redisUrl && redisToken ? new Redis({ url: redisUrl, token: redisToken }) : null;
 
 // Cache helper: read JSON, or compute + store with a short TTL.
 export async function cached<T>(key: string, ttlSeconds: number, compute: () => Promise<T>): Promise<T> {
