@@ -11,15 +11,26 @@ export function AssetChart({ symbol }: { symbol: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/chart/${symbol}`)
-      .then((r) => r.json())
-      .then((d) => {
-        setPts(d.points ?? []);
-        setLast(d.last ?? d.points?.at?.(-1)?.c ?? null);
-        setChange(d.change24 ?? null);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    let alive = true;
+    const load = async () => {
+      try {
+        const d = await fetch(`/api/chart/${symbol}`, { cache: "no-store" }).then((r) => r.json());
+        if (!alive) return;
+        // Keep the last good chart if a poll comes back empty.
+        if (d.points?.length) {
+          setPts(d.points);
+          setLast(d.last ?? d.points.at(-1)?.c ?? null);
+          setChange(d.change24 ?? null);
+        }
+      } catch {}
+      if (alive) setLoading(false);
+    };
+    load();
+    const t = setInterval(load, 30_000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
   }, [symbol]);
 
   const W = 640;
@@ -59,7 +70,7 @@ export function AssetChart({ symbol }: { symbol: string }) {
       </div>
 
       {loading ? (
-        <div className="h-[150px] animate-pulse rounded-lg bg-white/[0.04]" />
+        <div className="skeleton h-[150px] rounded-lg" />
       ) : pts.length > 1 ? (
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 150 }}>
           <defs>
