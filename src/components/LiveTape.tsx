@@ -20,25 +20,22 @@ function fmtUsd(n: number): string {
   return `$${n.toFixed(0)}`;
 }
 
-const KIND: Record<string, { label: string; cls: string }> = {
-  BUY: { label: "BUY", cls: "text-emerald-400" },
-  SELL: { label: "SELL", cls: "text-rose-400" },
-  WHALE: { label: "WHALE", cls: "text-cyan-300" },
-  LAUNCH: { label: "NEW", cls: "text-[var(--accent-text)]" },
-};
-
 export function LiveTape({
   min = 0,
   wallet,
   title = "Live tape",
   compact = false,
   emptyText = "Waiting for the next trade…",
+  bare = false,
+  hideHeader = false,
 }: {
   min?: number;
   wallet?: string;
   title?: string;
   compact?: boolean;
   emptyText?: string;
+  bare?: boolean;
+  hideHeader?: boolean;
 }) {
   const [ticks, setTicks] = useState<Tick[]>([]);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
@@ -80,14 +77,16 @@ export function LiveTape({
   }, [min, wallet]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border hairline">
-      <div className="flex items-center justify-between border-b hairline px-4 py-3">
-        <h2 className="flex items-center gap-2 text-[15px] font-extrabold tracking-tight">
-          <span className="live-dot h-2 w-2 rounded-full bg-[var(--accent)]" />
-          {title}
-        </h2>
-        <span className="text-[11px] uppercase tracking-wide text-[var(--muted)]">Robinhood Chain</span>
-      </div>
+    <div className={bare ? "" : "overflow-hidden rounded-2xl border hairline"}>
+      {!hideHeader && (
+        <div className="flex items-center justify-between border-b hairline px-4 py-3">
+          <h2 className="mono flex items-center gap-2 text-[var(--text)]">
+            <span className="live-dot h-1.5 w-1.5 rounded-full bg-[var(--accent-text)]" />
+            {title}
+          </h2>
+          <span className="mono">Robinhood Chain</span>
+        </div>
+      )}
 
       <div className={compact ? "max-h-[360px] overflow-y-auto" : "max-h-[70vh] overflow-y-auto"}>
         {!ready ? (
@@ -96,28 +95,32 @@ export function LiveTape({
           <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">{emptyText}</p>
         ) : (
           ticks.map((t) => {
-            const k = KIND[t.kind] ?? KIND.BUY;
             const isFresh = fresh.has(t.id);
-            const flash = t.kind === "SELL" ? "bg-rose-400/10" : "bg-emerald-400/10";
+            const buy = t.kind === "BUY" || t.kind === "WHALE";
+            const flash = buy ? "bg-[color:var(--up)]/8" : "bg-[color:var(--down)]/8";
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 border-b border-white/[0.04] px-4 py-2.5 text-[13px] transition-colors duration-1000 ${
+                className={`flex items-center gap-3 border-b border-[var(--border)] px-4 py-2.5 text-[13px] transition-colors duration-1000 last:border-0 ${
                   isFresh ? flash : ""
                 }`}
               >
-                <span className={`w-12 shrink-0 text-[11px] font-bold ${k.cls}`}>{k.label}</span>
-                <a href={`/asset/${t.symbol}`} className="shrink-0 font-bold hover:text-[var(--accent-text)]">
+                <span
+                  className={`mono w-11 shrink-0 ${buy ? "text-[var(--up)]" : "text-[var(--down)]"}`}
+                >
+                  {t.kind === "WHALE" ? "Whale" : buy ? "Buy" : "Sell"}
+                </span>
+                <a href={`/asset/${t.symbol}`} className="shrink-0 font-semibold hover:underline">
                   ${t.symbol}
                 </a>
-                <span className="shrink-0 font-semibold tabular-nums text-[var(--text)]">{fmtUsd(t.usd)}</span>
+                <span className="shrink-0 tabular-nums">{fmtUsd(t.usd)}</span>
                 <a
                   href={`/wallet/${t.wallet}`}
                   className="ml-auto hidden font-mono text-[12px] text-[var(--muted)] hover:text-[var(--text)] sm:block"
                 >
                   {shortAddr(t.wallet)}
                 </a>
-                <span className="w-9 shrink-0 text-right text-[11px] text-[var(--muted)]">{timeAgo(t.ts)}</span>
+                <span className="w-9 shrink-0 text-right text-[11px] tabular-nums text-[var(--muted)]">{timeAgo(t.ts)}</span>
               </div>
             );
           })
