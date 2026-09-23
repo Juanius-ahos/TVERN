@@ -9,14 +9,8 @@ import { useSession } from "@/lib/useSession";
 
 const baseNav = [
   { href: "/", label: "Home", icon: "home" },
-  { href: "/live", label: "The Tape", icon: "bolt" },
+  { href: "/explore", label: "Explore", icon: "compass" },
   { href: "/search", label: "Search", icon: "search" },
-  { href: "/tokens", label: "Tokens", icon: "coins" },
-  { href: "/explore", label: "Explore", icon: "trending" },
-  { href: "/communities", label: "Communities", icon: "users" },
-  { href: "/whales", label: "Whales", icon: "waves" },
-  { href: "/stocks", label: "Stocks", icon: "trending" },
-  { href: "/docs", label: "Docs", icon: "book" },
 ];
 
 export function Sidebar() {
@@ -49,23 +43,20 @@ export function Sidebar() {
   const items = user
     ? [
         ...baseNav,
-        { href: "/messages", label: "Messages", icon: "mail", badge: dmUnread },
-        { href: "/watchlist", label: "Watchlist", icon: "star" },
-        { href: "/bookmarks", label: "Bookmarks", icon: "bookmark" },
         { href: "/notifications", label: "Notifications", icon: "bell", badge: unread },
+        { href: "/messages", label: "Messages", icon: "mail", badge: dmUnread },
         { href: `/wallet/${user.address}`, label: "Profile", icon: "user" },
-        { href: "/settings", label: "Settings", icon: "gear" },
       ]
     : baseNav;
 
   return (
     <aside className="sticky top-11 flex h-[calc(100dvh-2.75rem)] flex-col justify-between px-2 py-4 lg:px-3">
       <div>
-        <a href="/" className="mb-5 flex items-center px-2 py-1">
+        <a href="/" className="mb-6 flex items-center px-2 py-1">
           <Logo />
         </a>
 
-        <nav className="space-y-1">
+        <nav className="space-y-0.5">
           {items.map((n) => {
             const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
             const badge = "badge" in n ? (n.badge as number) : 0;
@@ -73,23 +64,19 @@ export function Sidebar() {
               <a
                 key={n.href}
                 href={n.href}
-                className={`group relative flex items-center gap-4 rounded-xl px-3 py-2.5 text-[15.5px] transition ${
-                  active
-                    ? "bg-[color:var(--accent)]/[0.1] font-bold text-[var(--text)] ring-1 ring-[color:var(--accent)]/20"
-                    : "text-[var(--muted)] hover:bg-white/[0.045] hover:text-[var(--text)]"
+                className={`group relative flex items-center gap-4 rounded-lg px-3 py-2.5 text-[15px] transition ${
+                  active ? "font-semibold text-[var(--text)]" : "text-[var(--muted)] hover:text-[var(--text)]"
                 }`}
               >
-                {active && (
-                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[var(--accent)]" />
-                )}
                 <span className="relative">
                   <Icon
                     name={n.icon}
-                    size={22}
-                    className={`transition ${active ? "text-[var(--accent)]" : "group-hover:text-[var(--text)]"}`}
+                    size={21}
+                    fill={active && (n.icon === "home" || n.icon === "user")}
+                    className={active ? "text-[var(--text)]" : "text-[var(--muted)] group-hover:text-[var(--text)]"}
                   />
                   {badge > 0 && (
-                    <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)] shadow-[0_0_10px_-2px_rgba(204,255,0,0.8)]">
+                    <span className="absolute -right-1.5 -top-1 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)]">
                       {badge > 9 ? "9+" : badge}
                     </span>
                   )}
@@ -98,11 +85,33 @@ export function Sidebar() {
               </a>
             );
           })}
+
+          {user && (
+            <a
+              href="/settings"
+              className={`group flex items-center gap-4 rounded-lg px-3 py-2.5 text-[15px] transition ${
+                pathname.startsWith("/settings")
+                  ? "font-semibold text-[var(--text)]"
+                  : "text-[var(--muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              <Icon name="gear" size={21} className="text-[var(--muted)] group-hover:text-[var(--text)]" />
+              <span className="hidden lg:block">Settings</span>
+            </a>
+          )}
         </nav>
       </div>
 
       <div className="px-1 pb-2">
         <ConnectButton />
+        <div className="mt-3 hidden gap-3 px-2 text-[12px] text-[var(--faint)] lg:flex">
+          <a href="/docs" className="hover:text-[var(--muted)]">
+            Docs
+          </a>
+          <a href="/tokens" className="hover:text-[var(--muted)]">
+            Markets
+          </a>
+        </div>
       </div>
     </aside>
   );

@@ -103,6 +103,12 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   moon: <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />,
+  compass: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m15.5 8.5-2 5-5 2 2-5z" />
+    </>
+  ),
   coins: (
     <>
       <ellipse cx="8" cy="6" rx="5" ry="2.6" />

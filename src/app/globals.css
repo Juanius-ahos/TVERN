@@ -1,58 +1,61 @@
 @import "tailwindcss";
 
+/* ============================================================
+   The Tavern — design system
+   Restrained, neutral, one accent. Hierarchy over decoration.
+   ============================================================ */
+
 :root {
-  /* Deep charcoal base with a hint of blue for depth */
-  --bg: #0c0d0f;
-  --bg-2: #0f1113;
-  --panel: #15171b;
-  --panel-2: rgba(255, 255, 255, 0.035);
-  --panel-hover: rgba(255, 255, 255, 0.06);
-  --border: rgba(255, 255, 255, 0.07);
+  /* Neutral dark scale (no color tint) */
+  --bg: #0b0b0c;
+  --surface: #141416;
+  --surface-2: #1b1b1e;
+  --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
-  --text: #f4f6f7;
-  --muted: #9099a6;
+  --text: #f4f4f5;
+  --muted: #8a8a90;
+  --faint: #5f5f66;
 
-  --accent: #ccff00; /* electric lime — the Robinhood Chain accent */
-  --accent-2: #a6e000;
+  /* One accent — the Robinhood Chain lime. Used sparingly. */
+  --accent: #ccff00;
   --accent-ink: #0d1400; /* text on lime */
-  --olive: #7e9e07;
-  --grad: linear-gradient(135deg, #ccff00 0%, #9fe030 100%);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px -12px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+  /* Market semantics only */
+  --up: #37d67a;
+  --down: #f4576b;
+
+  /* Elevation — subtle, near-flat */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px -14px rgba(0, 0, 0, 0.6);
+
+  /* Radius scale */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-full: 999px;
+
+  /* Legacy aliases (kept so existing components keep working during migration) */
+  --panel: var(--surface);
+  --panel-2: rgba(255, 255, 255, 0.03);
+  --panel-hover: rgba(255, 255, 255, 0.05);
+  --accent-2: #a6e000;
 }
 
-/* Light mode — warm parchment "daytime tavern" with the same lime accent. */
+/* Light — warm neutral, same accent */
 :root[data-theme="light"] {
-  --bg: #f6f7f3;
-  --bg-2: #eef0ea;
-  --panel: #ffffff;
-  --panel-2: rgba(18, 22, 12, 0.035);
-  --panel-hover: rgba(18, 22, 12, 0.055);
-  --border: rgba(18, 22, 12, 0.1);
-  --border-strong: rgba(18, 22, 12, 0.2);
-  --text: #14160f;
-  --muted: #616855;
-  --accent: #5f7d00; /* readable lime-olive for text & icons on light */
-  --accent-2: #506a00;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 10, 0.12);
-  --shadow-md: 0 10px 26px -16px rgba(20, 30, 10, 0.22);
-  --shadow-lg: 0 26px 60px -30px rgba(20, 30, 10, 0.26);
-}
-:root[data-theme="light"] .brand-gradient {
-  background: linear-gradient(120deg, #1b1e14 0%, #5f7d00 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-/* Keep the primary button bright lime in both themes. */
-:root[data-theme="light"] .btn-accent {
-  background: linear-gradient(180deg, #d6ff3d 0%, #ccff00 45%, #a6e000 100%);
-  color: #0d1400;
-}
-:root[data-theme="light"] body::after {
-  opacity: 0.015;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f6f6f4;
+  --border: rgba(17, 17, 17, 0.1);
+  --border-strong: rgba(17, 17, 17, 0.18);
+  --text: #16161a;
+  --muted: #6b6b72;
+  --faint: #9a9aa1;
+  --accent: #5f7d00; /* readable lime-olive for text/icons on light */
+  --shadow-md: 0 8px 26px -18px rgba(0, 0, 0, 0.25);
+  --panel: var(--surface);
+  --panel-2: rgba(17, 17, 17, 0.03);
+  --panel-hover: rgba(17, 17, 17, 0.05);
 }
 
 html {
@@ -68,36 +71,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.011em;
-  font-feature-settings: "cv11", "ss01";
-}
-
-/* Layered ambient background — soft lime aura up top, cool depth to the side, subtle grain. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    radial-gradient(1100px 620px at 50% -12%, rgba(204, 255, 0, 0.06), transparent 62%),
-    radial-gradient(900px 520px at 108% 4%, rgba(90, 130, 255, 0.045), transparent 55%),
-    radial-gradient(800px 500px at -8% 12%, rgba(120, 90, 255, 0.035), transparent 55%),
-    var(--bg);
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 h1,
 h2,
 h3 {
-  letter-spacing: -0.022em;
+  letter-spacing: -0.021em;
 }
 .tabular-nums,
 .tnum {
@@ -105,11 +84,11 @@ h3 {
 }
 
 ::selection {
-  background: rgba(204, 255, 0, 0.28);
-  color: #0d1400;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text);
 }
 :focus-visible {
-  outline: 2px solid rgba(204, 255, 0, 0.6);
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -119,93 +98,78 @@ h3 {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  background: rgba(140, 140, 150, 0.28);
+  border-radius: var(--r-full);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(140, 140, 150, 0.45);
   background-clip: padding-box;
 }
 
 /* ---------- surfaces ---------- */
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-}
 .hairline {
   border-color: var(--border);
 }
-/* A premium bordered card: faint top-light, soft shadow, gradient wash. */
-.surface {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 40%),
-    var(--panel-2);
+.panel {
+  background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+/* Sticky headers / bars — quiet frosted neutral, no color. */
 .glass {
-  background: color-mix(in srgb, var(--bg) 72%, transparent);
-  backdrop-filter: saturate(160%) blur(16px);
-  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(120%) blur(14px);
+  -webkit-backdrop-filter: saturate(120%) blur(14px);
 }
 
 .brand-gradient {
-  background: linear-gradient(120deg, #ffffff 0%, var(--accent) 60%, #b6e800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--text);
 }
 
 /* ---------- buttons ---------- */
 .btn-accent {
-  background: linear-gradient(180deg, #d6ff3d 0%, var(--accent) 45%, var(--accent-2) 100%);
+  background: var(--accent);
   color: var(--accent-ink);
-  font-weight: 700;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 8px 20px -12px rgba(204, 255, 0, 0.75);
-  transition: filter 0.15s ease, transform 0.08s ease, box-shadow 0.2s ease;
+  font-weight: 600;
+  transition: opacity 0.14s ease, transform 0.06s ease;
 }
 .btn-accent:hover {
-  filter: brightness(1.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 0 0 1px rgba(204, 255, 0, 0.35),
-    0 12px 28px -10px rgba(204, 255, 0, 0.8);
+  opacity: 0.9;
 }
 .btn-accent:active {
-  transform: translateY(1px);
+  transform: translateY(0.5px);
+}
+.btn-ghost {
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--border-strong);
+  background: var(--panel-hover);
 }
 .glow-accent {
-  box-shadow: 0 0 28px -6px rgba(204, 255, 0, 0.4);
+  box-shadow: none;
 }
 
-/* ---------- cards / rows ---------- */
+/* ---------- rows / cards ---------- */
 .card-hover {
-  transition:
-    transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1),
-    background 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
+  transition: background 0.14s ease;
 }
 .card-hover:hover {
   background: var(--panel-hover);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
-}
-/* Feed/thread article cards get a gentle lift. */
-article.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
 }
 
-/* ---------- motion ---------- */
-@keyframes fadeInUp {
+/* ---------- motion (minimal) ---------- */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -213,22 +177,31 @@ article.card-hover:hover {
   }
 }
 .animate-in {
-  animation: fadeInUp 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: fadeIn 0.2s ease both;
 }
 
-@keyframes livepulse {
+.live-dot {
+  position: relative;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  opacity: 0.5;
+  animation: livedot 2s ease-in-out infinite;
+}
+@keyframes livedot {
   0%,
   100% {
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgba(204, 255, 0, 0.5);
+    opacity: 0.35;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.55;
-    box-shadow: 0 0 0 6px rgba(204, 255, 0, 0);
+    opacity: 0;
+    transform: scale(1.8);
   }
-}
-.live-dot {
-  animation: livepulse 1.8s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -239,14 +212,28 @@ article.card-hover:hover {
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.04) 25%,
-    rgba(255, 255, 255, 0.09) 37%,
-    rgba(255, 255, 255, 0.04) 63%
+    rgba(140, 140, 150, 0.08) 25%,
+    rgba(140, 140, 150, 0.16) 37%,
+    rgba(140, 140, 150, 0.08) 63%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease infinite;
 }
 
+/* loader bar (branded loading) */
+@keyframes loaderslide {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+.loader-bar {
+  animation: loaderslide 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* login sheen (marketing only) */
 @keyframes sheen {
   0%,
   100% {
@@ -263,87 +250,6 @@ article.card-hover:hover {
   background-clip: text;
   color: transparent;
   animation: sheen 6s ease-in-out infinite;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.marquee-track {
-  display: inline-flex;
-  white-space: nowrap;
-  animation: marquee 60s linear infinite;
-  will-change: transform;
-}
-.marquee-mask:hover .marquee-track {
-  animation-play-state: paused;
-}
-
-/* Slow "lantern" breathing of the ambient aura. */
-@keyframes aura {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.72;
-  }
-}
-body::before {
-  animation: aura 9s ease-in-out infinite;
-}
-
-/* Branded loader: the mug breathes, a lime bar sweeps. */
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-}
-.breathe {
-  animation: breathe 2.4s ease-in-out infinite;
-}
-@keyframes loaderslide {
-  0% {
-    transform: translateX(-140%);
-  }
-  100% {
-    transform: translateX(260%);
-  }
-}
-.loader-bar {
-  animation: loaderslide 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-/* Shine sweep across the primary button on hover. */
-.btn-accent {
-  position: relative;
-  overflow: hidden;
-}
-.btn-accent::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
-  transform: translateX(-130%);
-  pointer-events: none;
-}
-.btn-accent:hover::after {
-  animation: shine 0.75s ease;
-}
-@keyframes shine {
-  to {
-    transform: translateX(130%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

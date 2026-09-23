@@ -5,7 +5,6 @@ import { Providers } from "./providers";
 import { Sidebar } from "@/components/Sidebar";
 import { RightRail } from "@/components/RightRail";
 import { TopBar } from "@/components/TopBar";
-import { MarketTicker } from "@/components/MarketTicker";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -29,8 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh antialiased">
         <Providers>
           <TopBar />
-          <MarketTicker />
-          <div className="mx-auto flex w-full max-w-[1760px]">
+          <div className="mx-auto flex w-full max-w-[1600px]">
             {/* Left nav */}
             <div className="w-[68px] shrink-0 border-r hairline lg:w-[248px]">
               <Sidebar />
