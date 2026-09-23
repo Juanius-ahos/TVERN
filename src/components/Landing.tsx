@@ -66,10 +66,12 @@ export function Landing() {
           </div>
 
           {stats && (
-            <div className="mt-12 flex flex-wrap gap-x-10 gap-y-4">
-              <Stat value={String(stats.tokens)} label="tokens tracked" />
+            <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-5">
+              <Stat value={String(stats.tokens)} label="Tokens tracked" />
+              <Divider />
               <Stat value={fmtBig(stats.volume24)} label="24h volume" />
-              <Stat value="Live" label="trade tape" accent />
+              <Divider />
+              <Stat value="Live" label="Trade tape" accent />
             </div>
           )}
           </div>
@@ -95,8 +97,18 @@ export function Landing() {
 function Stat({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
   return (
     <div>
-      <div className={`text-[26px] font-bold tabular-nums ${accent ? "text-[var(--accent-text)]" : ""}`}>{value}</div>
-      <div className="text-[13px] text-[var(--muted)]">{label}</div>
+      <div
+        className={`text-[30px] font-semibold leading-none tabular-nums ${
+          accent ? "text-[var(--accent-text)]" : "text-[var(--text)]"
+        }`}
+      >
+        {value}
+      </div>
+      <div className="mt-2 text-[11px] font-medium uppercase tracking-[0.13em] text-[var(--faint)]">{label}</div>
     </div>
   );
+}
+
+function Divider() {
+  return <div className="hidden h-9 w-px bg-[var(--border)] sm:block" />;
 }
