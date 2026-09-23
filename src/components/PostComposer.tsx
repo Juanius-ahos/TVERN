@@ -8,7 +8,7 @@ import { Icon } from "./Icon";
 export function PostComposer({
   onPosted,
   initialText = "",
-  placeholder = "what's happening on-chain?",
+  placeholder = "What's happening?",
   parentId,
   communityId,
   submitLabel = "Post",

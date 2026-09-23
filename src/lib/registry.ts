@@ -139,6 +139,28 @@ async function fetchPoolsCached(key: string, url: string, ttl = 45): Promise<Dis
   );
 }
 
+// A broad slice of the token universe — several pages of pools, deduped per token.
+export async function getPoolUniverse(pages = 5): Promise<DiscoverPool[]> {
+  const reqs: Promise<DiscoverPool[]>[] = [];
+  for (let p = 1; p <= pages; p++) {
+    reqs.push(
+      fetchPoolsCached(
+        `gt:pools:p${p}`,
+        `${GT}/networks/${NETWORK}/pools?page=${p}&sort=h24_volume_usd_desc&include=base_token,quote_token`,
+        60
+      )
+    );
+  }
+  const all = (await Promise.all(reqs)).flat();
+  const bySymbol = new Map<string, DiscoverPool>();
+  for (const p of all) {
+    if (!p.baseSymbol || p.priceUsd <= 0) continue;
+    const cur = bySymbol.get(p.baseSymbol);
+    if (!cur || p.volume24 > cur.volume24) bySymbol.set(p.baseSymbol, p);
+  }
+  return [...bySymbol.values()];
+}
+
 // Freshly created pools = new token launches.
 export async function getNewPools(): Promise<DiscoverPool[]> {
   return fetchPoolsCached(

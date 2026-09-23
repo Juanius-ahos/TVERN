@@ -84,8 +84,8 @@ export function Feed({
       <div className="space-y-3">
         {showComposer && filter === "" && canPost && <PostComposer onPosted={load} />}
         {showComposer && filter === "" && !canPost && (
-          <div className="rounded-2xl border hairline p-4 text-[14px] text-[var(--muted)]">
-            Pull up a stool — connect your wallet to post, reply, and follow wallets. Browsing is free.
+          <div className="rounded-xl border hairline p-4 text-[14px] text-[var(--muted)]">
+            Sign in with your wallet to post and reply. Reading is open to everyone.
           </div>
         )}
 
@@ -100,10 +100,10 @@ export function Feed({
         {!loading && items.length === 0 && (
           <div className="rounded-2xl border hairline py-12 text-center text-[14px] text-[var(--muted)]">
             {filter === "stock"
-              ? "No tokenized-stock moves yet. Stock volume is quiet — check back."
+              ? "No tokenized-stock trades recently."
               : filter === "launch"
-              ? "No new launches indexed yet — refreshing from the chain."
-              : "Nothing here yet."}
+              ? "No new launches in the last few hours."
+              : "No posts yet."}
           </div>
         )}
 

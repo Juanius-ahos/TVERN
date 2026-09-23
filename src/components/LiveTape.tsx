@@ -91,7 +91,7 @@ export function LiveTape({
 
       <div className={compact ? "max-h-[360px] overflow-y-auto" : "max-h-[70vh] overflow-y-auto"}>
         {!ready ? (
-          <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">Tapping the kegs…</p>
+          <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">Loading…</p>
         ) : ticks.length === 0 ? (
           <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">{emptyText}</p>
         ) : (

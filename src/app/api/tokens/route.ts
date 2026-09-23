@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getActivePools, getTrendingPools, getNewPools, type DiscoverPool } from "@/lib/registry";
+import { getPoolUniverse, getTrendingPools, getNewPools, type DiscoverPool } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -21,50 +21,36 @@ function row(p: DiscoverPool) {
 
 // GET → the full live token screener (deduped, ranked) + market summary.
 export async function GET() {
-  const [trending, active, fresh] = await Promise.all([
+  const [universe, trending, fresh] = await Promise.all([
+    getPoolUniverse(5), // several pages — the real token universe, not just page 1
     getTrendingPools(),
-    getActivePools(),
     getNewPools(),
   ]);
 
-  // active pools lack change/mcap; trending + new carry the rich fields. Merge,
-  // preferring the richest record per symbol.
+  // Merge everything, keeping the richest record per token symbol.
   const bySymbol = new Map<string, DiscoverPool>();
   const add = (p: DiscoverPool) => {
     if (!p.baseSymbol || p.priceUsd <= 0) return;
     const cur = bySymbol.get(p.baseSymbol);
-    if (!cur || p.volume24 > cur.volume24 || (p.mcap > 0 && cur.mcap === 0)) {
-      bySymbol.set(p.baseSymbol, { ...cur, ...p });
+    if (!cur) {
+      bySymbol.set(p.baseSymbol, p);
+      return;
     }
+    // prefer more volume, and fill in mcap/change from whichever record has them
+    const merged: DiscoverPool = { ...cur };
+    if (p.volume24 > merged.volume24) merged.volume24 = p.volume24;
+    if (merged.mcap === 0 && p.mcap > 0) merged.mcap = p.mcap;
+    if (merged.fdv === 0 && p.fdv > 0) merged.fdv = p.fdv;
+    if (merged.change24h === 0 && p.change24h !== 0) merged.change24h = p.change24h;
+    if (!merged.createdAt && p.createdAt) merged.createdAt = p.createdAt;
+    if (merged.liquidityUsd === 0 && p.liquidityUsd > 0) merged.liquidityUsd = p.liquidityUsd;
+    bySymbol.set(p.baseSymbol, merged);
   };
+  universe.forEach(add);
   trending.forEach(add);
   fresh.forEach(add);
-  // active pools only have symbol/price/volume — enrich existing rows' volume.
-  for (const a of active) {
-    const cur = bySymbol.get(a.baseSymbol);
-    if (cur) {
-      if (a.volume24 > cur.volume24) cur.volume24 = a.volume24;
-    } else {
-      bySymbol.set(a.baseSymbol, {
-        poolAddress: a.poolAddress,
-        baseSymbol: a.baseSymbol,
-        baseAddress: a.baseAddress,
-        baseDecimals: a.baseDecimals,
-        quoteSymbol: a.quoteSymbol,
-        priceUsd: a.priceUsd,
-        volume24: a.volume24,
-        liquidityUsd: 0,
-        mcap: 0,
-        fdv: 0,
-        change1h: 0,
-        change24h: 0,
-        createdAt: null,
-        isStock: a.isStock,
-      });
-    }
-  }
 
-  const tokens = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 60).map(row);
+  const tokens = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 120).map(row);
 
   const stats = {
     tokens: tokens.length,
