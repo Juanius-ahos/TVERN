@@ -69,6 +69,7 @@ export type DiscoverPool = {
   baseSymbol: string;
   baseAddress: string;
   baseDecimals: number;
+  baseImageUrl: string;
   quoteSymbol: string;
   priceUsd: number;
   volume24: number;
@@ -86,13 +87,14 @@ function parsePools(data: unknown): DiscoverPool[] {
   const out: DiscoverPool[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = data as any;
-  const tokenById = new Map<string, { symbol: string; address: string; decimals: number }>();
+  const tokenById = new Map<string, { symbol: string; address: string; decimals: number; imageUrl: string }>();
   for (const inc of d?.included ?? []) {
     if (inc.type === "token") {
       tokenById.set(inc.id, {
         symbol: String(inc.attributes?.symbol ?? "").toUpperCase(),
         address: String(inc.attributes?.address ?? "").toLowerCase(),
         decimals: Number(inc.attributes?.decimals ?? 18),
+        imageUrl: String(inc.attributes?.image_url ?? ""),
       });
     }
   }
@@ -108,8 +110,9 @@ function parsePools(data: unknown): DiscoverPool[] {
     out.push({
       poolAddress: String(a.address ?? "").toLowerCase(),
       baseSymbol,
-      baseAddress: base?.address ?? "",
+      baseAddress: String(base?.address ?? "").toLowerCase(),
       baseDecimals: base?.decimals ?? 18,
+      baseImageUrl: base?.imageUrl ?? "",
       quoteSymbol,
       priceUsd: Number(a.base_token_price_usd ?? 0),
       volume24: Number(a.volume_usd?.h24 ?? 0),

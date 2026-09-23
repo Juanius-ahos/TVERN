@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 function row(p: DiscoverPool) {
   return {
     symbol: p.baseSymbol,
+    imageUrl: p.baseImageUrl || null,
     quote: p.quoteSymbol,
     priceUsd: p.priceUsd,
     volume24: p.volume24,
@@ -50,7 +51,7 @@ export async function GET() {
   trending.forEach(add);
   fresh.forEach(add);
 
-  const tokens = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 120).map(row);
+  const tokens = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 400).map(row);
 
   const stats = {
     tokens: tokens.length,

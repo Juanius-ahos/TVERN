@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 type Token = {
   symbol: string;
   quote: string;
+  imageUrl: string | null;
   priceUsd: number;
   volume24: number;
   liquidityUsd: number;
@@ -165,9 +166,17 @@ export default function TokensPage() {
                 <tr key={t.symbol + i} className="group">
                   <td className="border-b border-white/[0.04] px-3 py-2.5">
                     <a href={`/asset/${t.symbol}`} className="flex items-center gap-2">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[11px] font-bold text-[var(--accent-text)]">
-                        {t.symbol.slice(0, 2)}
-                      </span>
+                      {t.imageUrl ? (
+                        <img
+                          src={t.imageUrl}
+                          alt={`${t.symbol} logo`}
+                          className="h-7 w-7 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[11px] font-bold text-[var(--accent-text)]">
+                          {t.symbol.slice(0, 2)}
+                        </span>
+                      )}
                       <span className="font-bold group-hover:text-[var(--accent-text)]">${t.symbol}</span>
                       {t.isStock && (
                         <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[9px] font-bold text-[var(--accent-text)]">
