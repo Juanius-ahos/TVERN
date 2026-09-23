@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Sidebar } from "@/components/Sidebar";
@@ -7,17 +7,22 @@ import { RightRail } from "@/components/RightRail";
 import { TopBar } from "@/components/TopBar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  axes: ["opsz"],
+});
 
 export const metadata: Metadata = {
-  title: "The Tavern — where Robinhood Chain gathers",
+  title: "The Tavern — the live market and community for Robinhood Chain",
   description:
-    "Pull up a stool. Watch the whales, swap the alpha, and see what's happening on Robinhood Chain — live.",
+    "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
   icons: { icon: "/logo.svg", shortcut: "/logo.svg", apple: "/logo.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

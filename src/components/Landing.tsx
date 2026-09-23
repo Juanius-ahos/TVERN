@@ -1,0 +1,86 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { LiveTape } from "./LiveTape";
+
+function fmtBig(n: number): string {
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
+  return `$${n.toFixed(0)}`;
+}
+
+export function Landing() {
+  const [stats, setStats] = useState<{ tokens: number; volume24: number } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/tokens", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => d.stats && setStats(d.stats))
+      .catch(() => {});
+  }, []);
+
+  return (
+    <div>
+      {/* Hero */}
+      <section className="border-b hairline px-6 py-16 sm:px-10 sm:py-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border hairline px-3 py-1 text-[12px] font-medium text-[var(--muted)]">
+            <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+            Live on Robinhood Chain
+          </div>
+
+          <h1 className="display text-[42px] font-semibold leading-[1.05] tracking-tight sm:text-[64px]">
+            Where the chain
+            <br />
+            gathers.
+          </h1>
+
+          <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--muted)]">
+            The Tavern is the live market and community for Robinhood Chain. Every token, every trade, and every
+            conversation — in one place, in real time.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href="/login" className="btn-accent rounded-full px-6 py-2.5 text-[15px] font-semibold">
+              Connect wallet
+            </a>
+            <a href="/explore" className="btn-ghost rounded-full px-6 py-2.5 text-[15px] font-semibold">
+              Explore the chain
+            </a>
+          </div>
+
+          {stats && (
+            <div className="mt-12 flex flex-wrap gap-x-10 gap-y-4">
+              <Stat value={String(stats.tokens)} label="tokens tracked" />
+              <Stat value={fmtBig(stats.volume24)} label="24h volume" />
+              <Stat value="Live" label="trade tape" accent />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Live proof */}
+      <section className="px-6 py-12 sm:px-10">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="display text-[22px] font-semibold">Happening right now</h2>
+            <a href="/explore" className="text-[13px] text-[var(--muted)] hover:text-[var(--text)]">
+              View all →
+            </a>
+          </div>
+          <LiveTape title="Live trades" emptyText="Listening to the chain…" compact />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Stat({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
+  return (
+    <div>
+      <div className={`text-[26px] font-bold tabular-nums ${accent ? "text-[var(--accent)]" : ""}`}>{value}</div>
+      <div className="text-[13px] text-[var(--muted)]">{label}</div>
+    </div>
+  );
+}
