@@ -23,7 +23,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="grid h-7 w-7 place-items-center rounded-full text-[var(--muted)] transition hover:bg-white/[0.06] hover:text-[var(--accent)]"
+      className="grid h-7 w-7 place-items-center rounded-full text-[var(--muted)] transition hover:bg-white/[0.06] hover:text-[var(--accent-text)]"
       aria-label="Toggle light / dark"
       title="Toggle theme"
     >

@@ -19,7 +19,7 @@ export function LoginPanel() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // de-dupe connectors by name (EIP-6963 can surface duplicates)
+  // De-dupe connectors by name (EIP-6963 can surface duplicates).
   const seen = new Set<string>();
   const wallets = connectors.filter((c) => {
     const k = c.name.toLowerCase();
@@ -40,7 +40,7 @@ export function LoginPanel() {
         address,
         nonce,
         issuedAt: new Date().toISOString(),
-        chainId: chainId || 1, // sign on the wallet's current chain — no network switch
+        chainId: chainId || 1,
       });
       const signature = await signMessageAsync({ message });
       const res = await fetch("/api/auth/verify", {
@@ -48,59 +48,58 @@ export function LoginPanel() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message, signature }),
       });
-      if (!res.ok) throw new Error((await res.json()).error ?? "sign-in failed");
+      if (!res.ok) throw new Error((await res.json()).error ?? "Sign-in failed");
       await refresh();
       router.push("/");
       router.refresh();
     } catch (e: unknown) {
-      const m = e instanceof Error ? e.message : "sign-in failed";
-      setErr(m.includes("rejected") ? "Signature cancelled." : m);
+      const m = e instanceof Error ? e.message : "Sign-in failed";
+      setErr(m.toLowerCase().includes("reject") ? "Signature cancelled." : m);
     } finally {
       setBusy(false);
     }
   }
 
-  const Safety = (
-    <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-      <div className="mb-2 flex items-center gap-2 text-[13px] font-semibold text-[var(--accent)]">
-        <Icon name="check" size={15} /> Your funds are never at risk
-      </div>
-      <ul className="space-y-1.5 text-[13px] leading-relaxed text-neutral-300">
-        <li>· You only <b>sign a message</b> to prove the wallet is yours.</li>
-        <li>· It’s a <b>signature, not a transaction</b> — costs no gas.</li>
-        <li>· It <b>can’t move, spend, or approve</b> any of your tokens or ETH.</li>
-        <li>· We never see your seed phrase or private keys.</li>
-        <li>· Disconnect anytime.</li>
-      </ul>
-    </div>
+  const safety = (
+    <p className="mt-5 text-[12.5px] leading-relaxed text-[var(--faint)]">
+      Signing in is a <span className="text-[var(--muted)]">message signature</span>, not a transaction — it costs no
+      gas and can&apos;t move or approve your funds. We never see your keys.
+    </p>
   );
 
   return (
-    <div className="w-full max-w-[420px]">
-      {/* Already signed in */}
+    <div className="w-full max-w-[380px]">
       {user ? (
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-xl">
-          <p className="text-[15px] text-neutral-200">
-            Signed in as <span className="font-mono font-semibold text-[var(--accent)]">{user.username ?? shortAddr(user.address)}</span>
+        <div>
+          <h2 className="display text-[26px] font-semibold">You&apos;re in.</h2>
+          <p className="mt-1.5 text-[14px] text-[var(--muted)]">
+            Signed in as{" "}
+            <span className="font-medium text-[var(--text)]">{user.username ?? shortAddr(user.address)}</span>.
           </p>
-          <button onClick={() => router.push("/")} className="btn-accent mt-4 w-full rounded-full py-3 text-[15px]">
-            Enter The Tavern
+          <button onClick={() => router.push("/")} className="btn-accent mt-6 w-full rounded-full py-3 text-[15px]">
+            Enter
           </button>
         </div>
       ) : !isConnected ? (
-        /* Step 1: choose a wallet */
-        <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 backdrop-blur-xl">
-          <h2 className="text-[17px] font-bold">Connect your wallet</h2>
-          <p className="mt-1 text-[13px] text-neutral-400">Pick a wallet to continue. Browsing stays free.</p>
+        <div>
+          <h2 className="display text-[26px] font-semibold">Sign in</h2>
+          <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--muted)]">
+            Connect an EVM wallet to continue. New here? Your profile is created the moment you sign in.
+          </p>
 
-          <div className="mt-4 space-y-2">
+          <div className="mt-6 space-y-2">
             {wallets.length === 0 && (
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-[13px] text-neutral-400">
+              <div className="rounded-xl border hairline p-3 text-[13px] text-[var(--muted)]">
                 No wallet detected. Install{" "}
-                <a href="https://metamask.io/download/" target="_blank" rel="noreferrer" className="text-[var(--accent)] hover:underline">
+                <a
+                  href="https://metamask.io/download/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--accent-text)] hover:underline"
+                >
                   MetaMask
                 </a>{" "}
-                (or Rabby / Coinbase Wallet) and refresh.
+                (or Rabby, Coinbase Wallet) and refresh.
               </div>
             )}
             {wallets.map((c) => (
@@ -108,49 +107,46 @@ export function LoginPanel() {
                 key={c.uid}
                 onClick={() => connect({ connector: c })}
                 disabled={connecting}
-                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-[15px] font-medium transition hover:border-[color:var(--accent)]/50 hover:bg-white/[0.06] disabled:opacity-50"
+                className="flex w-full items-center gap-3 rounded-xl border hairline bg-[var(--surface)] px-4 py-3 text-[15px] font-medium transition hover:border-[color:var(--border-strong)] disabled:opacity-50"
               >
-                <span className="flex items-center gap-3">
-                  {c.icon ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.icon} alt="" className="h-6 w-6 rounded" />
-                  ) : (
-                    <span className="grid h-6 w-6 place-items-center rounded bg-[color:var(--accent)]/15 text-[var(--accent)]">
-                      <Icon name="bolt" size={14} />
-                    </span>
-                  )}
-                  {c.name}
-                </span>
-                <span className="text-neutral-500">→</span>
+                {c.icon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.icon} alt="" className="h-6 w-6 rounded-md" />
+                ) : (
+                  <span className="grid h-6 w-6 place-items-center rounded-md bg-[var(--surface-2)] text-[var(--muted)]">
+                    <Icon name="user" size={13} />
+                  </span>
+                )}
+                <span>{c.name}</span>
+                <span className="ml-auto text-[var(--faint)]">→</span>
               </button>
             ))}
           </div>
-          {Safety}
+          {safety}
         </div>
       ) : (
-        /* Step 2: sign the message */
-        <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 backdrop-blur-xl">
-          <h2 className="text-[17px] font-bold">Prove it’s you</h2>
-          <p className="mt-1 text-[13px] text-neutral-400">
-            Connected as <span className="font-mono text-neutral-200">{shortAddr(address ?? "")}</span>. Sign the message below to finish — it’s free and safe.
+        <div>
+          <h2 className="display text-[26px] font-semibold">One signature</h2>
+          <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--muted)]">
+            Connected as <span className="font-mono text-[var(--text)]">{shortAddr(address ?? "")}</span>. Sign to
+            confirm it&apos;s you — free and safe.
           </p>
 
-          <div className="mt-3 rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[12px] leading-relaxed text-neutral-400">
-            Sign in to The Tavern — no transaction, no gas.
-          </div>
-          <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-            Your wallet may show a routine “signature request” caution — that’s normal for any
-            sign-in. It’s <b>just a signature</b>: it can’t move funds or approve anything.
-          </p>
-
-          <button onClick={signIn} disabled={busy} className="btn-accent mt-4 w-full rounded-full py-3 text-[15px] disabled:opacity-50">
+          <button
+            onClick={signIn}
+            disabled={busy}
+            className="btn-accent mt-6 w-full rounded-full py-3 text-[15px] disabled:opacity-50"
+          >
             {busy ? "Check your wallet…" : "Sign in"}
           </button>
-          {err && <p className="mt-2 text-center text-[13px] text-rose-400">{err}</p>}
-          <button onClick={() => disconnect()} className="mt-3 block w-full text-center text-[13px] text-neutral-500 hover:text-neutral-300">
-            use a different wallet
+          {err && <p className="mt-2.5 text-center text-[13px] text-[var(--down)]">{err}</p>}
+          <button
+            onClick={() => disconnect()}
+            className="mt-3 block w-full text-center text-[13px] text-[var(--muted)] hover:text-[var(--text)]"
+          >
+            Use a different wallet
           </button>
-          {Safety}
+          {safety}
         </div>
       )}
     </div>

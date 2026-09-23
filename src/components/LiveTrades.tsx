@@ -107,7 +107,7 @@ export function LiveTrades({ symbol }: { symbol: string }) {
                 >
                   {t.side === "buy" ? "BUY" : "SELL"}
                 </span>
-                <span className={`shrink-0 font-semibold tabular-nums ${whale ? "text-[var(--accent)]" : ""}`}>
+                <span className={`shrink-0 font-semibold tabular-nums ${whale ? "text-[var(--accent-text)]" : ""}`}>
                   {fmtUsd(t.usd)}
                   {whale && " *"}
                 </span>

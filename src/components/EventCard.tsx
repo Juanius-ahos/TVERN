@@ -28,7 +28,7 @@ const kindStyle: Record<
   BUY: { label: "Buy", icon: "arrowUp", text: "text-emerald-300", bg: "bg-emerald-400/10" },
   SELL: { label: "Sell", icon: "arrowDown", text: "text-rose-300", bg: "bg-rose-400/10" },
   TRANSFER: { label: "Transfer", icon: "external", text: "text-neutral-300", bg: "bg-white/[0.06]" },
-  LAUNCH: { label: "New launch", icon: "bolt", text: "text-[var(--accent)]", bg: "bg-[color:var(--accent)]/12" },
+  LAUNCH: { label: "New launch", icon: "bolt", text: "text-[var(--accent-text)]", bg: "bg-[color:var(--accent)]/12" },
 };
 
 export function EventCard({
@@ -110,7 +110,7 @@ export function EventCard({
 
           <div className="mt-3 flex items-center gap-6 text-[13px] text-[var(--muted)]">
             {canPost && (
-              <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-1.5 transition hover:text-[var(--accent)]">
+              <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-1.5 transition hover:text-[var(--accent-text)]">
                 <Icon name="comment" size={16} />
                 {e.commentCount > 0 ? e.commentCount : ""}
               </button>
@@ -118,7 +118,7 @@ export function EventCard({
             {isLaunch ? (
               <a
                 href={`/asset/${e.assetSymbol}`}
-                className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+                className="flex items-center gap-1.5 transition hover:text-[var(--accent-text)]"
               >
                 <Icon name="trending" size={16} /> View token
               </a>
@@ -126,7 +126,7 @@ export function EventCard({
               <>
                 <button
                   onClick={followWallet}
-                  className={`flex items-center gap-1.5 transition hover:text-[var(--accent)] ${followed ? "text-[var(--accent)]" : ""}`}
+                  className={`flex items-center gap-1.5 transition hover:text-[var(--accent-text)] ${followed ? "text-[var(--accent-text)]" : ""}`}
                 >
                   <Icon name={followed ? "check" : "plus"} size={16} />
                   {followed ? "Following" : "Follow"}
@@ -135,7 +135,7 @@ export function EventCard({
                   href={`https://robinhoodchain.blockscout.com/tx/${e.txHash}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+                  className="flex items-center gap-1.5 transition hover:text-[var(--accent-text)]"
                 >
                   <Icon name="external" size={16} />
                 </a>

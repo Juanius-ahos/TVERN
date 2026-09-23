@@ -90,14 +90,14 @@ export function TopSearch({ autoFocus = false }: { autoFocus?: boolean }) {
                       href={`/asset/${a.symbol}`}
                       className="flex items-center gap-3 px-4 py-2 transition hover:bg-white/[0.04]"
                     >
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[13px] font-bold text-[var(--accent)]">
+                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[13px] font-bold text-[var(--accent-text)]">
                         $
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-1.5 text-[14px] font-semibold">
                           ${a.symbol}
                           {a.isStock && (
-                            <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent)]">
+                            <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent-text)]">
                               STOCK
                             </span>
                           )}
@@ -159,7 +159,7 @@ export function TopSearch({ autoFocus = false }: { autoFocus?: boolean }) {
                   e.preventDefault();
                   window.location.href = `/search?q=${encodeURIComponent(q.trim())}`;
                 }}
-                className="w-full border-t hairline px-4 py-2.5 text-left text-[13px] font-semibold text-[var(--accent)] transition hover:bg-white/[0.04]"
+                className="w-full border-t hairline px-4 py-2.5 text-left text-[13px] font-semibold text-[var(--accent-text)] transition hover:bg-white/[0.04]"
               >
                 See all results for “{q.trim()}”
               </button>

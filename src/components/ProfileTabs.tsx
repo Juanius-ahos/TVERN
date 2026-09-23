@@ -45,7 +45,7 @@ export function ProfileTabs({
   function Empty({ title, sub, cta }: { title: string; sub?: string; cta?: boolean }) {
     return (
       <div className="mx-4 rounded-2xl border hairline px-6 py-12 text-center">
-        <div className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-[color:var(--accent)]/12 text-[var(--accent)]">
+        <div className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-[color:var(--accent)]/12 text-[var(--accent-text)]">
           <Icon name="bolt" size={20} />
         </div>
         <p className="text-[15px] font-semibold">{title}</p>

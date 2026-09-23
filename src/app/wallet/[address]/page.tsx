@@ -135,7 +135,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
                 {user && (
                   <a
                     href={`/messages/${addr}`}
-                    className="rounded-full border hairline px-4 py-1.5 text-[14px] font-semibold transition hover:border-[color:var(--accent)]/50 hover:text-[var(--accent)]"
+                    className="rounded-full border hairline px-4 py-1.5 text-[14px] font-semibold transition hover:border-[color:var(--accent)]/50 hover:text-[var(--accent-text)]"
                   >
                     Message
                   </a>
@@ -160,14 +160,14 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
               href={user.website}
               target="_blank"
               rel="noreferrer nofollow"
-              className="font-semibold text-[var(--accent)] hover:underline"
+              className="font-semibold text-[var(--accent-text)] hover:underline"
             >
               {user.website.replace(/^https?:\/\//, "")}
             </a>
           )}
           {joined && <span>Joined {new Date(joined).toISOString().slice(0, 10)}</span>}
           {user && (
-            <span className="rounded bg-[color:var(--accent)]/12 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
+            <span className="rounded bg-[color:var(--accent)]/12 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--accent-text)]">
               on The Tavern
             </span>
           )}

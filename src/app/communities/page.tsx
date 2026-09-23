@@ -33,7 +33,7 @@ export default async function CommunitiesPage() {
                 className="card-hover rounded-2xl border hairline p-4"
               >
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[17px] font-bold text-[var(--accent)]">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[17px] font-bold text-[var(--accent-text)]">
                     {c.name.slice(0, 1).toUpperCase()}
                   </span>
                   <div className="min-w-0">

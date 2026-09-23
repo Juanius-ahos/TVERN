@@ -87,7 +87,7 @@ export default function TokensPage() {
         onClick={() => (on ? setAsc((v) => !v) : (setSort(k), setAsc(false)))}
         className={`cursor-pointer select-none px-3 py-2 text-[11px] font-semibold uppercase tracking-wide transition hover:text-[var(--text)] ${
           right ? "text-right" : "text-left"
-        } ${on ? "text-[var(--accent)]" : "text-[var(--muted)]"}`}
+        } ${on ? "text-[var(--accent-text)]" : "text-[var(--muted)]"}`}
       >
         {label}
         {on ? (asc ? " ↑" : " ↓") : ""}
@@ -128,7 +128,7 @@ export default function TokensPage() {
                 key={k}
                 onClick={() => setFilter(k)}
                 className={`rounded-full px-3 py-1 font-semibold capitalize transition ${
-                  filter === k ? "bg-[color:var(--accent)]/[0.12] text-[var(--accent)]" : "text-[var(--muted)]"
+                  filter === k ? "bg-[color:var(--accent)]/[0.12] text-[var(--accent-text)]" : "text-[var(--muted)]"
                 }`}
               >
                 {k === "all" ? "All" : k === "stock" ? "Stocks" : "New"}
@@ -165,12 +165,12 @@ export default function TokensPage() {
                 <tr key={t.symbol + i} className="group">
                   <td className="border-b border-white/[0.04] px-3 py-2.5">
                     <a href={`/asset/${t.symbol}`} className="flex items-center gap-2">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[11px] font-bold text-[var(--accent)]">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[11px] font-bold text-[var(--accent-text)]">
                         {t.symbol.slice(0, 2)}
                       </span>
-                      <span className="font-bold group-hover:text-[var(--accent)]">${t.symbol}</span>
+                      <span className="font-bold group-hover:text-[var(--accent-text)]">${t.symbol}</span>
                       {t.isStock && (
-                        <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[9px] font-bold text-[var(--accent)]">
+                        <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[9px] font-bold text-[var(--accent-text)]">
                           STOCK
                         </span>
                       )}

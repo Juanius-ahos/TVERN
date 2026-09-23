@@ -41,7 +41,7 @@ export function MarketTicker() {
           >
             <span className="font-bold text-[var(--text)]">${it.symbol}</span>
             {it.isStock && (
-              <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[9px] font-bold text-[var(--accent)]">
+              <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[9px] font-bold text-[var(--accent-text)]">
                 STOCK
               </span>
             )}

@@ -15,7 +15,7 @@ export default async function WatchlistPage() {
           <h1 className="text-[19px] font-bold tracking-tight">Watchlist</h1>
         </header>
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">
-          <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">
+          <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">
             Sign in
           </a>{" "}
           to build a watchlist of the assets you care about.
@@ -60,7 +60,7 @@ export default async function WatchlistPage() {
 
       {symbols.length === 0 ? (
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">
-          No assets yet. Open any <span className="font-semibold text-[var(--accent)]">$ticker</span> and tap{" "}
+          No assets yet. Open any <span className="font-semibold text-[var(--accent-text)]">$ticker</span> and tap{" "}
           <span className="font-semibold">Watch</span> to add it here.
         </div>
       ) : (
@@ -69,7 +69,7 @@ export default async function WatchlistPage() {
             <div key={s} className="card-hover flex items-center gap-3 rounded-2xl border hairline p-3">
               <a
                 href={`/asset/${s}`}
-                className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[16px] font-bold text-[var(--accent)]"
+                className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[16px] font-bold text-[var(--accent-text)]"
               >
                 $
               </a>
@@ -77,7 +77,7 @@ export default async function WatchlistPage() {
                 <span className="flex items-center gap-1.5 text-[15px] font-bold">
                   ${s}
                   {KNOWN_TICKERS.has(s) && (
-                    <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent)]">
+                    <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent-text)]">
                       STOCK
                     </span>
                   )}

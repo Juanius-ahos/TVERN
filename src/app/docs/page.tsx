@@ -29,7 +29,7 @@ export default function DocsPage() {
         <Section id="what" title="What it is">
           <p>
             The Tavern is where Robinhood Chain gathers. It fuses a social network with a live market terminal: post
-            and reply like a feed, but every <span className="font-semibold text-[var(--accent)]">$ticker</span> links
+            and reply like a feed, but every <span className="font-semibold text-[var(--accent-text)]">$ticker</span> links
             to a live asset page with price, market cap, a chart, and a streaming trade tape.
           </p>
           <p>

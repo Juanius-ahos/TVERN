@@ -49,7 +49,7 @@ export function TopBar() {
             href="https://robinhoodchain.blockscout.com"
             target="_blank"
             rel="noreferrer"
-            className="hidden items-center gap-1 text-[var(--muted)] transition hover:text-[var(--accent)] sm:inline-flex"
+            className="hidden items-center gap-1 text-[var(--muted)] transition hover:text-[var(--accent-text)] sm:inline-flex"
           >
             Explorer
           </a>

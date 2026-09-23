@@ -45,7 +45,7 @@ export default function MessagesPage() {
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">Loading…</div>
       ) : !user ? (
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">
-          <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">
+          <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">
             Sign in
           </a>{" "}
           to send and read messages.

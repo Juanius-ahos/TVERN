@@ -14,7 +14,7 @@ type Stats = {
 function Stat({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5 rounded-xl border hairline bg-[var(--panel-2)] px-3 py-2.5">
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[var(--accent)]">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[var(--accent-text)]">
         <Icon name={icon} size={16} />
       </span>
       <div className="min-w-0">

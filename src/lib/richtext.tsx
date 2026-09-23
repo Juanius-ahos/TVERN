@@ -15,7 +15,7 @@ export function RichText({ text }: { text: string }) {
     if (tok.startsWith("$")) {
       const sym = tok.slice(1).toUpperCase();
       parts.push(
-        <a key={key++} href={`/asset/${sym}`} className="font-semibold text-[var(--accent)] hover:underline">
+        <a key={key++} href={`/asset/${sym}`} className="font-semibold text-[var(--accent-text)] hover:underline">
           ${sym}
         </a>
       );
@@ -26,7 +26,7 @@ export function RichText({ text }: { text: string }) {
           href={tok}
           target="_blank"
           rel="noreferrer"
-          className="break-all text-[var(--accent)] hover:underline"
+          className="break-all text-[var(--accent-text)] hover:underline"
         >
           {tok}
         </a>

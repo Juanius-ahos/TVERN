@@ -24,7 +24,7 @@ const KIND: Record<string, { label: string; cls: string }> = {
   BUY: { label: "BUY", cls: "text-emerald-400" },
   SELL: { label: "SELL", cls: "text-rose-400" },
   WHALE: { label: "WHALE", cls: "text-cyan-300" },
-  LAUNCH: { label: "NEW", cls: "text-[var(--accent)]" },
+  LAUNCH: { label: "NEW", cls: "text-[var(--accent-text)]" },
 };
 
 export function LiveTape({
@@ -107,7 +107,7 @@ export function LiveTape({
                 }`}
               >
                 <span className={`w-12 shrink-0 text-[11px] font-bold ${k.cls}`}>{k.label}</span>
-                <a href={`/asset/${t.symbol}`} className="shrink-0 font-bold hover:text-[var(--accent)]">
+                <a href={`/asset/${t.symbol}`} className="shrink-0 font-bold hover:text-[var(--accent-text)]">
                   ${t.symbol}
                 </a>
                 <span className="shrink-0 font-semibold tabular-nums text-[var(--text)]">{fmtUsd(t.usd)}</span>

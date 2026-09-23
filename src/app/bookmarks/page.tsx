@@ -15,7 +15,7 @@ export default async function BookmarksPage() {
           <h1 className="text-[19px] font-bold tracking-tight">Bookmarks</h1>
         </header>
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">
-          <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">
+          <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">
             Sign in
           </a>{" "}
           to save posts for later.

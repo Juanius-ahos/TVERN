@@ -1,49 +1,38 @@
 /* eslint-disable @next/next/no-img-element */
 import { LoginPanel } from "@/components/LoginPanel";
-import { LoginBackground } from "@/components/LoginBackground";
-
-const NOISE =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 export default function LoginPage() {
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#08090b]">
-      {/* blurred app preview */}
-      <LoginBackground />
-      {/* scrim to sink the preview back */}
-      <div className="pointer-events-none absolute inset-0 bg-[#08090b]/55" />
-      {/* lime beam */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(120% 80% at 50% 0%, rgba(198,255,50,0.10), transparent 55%)" }}
-      />
-      {/* vignette */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(130% 100% at 50% 42%, transparent 34%, rgba(0,0,0,0.72) 100%)" }}
-      />
-      {/* film grain */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.035] mix-blend-overlay" style={{ backgroundImage: NOISE }} />
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--bg)]">
+      <div className="mx-auto grid min-h-dvh w-full max-w-6xl lg:grid-cols-2">
+        {/* Brand side */}
+        <div className="relative flex flex-col justify-between border-b hairline p-8 sm:p-12 lg:border-b-0 lg:border-r">
+          <a href="/" className="flex items-center gap-2.5">
+            <img src="/logo.svg" className="h-8 w-8" alt="" />
+            <span className="display text-[22px] font-semibold text-[var(--text)]">Tavern</span>
+          </a>
 
-      <div className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-12">
-        <img
-          src="/logo.svg"
-          alt="The Tavern"
-          className="mb-5 h-14 w-14"
-          style={{ filter: "drop-shadow(0 0 18px rgba(198,255,50,0.4))" }}
-        />
-        <h1 className="sheen-text text-center font-serif text-5xl font-normal leading-[0.98] tracking-tight sm:text-6xl">
-          The Tavern
-        </h1>
-        <p className="mt-3 max-w-sm text-center text-[15px] leading-relaxed text-neutral-400">
-          Where Robinhood Chain gathers — watch the whales, swap the alpha, pull up a stool.
-        </p>
+          <div className="py-10">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border hairline px-3 py-1 text-[12px] text-[var(--muted)]">
+              <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+              Live on Robinhood Chain
+            </div>
+            <h1 className="display text-[40px] font-semibold leading-[1.05] tracking-tight sm:text-[54px]">
+              Where the chain gathers.
+            </h1>
+            <p className="mt-5 max-w-md text-[16px] leading-relaxed text-[var(--muted)]">
+              The live market and community for Robinhood Chain. Your wallet is your account — no email, no password,
+              nothing to remember.
+            </p>
+          </div>
 
-        <div className="mt-8 flex w-full justify-center">
-          <LoginPanel />
+          <p className="text-[12px] text-[var(--faint)]">Not financial advice · wallet data is public</p>
         </div>
 
-        <p className="mt-8 text-[12px] text-neutral-600">Not financial advice · your wallet data is public on-chain</p>
+        {/* Connect side */}
+        <div className="flex items-center justify-center p-6 sm:p-12">
+          <LoginPanel />
+        </div>
       </div>
     </div>
   );

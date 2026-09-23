@@ -125,7 +125,7 @@ export function PostComposer({
               ))}
               <div className="flex items-center justify-between">
                 {pollOpts.length < 4 ? (
-                  <button onClick={addOpt} className="text-[13px] font-semibold text-[var(--accent)] hover:opacity-80">
+                  <button onClick={addOpt} className="text-[13px] font-semibold text-[var(--accent-text)] hover:opacity-80">
                     + Add option
                   </button>
                 ) : (
@@ -142,7 +142,7 @@ export function PostComposer({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="text-[var(--accent)] transition hover:opacity-80"
+                className="text-[var(--accent-text)] transition hover:opacity-80"
                 title="Add photo or video"
               >
                 <Icon name="external" size={18} />
@@ -150,7 +150,7 @@ export function PostComposer({
               {allowPoll && (
                 <button
                   onClick={togglePoll}
-                  className={`transition hover:opacity-80 ${pollOpts ? "text-[var(--accent)]" : "text-[var(--muted)]"}`}
+                  className={`transition hover:opacity-80 ${pollOpts ? "text-[var(--accent-text)]" : "text-[var(--muted)]"}`}
                   title="Add a poll"
                 >
                   <Icon name="trending" size={18} />

@@ -88,7 +88,7 @@ export default function DMThreadPage({ params }: { params: Promise<{ address: st
           <p className="py-10 text-center text-[14px] text-[var(--muted)]">Loading…</p>
         ) : !user ? (
           <p className="py-10 text-center text-[14px] text-[var(--muted)]">
-            <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">
+            <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">
               Sign in
             </a>{" "}
             to message.

@@ -79,7 +79,7 @@ export function Landing() {
 function Stat({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
   return (
     <div>
-      <div className={`text-[26px] font-bold tabular-nums ${accent ? "text-[var(--accent)]" : ""}`}>{value}</div>
+      <div className={`text-[26px] font-bold tabular-nums ${accent ? "text-[var(--accent-text)]" : ""}`}>{value}</div>
       <div className="text-[13px] text-[var(--muted)]">{label}</div>
     </div>
   );

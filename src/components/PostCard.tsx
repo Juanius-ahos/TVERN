@@ -94,7 +94,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             {p.community && (
               <a
                 href={`/c/${p.community.slug}`}
-                className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--muted)] transition hover:text-[var(--accent)]"
+                className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--muted)] transition hover:text-[var(--accent-text)]"
               >
                 {p.community.name}
               </a>
@@ -134,7 +134,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
           <div className="mt-3 flex items-center gap-6 text-[13px] text-[var(--muted)]">
             <a
               href={`/post/${p.id}`}
-              className="flex items-center gap-1.5 transition hover:text-[var(--accent)]"
+              className="flex items-center gap-1.5 transition hover:text-[var(--accent-text)]"
             >
               <Icon name="comment" size={16} /> {p.replyCount}
             </a>
@@ -152,7 +152,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             </button>
             <button
               onClick={bookmark}
-              className={`flex items-center gap-1.5 transition ${bookmarked ? "text-[var(--accent)]" : "hover:text-[var(--accent)]"}`}
+              className={`flex items-center gap-1.5 transition ${bookmarked ? "text-[var(--accent-text)]" : "hover:text-[var(--accent-text)]"}`}
               aria-label="Bookmark"
             >
               <Icon name="bookmark" size={16} fill={bookmarked} />

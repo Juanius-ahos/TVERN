@@ -34,7 +34,7 @@ export function WatchButton({ symbol, initialWatching }: { symbol: string; initi
       disabled={busy}
       className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[14px] font-semibold transition ${
         watching
-          ? "border hairline text-[var(--accent)] hover:border-rose-500/40 hover:text-rose-400"
+          ? "border hairline text-[var(--accent-text)] hover:border-rose-500/40 hover:text-rose-400"
           : "btn-accent"
       }`}
     >

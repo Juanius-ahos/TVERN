@@ -71,7 +71,7 @@ export function Feed({
               onClick={() => setFilter(t.key)}
               className={`flex-1 rounded-full px-3 py-1.5 font-semibold transition ${
                 filter === t.key
-                  ? "bg-[color:var(--accent)]/[0.12] text-[var(--accent)] ring-1 ring-[color:var(--accent)]/25"
+                  ? "bg-[color:var(--accent)]/[0.12] text-[var(--accent-text)] ring-1 ring-[color:var(--accent)]/25"
                   : "text-[var(--muted)] hover:text-[var(--text)]"
               }`}
             >

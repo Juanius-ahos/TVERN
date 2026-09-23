@@ -62,7 +62,7 @@ export function Poll({ poll, canVote }: { poll: PollData; canVote: boolean }) {
               />
             )}
             <span className="relative flex items-center justify-between gap-2">
-              <span className={`truncate ${isMine ? "font-semibold text-[var(--accent)]" : ""}`}>
+              <span className={`truncate ${isMine ? "font-semibold text-[var(--accent-text)]" : ""}`}>
                 {o.text}
                 {isMine && " ✓"}
               </span>

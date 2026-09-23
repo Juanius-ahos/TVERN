@@ -81,7 +81,7 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
             <h1 className="flex items-center gap-2 text-[19px] font-bold tracking-tight">
               ${symbol}
               {isStock && (
-                <span className="rounded bg-[color:var(--accent)]/15 px-1.5 py-0.5 text-xs font-semibold text-[var(--accent)]">
+                <span className="rounded bg-[color:var(--accent)]/15 px-1.5 py-0.5 text-xs font-semibold text-[var(--accent-text)]">
                   STOCK
                 </span>
               )}

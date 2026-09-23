@@ -61,7 +61,7 @@ export default function NotificationsPage() {
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">Loading…</div>
       ) : !user ? (
         <div className="px-4 py-12 text-center text-[14px] text-[var(--muted)]">
-          <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">
+          <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">
             Sign in
           </a>{" "}
           to see your notifications.
@@ -83,7 +83,7 @@ export default function NotificationsPage() {
                   n.read ? "" : "bg-[color:var(--accent)]/[0.05]"
                 }`}
               >
-                <span className="mt-1 text-[var(--accent)]">
+                <span className="mt-1 text-[var(--accent-text)]">
                   <Icon name={ICON[n.type]} size={18} fill={n.type === "LIKE"} />
                 </span>
                 <Avatar address={n.actor.address} src={n.actor.avatarUrl} size={36} />

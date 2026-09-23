@@ -94,7 +94,7 @@ export function RightRail() {
               <span className="w-4 shrink-0 text-[13px] text-[var(--muted)]">{i + 1}</span>
               <span className="truncate font-bold">${t.symbol}</span>
               {t.isStock && (
-                <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-semibold text-[var(--accent)]">STOCK</span>
+                <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-semibold text-[var(--accent-text)]">STOCK</span>
               )}
             </div>
             <div className="text-right">

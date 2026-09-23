@@ -115,14 +115,14 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     href={`/asset/${a.symbol}`}
                     className="card-hover flex items-center gap-3 rounded-2xl border hairline p-3"
                   >
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[15px] font-bold text-[var(--accent)]">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[15px] font-bold text-[var(--accent-text)]">
                       $
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-1.5 text-[15px] font-bold">
                         ${a.symbol}
                         {a.isStock && (
-                          <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent)]">
+                          <span className="rounded bg-[color:var(--accent)]/15 px-1 text-[10px] font-bold text-[var(--accent-text)]">
                             STOCK
                           </span>
                         )}

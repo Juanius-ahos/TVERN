@@ -41,7 +41,7 @@ export default async function CommunityPage({ params }: { params: Promise<{ slug
       <header className="sticky top-11 z-20 border-b hairline bg-[var(--bg)]/85 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[19px] font-bold text-[var(--accent)]">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[19px] font-bold text-[var(--accent-text)]">
               {community.name.slice(0, 1).toUpperCase()}
             </span>
             <div>
@@ -66,7 +66,7 @@ export default async function CommunityPage({ params }: { params: Promise<{ slug
           <div className="rounded-2xl border hairline p-4 text-center text-[14px] text-[var(--muted)]">
             {session ? "Join this community to post." : (
               <>
-                <a href="/login" className="font-semibold text-[var(--accent)] hover:underline">Sign in</a> and join to post.
+                <a href="/login" className="font-semibold text-[var(--accent-text)] hover:underline">Sign in</a> and join to post.
               </>
             )}
           </div>

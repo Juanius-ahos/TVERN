@@ -16,9 +16,10 @@
   --muted: #9c9486;
   --faint: #6b655b;
 
-  /* One accent — the Robinhood Chain lime. Used sparingly. */
+  /* Brand lime — IDENTICAL in both themes (fills, buttons, logo, badges, live dot). */
   --accent: #ccff00;
   --accent-ink: #14180a; /* text on lime */
+  --accent-text: #ccff00; /* accent used AS text/icons — darkens on light for contrast */
   /* A rare warm highlight (lantern) — used only for the live pulse / small marks. */
   --ember: #f0a63c;
 
@@ -53,7 +54,9 @@
   --text: #1b1712;
   --muted: #6c6459;
   --faint: #9a9186;
-  --accent: #5f7d00; /* readable lime-olive for text/icons on light */
+  /* Brand lime is unchanged; only accent-as-text darkens for readability on light. */
+  --accent: #ccff00;
+  --accent-text: #47630a;
   --ember: #b9781f;
   --shadow-md: 0 8px 26px -18px rgba(40, 30, 15, 0.22);
   --panel: var(--surface);
