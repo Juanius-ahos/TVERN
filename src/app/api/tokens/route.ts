@@ -44,8 +44,13 @@ export async function GET() {
     if (merged.mcap === 0 && p.mcap > 0) merged.mcap = p.mcap;
     if (merged.fdv === 0 && p.fdv > 0) merged.fdv = p.fdv;
     if (merged.change24h === 0 && p.change24h !== 0) merged.change24h = p.change24h;
+    if (merged.change1h === 0 && p.change1h !== 0) merged.change1h = p.change1h;
     if (!merged.createdAt && p.createdAt) merged.createdAt = p.createdAt;
     if (merged.liquidityUsd === 0 && p.liquidityUsd > 0) merged.liquidityUsd = p.liquidityUsd;
+    // Fill in the token's real logo / address / price from whichever source has it.
+    if (!merged.baseImageUrl && p.baseImageUrl) merged.baseImageUrl = p.baseImageUrl;
+    if (!merged.baseAddress && p.baseAddress) merged.baseAddress = p.baseAddress;
+    if (!(merged.priceUsd > 0) && p.priceUsd > 0) merged.priceUsd = p.priceUsd;
     bySymbol.set(p.baseSymbol, merged);
   };
   universe.forEach(add);

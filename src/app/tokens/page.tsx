@@ -47,6 +47,7 @@ export default function TokensPage() {
   const [asc, setAsc] = useState(false);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "stock" | "new">("all");
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -166,11 +167,13 @@ export default function TokensPage() {
                 <tr key={t.symbol + i} className="group">
                   <td className="border-b border-white/[0.04] px-3 py-2.5">
                     <a href={`/asset/${t.symbol}`} className="flex items-center gap-2">
-                      {t.imageUrl ? (
+                      {t.imageUrl && !brokenLogos.has(t.symbol) ? (
                         <img
                           src={t.imageUrl}
                           alt={`${t.symbol} logo`}
+                          loading="lazy"
                           className="h-7 w-7 shrink-0 rounded-full object-cover"
+                          onError={() => setBrokenLogos((s) => new Set(s).add(t.symbol))}
                         />
                       ) : (
                         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--accent)]/12 text-[11px] font-bold text-[var(--accent-text)]">
