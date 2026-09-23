@@ -142,19 +142,28 @@ async function fetchPoolsCached(key: string, url: string, ttl = 45): Promise<Dis
   );
 }
 
-// A broad slice of the token universe — several pages of pools, deduped per token.
-export async function getPoolUniverse(pages = 5): Promise<DiscoverPool[]> {
-  const reqs: Promise<DiscoverPool[]>[] = [];
-  for (let p = 1; p <= pages; p++) {
-    reqs.push(
-      fetchPoolsCached(
-        `gt:pools:p${p}`,
-        `${GT}/networks/${NETWORK}/pools?page=${p}&sort=h24_volume_usd_desc&include=base_token,quote_token`,
-        60
-      )
-    );
+// A broad slice of the token universe — the full paginated pool list, deduped per token.
+// GeckoTerminal rate-limits bursts (429), so we fetch pages in small batches with a short
+// gap instead of firing them all at once. Each page is cached with last-known-good, so across
+// the client's periodic refreshes the whole universe warms up and stays populated even if an
+// individual page is briefly rate-limited.
+export async function getPoolUniverse(pages = 10): Promise<DiscoverPool[]> {
+  const all: DiscoverPool[] = [];
+  const BATCH = 3;
+  for (let start = 1; start <= pages; start += BATCH) {
+    const batch: Promise<DiscoverPool[]>[] = [];
+    for (let p = start; p < start + BATCH && p <= pages; p++) {
+      batch.push(
+        fetchPoolsCached(
+          `gt:pools:p${p}`,
+          `${GT}/networks/${NETWORK}/pools?page=${p}&sort=h24_volume_usd_desc&include=base_token,quote_token`,
+          120
+        )
+      );
+    }
+    all.push(...(await Promise.all(batch)).flat());
+    if (start + BATCH <= pages) await new Promise((r) => setTimeout(r, 350));
   }
-  const all = (await Promise.all(reqs)).flat();
   const bySymbol = new Map<string, DiscoverPool>();
   for (const p of all) {
     if (!p.baseSymbol || p.priceUsd <= 0) continue;
@@ -180,6 +189,77 @@ export async function getTrendingPools(): Promise<DiscoverPool[]> {
     `${GT}/networks/${NETWORK}/trending_pools?duration=1h&include=base_token,quote_token`,
     30
   );
+}
+
+// ---- DexScreener: a second keyless market source (chainId "robinhood") ----
+// GeckoTerminal alone rate-limits and only surfaces its top pools. DexScreener indexes the
+// same chain with laxer limits and catches tokens GT misses, so we merge it into the universe.
+const DEXS = "https://api.dexscreener.com";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseDexPairs(payload: any): DiscoverPool[] {
+  const list: any[] = Array.isArray(payload) ? payload : payload?.pairs ?? []; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const out: DiscoverPool[] = [];
+  for (const p of list) {
+    if (p?.chainId && p.chainId !== NETWORK) continue;
+    const b = p?.baseToken ?? {};
+    const sym = String(b.symbol ?? "");
+    if (!sym || PLUMBING.has(sym.toUpperCase())) continue;
+    const price = Number(p?.priceUsd ?? 0);
+    if (!(price > 0)) continue;
+    out.push({
+      poolAddress: String(p?.pairAddress ?? ""),
+      baseSymbol: sym,
+      baseAddress: String(b.address ?? "").toLowerCase(),
+      baseDecimals: 18,
+      baseImageUrl: String(p?.info?.imageUrl ?? ""),
+      quoteSymbol: String(p?.quoteToken?.symbol ?? ""),
+      priceUsd: price,
+      volume24: Number(p?.volume?.h24 ?? 0),
+      liquidityUsd: Number(p?.liquidity?.usd ?? 0),
+      mcap: Number(p?.marketCap ?? 0),
+      fdv: Number(p?.fdv ?? 0),
+      change1h: Number(p?.priceChange?.h1 ?? 0),
+      change24h: Number(p?.priceChange?.h24 ?? 0),
+      createdAt: p?.pairCreatedAt ? new Date(p.pairCreatedAt).toISOString() : null,
+      isStock: KNOWN_TICKERS.has(sym.toUpperCase()),
+    });
+  }
+  return out;
+}
+
+async function fetchDexCached(key: string, url: string, ttl = 90): Promise<DiscoverPool[]> {
+  return liveCached(
+    key,
+    ttl,
+    async () => {
+      const res = await fetch(url, {
+        headers: {
+          accept: "application/json",
+          "User-Agent": "Mozilla/5.0 (compatible; wtf-happened/0.1)",
+        },
+      });
+      if (!res.ok) throw new Error(`dexscreener ${res.status}`);
+      return parseDexPairs(await res.json());
+    },
+    (p) => p.length === 0
+  );
+}
+
+// DexScreener universe: base tokens paired against the chain's main quote assets (USDG, WETH).
+export async function getDexUniverse(): Promise<DiscoverPool[]> {
+  const quotes = [USDG, WETH];
+  const results = await Promise.all(
+    quotes.map((q, i) =>
+      fetchDexCached(`ds:pairs:${i}`, `${DEXS}/token-pairs/v1/${NETWORK}/${q}`, 90)
+    )
+  );
+  const bySymbol = new Map<string, DiscoverPool>();
+  for (const p of results.flat()) {
+    const cur = bySymbol.get(p.baseSymbol);
+    if (!cur || p.volume24 > cur.volume24) bySymbol.set(p.baseSymbol, p);
+  }
+  return [...bySymbol.values()];
 }
 
 // Live search results for a query (cached briefly, shared).

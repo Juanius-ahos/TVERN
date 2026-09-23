@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPoolUniverse, getTrendingPools, getNewPools, type DiscoverPool } from "@/lib/registry";
+import { getPoolUniverse, getDexUniverse, getTrendingPools, getNewPools, type DiscoverPool } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +22,9 @@ function row(p: DiscoverPool) {
 
 // GET → the full live token screener (deduped, ranked) + market summary.
 export async function GET() {
-  const [universe, trending, fresh] = await Promise.all([
-    getPoolUniverse(5), // several pages — the real token universe, not just page 1
+  const [universe, dex, trending, fresh] = await Promise.all([
+    getPoolUniverse(10), // full paginated pool list — the real token universe, not just page 1
+    getDexUniverse(), // second source (DexScreener) — catches tokens GeckoTerminal misses
     getTrendingPools(),
     getNewPools(),
   ]);
@@ -48,6 +49,7 @@ export async function GET() {
     bySymbol.set(p.baseSymbol, merged);
   };
   universe.forEach(add);
+  dex.forEach(add);
   trending.forEach(add);
   fresh.forEach(add);
 
