@@ -23,6 +23,38 @@
   --shadow-lg: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
 }
 
+/* Light mode — warm parchment "daytime tavern" with the same lime accent. */
+:root[data-theme="light"] {
+  --bg: #f6f7f3;
+  --bg-2: #eef0ea;
+  --panel: #ffffff;
+  --panel-2: rgba(18, 22, 12, 0.035);
+  --panel-hover: rgba(18, 22, 12, 0.055);
+  --border: rgba(18, 22, 12, 0.1);
+  --border-strong: rgba(18, 22, 12, 0.2);
+  --text: #14160f;
+  --muted: #616855;
+  --accent: #5f7d00; /* readable lime-olive for text & icons on light */
+  --accent-2: #506a00;
+  --shadow-sm: 0 1px 2px rgba(20, 30, 10, 0.12);
+  --shadow-md: 0 10px 26px -16px rgba(20, 30, 10, 0.22);
+  --shadow-lg: 0 26px 60px -30px rgba(20, 30, 10, 0.26);
+}
+:root[data-theme="light"] .brand-gradient {
+  background: linear-gradient(120deg, #1b1e14 0%, #5f7d00 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Keep the primary button bright lime in both themes. */
+:root[data-theme="light"] .btn-accent {
+  background: linear-gradient(180deg, #d6ff3d 0%, #ccff00 45%, #a6e000 100%);
+  color: #0d1400;
+}
+:root[data-theme="light"] body::after {
+  opacity: 0.015;
+}
+
 html {
   scroll-behavior: smooth;
 }

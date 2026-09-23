@@ -73,6 +73,8 @@ export type DiscoverPool = {
   priceUsd: number;
   volume24: number;
   liquidityUsd: number;
+  mcap: number;
+  fdv: number;
   change1h: number;
   change24h: number;
   createdAt: string | null;
@@ -112,6 +114,8 @@ function parsePools(data: unknown): DiscoverPool[] {
       priceUsd: Number(a.base_token_price_usd ?? 0),
       volume24: Number(a.volume_usd?.h24 ?? 0),
       liquidityUsd: Number(a.reserve_in_usd ?? 0),
+      mcap: Number(a.market_cap_usd ?? a.fdv_usd ?? 0),
+      fdv: Number(a.fdv_usd ?? 0),
       change1h: Number(a.price_change_percentage?.h1 ?? 0),
       change24h: Number(a.price_change_percentage?.h24 ?? 0),
       createdAt: a.pool_created_at ?? null,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 type Stats = {
   block: number | null;
@@ -43,14 +44,17 @@ export function TopBar() {
         <span className="hidden text-[var(--muted)] md:inline">
           Block <span className="font-semibold tabular-nums text-[var(--text)]">{block}</span>
         </span>
-        <a
-          href="https://robinhoodchain.blockscout.com"
-          target="_blank"
-          rel="noreferrer"
-          className="ml-auto hidden items-center gap-1 text-[var(--muted)] transition hover:text-[var(--accent)] sm:inline-flex"
-        >
-          Explorer
-        </a>
+        <div className="ml-auto flex items-center gap-3">
+          <a
+            href="https://robinhoodchain.blockscout.com"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden items-center gap-1 text-[var(--muted)] transition hover:text-[var(--accent)] sm:inline-flex"
+          >
+            Explorer
+          </a>
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );

@@ -96,6 +96,27 @@ const paths: Record<string, React.ReactNode> = {
       <path d="m3 7 9 6 9-6" />
     </>
   ),
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </>
+  ),
+  moon: <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />,
+  coins: (
+    <>
+      <ellipse cx="8" cy="6" rx="5" ry="2.6" />
+      <path d="M3 6v5c0 1.4 2.2 2.6 5 2.6s5-1.2 5-2.6V6" />
+      <path d="M13 12.5c.7 1 2.6 1.8 5 1.8 2.8 0 5-1.2 5-2.6V6.5" />
+      <ellipse cx="16" cy="6.5" rx="5" ry="2.6" />
+    </>
+  ),
+  book: (
+    <>
+      <path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z" />
+      <path d="M8 3v18" />
+    </>
+  ),
   gear: (
     <>
       <circle cx="12" cy="12" r="3" />

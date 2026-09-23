@@ -11,10 +11,12 @@ const baseNav = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/live", label: "The Tape", icon: "bolt" },
   { href: "/search", label: "Search", icon: "search" },
+  { href: "/tokens", label: "Tokens", icon: "coins" },
   { href: "/explore", label: "Explore", icon: "trending" },
   { href: "/communities", label: "Communities", icon: "users" },
   { href: "/whales", label: "Whales", icon: "waves" },
   { href: "/stocks", label: "Stocks", icon: "trending" },
+  { href: "/docs", label: "Docs", icon: "book" },
 ];
 
 export function Sidebar() {
@@ -73,7 +75,7 @@ export function Sidebar() {
                 href={n.href}
                 className={`group relative flex items-center gap-4 rounded-xl px-3 py-2.5 text-[15.5px] transition ${
                   active
-                    ? "bg-[color:var(--accent)]/[0.1] font-bold text-white ring-1 ring-[color:var(--accent)]/20"
+                    ? "bg-[color:var(--accent)]/[0.1] font-bold text-[var(--text)] ring-1 ring-[color:var(--accent)]/20"
                     : "text-[var(--muted)] hover:bg-white/[0.045] hover:text-[var(--text)]"
                 }`}
               >
