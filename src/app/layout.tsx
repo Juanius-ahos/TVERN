@@ -13,11 +13,31 @@ const fraunces = Fraunces({
   axes: ["opsz"],
 });
 
+const STABLE_URL = "https://web-juans-projects-853e3122.vercel.app";
+
 export const metadata: Metadata = {
-  title: "The Tavern — the live market and community for Robinhood Chain",
+  metadataBase: new URL(STABLE_URL),
+  title: {
+    default: "The Tavern — the live market and community for Robinhood Chain",
+    template: "%s · The Tavern",
+  },
   description:
     "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
   icons: { icon: "/logo.svg", shortcut: "/logo.svg", apple: "/logo.svg" },
+  openGraph: {
+    type: "website",
+    siteName: "The Tavern",
+    url: STABLE_URL,
+    title: "The Tavern — the live market and community for Robinhood Chain",
+    description:
+      "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
+  },
+  twitter: {
+    card: "summary",
+    title: "The Tavern — the live market and community for Robinhood Chain",
+    description:
+      "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

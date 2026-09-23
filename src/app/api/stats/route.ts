@@ -32,12 +32,15 @@ export async function GET() {
     ethUsd(),
   ]);
 
-  return NextResponse.json({
-    block: block ? Number(block) : null,
-    gasGwei: gas ? Number(gas) / 1e9 : null,
-    chainId: 4663,
-    blockTime: "0.1s",
-    events24,
-    ethUsd: eth,
-  });
+  return NextResponse.json(
+    {
+      block: block ? Number(block) : null,
+      gasGwei: gas ? Number(gas) / 1e9 : null,
+      chainId: 4663,
+      blockTime: "0.1s",
+      events24,
+      ethUsd: eth,
+    },
+    { headers: { "cache-control": "no-store" } }
+  );
 }

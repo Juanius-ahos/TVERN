@@ -1,0 +1,14 @@
+# Local env files must never leave the machine
+.env
+.env.*
+!.env.example
+
+# Local database + media
+dev.db
+*.db
+*.db-journal
+/public/uploads
+
+# Local tooling
+.vercel
+*.tsbuildinfo
