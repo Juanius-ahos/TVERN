@@ -4,11 +4,12 @@ import { AssetChart } from "@/components/AssetChart";
 import { ProfileTabs } from "@/components/ProfileTabs";
 import { ReloadComposer } from "@/components/ReloadComposer";
 import { WatchButton } from "@/components/WatchButton";
+import { LiveTrades } from "@/components/LiveTrades";
 import type { FeedPost } from "@/components/PostCard";
 import type { FeedEvent } from "@/components/EventCard";
 import { isStockTicker } from "@/lib/assets";
 import { postInclude, mapPost } from "@/lib/feedPost";
-import { resolvePool } from "@/lib/registry";
+import { getTokenStats } from "@/lib/registry";
 import { formatUsd } from "@/lib/format";
 
 function fmtPrice(n: number): string {
@@ -17,6 +18,13 @@ function fmtPrice(n: number): string {
   if (n >= 1) return `$${n.toFixed(2)}`;
   if (n >= 0.01) return `$${n.toFixed(4)}`;
   return `$${n.toPrecision(3)}`;
+}
+function fmtBig(n: number): string {
+  if (!n) return "—";
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+  return `$${n.toFixed(0)}`;
 }
 
 export default async function AssetPage({ params }: { params: Promise<{ symbol: string }> }) {
@@ -33,7 +41,7 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
     : false;
 
   const [market, rawEvents, rawPosts] = await Promise.all([
-    resolvePool(symbol),
+    getTokenStats(symbol),
     prisma.event.findMany({
       where: { assetSymbol: symbol },
       orderBy: { blockTs: "desc" },
@@ -87,7 +95,7 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
       </header>
 
       {market && (
-        <div className="grid grid-cols-2 gap-px border-b hairline bg-white/[0.04] sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-px border-b hairline bg-white/[0.04] sm:grid-cols-6">
           {[
             { label: "Price", value: fmtPrice(market.priceUsd) },
             {
@@ -95,13 +103,15 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
               value: `${market.change24h > 0 ? "+" : ""}${market.change24h.toFixed(2)}%`,
               tone: market.change24h > 0 ? "up" : market.change24h < 0 ? "down" : "",
             },
-            { label: "24h Volume", value: formatUsd(market.volume24) },
+            { label: "Mkt Cap", value: fmtBig(market.mcap) },
+            { label: "FDV", value: fmtBig(market.fdv) },
+            { label: "24h Vol", value: formatUsd(market.volume24) },
             { label: "Liquidity", value: formatUsd(market.liquidityUsd) },
           ].map((s) => (
-            <div key={s.label} className="bg-[var(--bg)] px-4 py-2.5">
-              <div className="text-[11px] uppercase tracking-wide text-[var(--muted)]">{s.label}</div>
+            <div key={s.label} className="bg-[var(--bg)] px-3 py-2.5">
+              <div className="text-[10.5px] uppercase tracking-wide text-[var(--muted)]">{s.label}</div>
               <div
-                className={`text-[15px] font-bold tabular-nums ${
+                className={`text-[14.5px] font-bold tabular-nums ${
                   s.tone === "up" ? "text-emerald-400" : s.tone === "down" ? "text-rose-400" : ""
                 }`}
               >
@@ -112,14 +122,19 @@ export default async function AssetPage({ params }: { params: Promise<{ symbol: 
         </div>
       )}
 
-      <div className="space-y-3 px-4 py-3">
-        <AssetChart symbol={symbol} />
-        {market?.quoteSymbol && (
-          <p className="text-[12px] text-[var(--muted)]">
-            Pair: {symbol}/{market.quoteSymbol} on Robinhood Chain
-          </p>
-        )}
-        {session && <ReloadComposer initialText={`$${symbol} `} placeholder={`Share your take on $${symbol}…`} />}
+      <div className="grid gap-3 px-4 py-3 lg:grid-cols-5">
+        <div className="space-y-3 lg:col-span-3">
+          <AssetChart symbol={symbol} />
+          {market?.quoteSymbol && (
+            <p className="text-[12px] text-[var(--muted)]">
+              Pair: {symbol}/{market.quoteSymbol} on Robinhood Chain
+            </p>
+          )}
+          {session && <ReloadComposer initialText={`$${symbol} `} placeholder={`Share your take on $${symbol}…`} />}
+        </div>
+        <div className="lg:col-span-2">
+          <LiveTrades symbol={symbol} />
+        </div>
       </div>
 
       <ProfileTabs

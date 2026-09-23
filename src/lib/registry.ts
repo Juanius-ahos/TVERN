@@ -177,3 +177,91 @@ export async function searchTokens(query: string): Promise<DiscoverPool[]> {
   }
   return [...bySymbol.values()];
 }
+
+export type Trade = {
+  side: "buy" | "sell";
+  usd: number;
+  amount: number;
+  wallet: string;
+  txHash: string;
+  ts: string;
+};
+
+// Live trade tape for a token's top pool (newest first).
+export async function getTradesForSymbol(symbol: string): Promise<Trade[]> {
+  const pool = await resolvePool(symbol);
+  if (!pool?.poolAddress) return [];
+  return liveCached(
+    `gt:trades:${pool.poolAddress}`,
+    6,
+    async () => {
+      const res = await fetch(`${GT}/networks/${NETWORK}/pools/${pool.poolAddress}/trades`, {
+        headers: { accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(`gt ${res.status}`);
+      const d = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return ((d.data ?? []) as any[]).map((t) => {
+        const a = t.attributes ?? {};
+        const side: "buy" | "sell" = a.kind === "sell" ? "sell" : "buy";
+        return {
+          side,
+          usd: Number(a.volume_in_usd ?? 0),
+          amount: Number(side === "buy" ? a.to_token_amount : a.from_token_amount) || 0,
+          wallet: String(a.tx_from_address ?? "").toLowerCase(),
+          txHash: String(a.tx_hash ?? ""),
+          ts: a.block_timestamp ?? new Date().toISOString(),
+        } as Trade;
+      });
+    },
+    (a) => a.length === 0
+  );
+}
+
+export type TokenStats = {
+  priceUsd: number;
+  fdv: number;
+  mcap: number;
+  supply: number;
+  volume24: number;
+  liquidityUsd: number;
+  change24h: number;
+  quoteSymbol: string;
+};
+
+// Deep market stats for a token (price, FDV, market cap, supply) — live.
+export async function getTokenStats(symbol: string): Promise<TokenStats | null> {
+  const pool = await resolvePool(symbol);
+  if (!pool) return null;
+  const base = {
+    priceUsd: pool.priceUsd,
+    fdv: 0,
+    mcap: 0,
+    supply: 0,
+    volume24: pool.volume24,
+    liquidityUsd: pool.liquidityUsd,
+    change24h: pool.change24h,
+    quoteSymbol: pool.quoteSymbol,
+  };
+  if (!pool.baseAddress) return base;
+  return liveCached(
+    `gt:tokstats:${pool.baseAddress}`,
+    30,
+    async () => {
+      const res = await fetch(`${GT}/networks/${NETWORK}/tokens/${pool.baseAddress}`, {
+        headers: { accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(`gt ${res.status}`);
+      const a = (await res.json())?.data?.attributes ?? {};
+      return {
+        ...base,
+        priceUsd: Number(a.price_usd ?? pool.priceUsd),
+        fdv: Number(a.fdv_usd ?? 0),
+        mcap: Number(a.market_cap_usd ?? a.fdv_usd ?? 0),
+        supply: Number(a.total_supply ?? 0),
+        volume24: Number(a.volume_usd?.h24 ?? pool.volume24),
+      };
+    },
+    (s) => !s || s.priceUsd <= 0
+  );
+}
