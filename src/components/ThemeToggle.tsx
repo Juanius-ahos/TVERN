@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { Icon } from "./Icon";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    const t = (document.documentElement.getAttribute("data-theme") as "dark" | "light") || "light";
+    const t = (document.documentElement.getAttribute("data-theme") as "dark" | "light") || "dark";
     setTheme(t);
   }, []);
 
