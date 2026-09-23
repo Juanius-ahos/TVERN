@@ -40,7 +40,7 @@ export function NetworkStats() {
     return () => clearInterval(t);
   }, []);
 
-  const gas = s?.gasGwei != null ? (s.gasGwei < 0.01 ? "< 0.01 gwei" : `${s.gasGwei.toFixed(2)} gwei`) : "—";
+  const gas = s?.gasGwei != null ? (s.gasGwei < 0.01 ? "< 0.01 gwei" : `${s.gasGwei.toFixed(2)} gwei`) : "-";
 
   return (
     <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">

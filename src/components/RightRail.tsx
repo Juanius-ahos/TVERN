@@ -19,7 +19,7 @@ type Pool = {
 type SuggestedUser = { id: string; address: string; username: string | null; avatarUrl: string | null; _count: { followers: number } };
 
 function fmtPrice(n: number): string {
-  if (!n) return "—";
+  if (!n) return "-";
   if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   if (n >= 1) return `$${n.toFixed(2)}`;
   if (n >= 0.01) return `$${n.toFixed(4)}`;
@@ -34,7 +34,7 @@ function ago(iso: string | null): string {
   return `${Math.floor(s / 86400)}d`;
 }
 function Pct({ v }: { v: number }) {
-  if (!v) return <span className="text-[var(--muted)]">—</span>;
+  if (!v) return <span className="text-[var(--muted)]">-</span>;
   const up = v > 0;
   return (
     <span className={`tabular-nums ${up ? "text-emerald-400" : "text-rose-400"}`}>

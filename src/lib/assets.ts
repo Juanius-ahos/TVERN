@@ -1,6 +1,6 @@
 // Robinhood-Chain-native asset helpers. "Assets" here = tokenized stocks and
 // RH-chain tokens. All market data comes from Robinhood Chain (GeckoTerminal /
-// on-chain), never global crypto/stock APIs — we stay inside the Robinhood world.
+// on-chain), never global crypto/stock APIs, we stay inside the Robinhood world.
 
 import { KNOWN_TICKERS } from "./registry";
 

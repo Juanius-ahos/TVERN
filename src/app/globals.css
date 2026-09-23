@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 /* ============================================================
-   The Tavern — design system
+   The Tavern, design system
    Restrained, neutral, one accent. Hierarchy over decoration.
    ============================================================ */
 
 :root {
-  /* Warm near-black — the Tavern at night. A hair of amber keeps it from feeling cold/generic. */
+  /* Warm near-black, the Tavern at night. A hair of amber keeps it from feeling cold/generic. */
   --bg: #0c0b0a;
   --surface: #16140f;
   --surface-2: #1e1b15;
@@ -16,18 +16,18 @@
   --muted: #9c9486;
   --faint: #6b655b;
 
-  /* Brand lime — IDENTICAL in both themes (fills, buttons, logo, badges, live dot). */
+  /* Brand lime, IDENTICAL in both themes (fills, buttons, logo, badges, live dot). */
   --accent: #ccff00;
   --accent-ink: #14180a; /* text on lime */
-  --accent-text: #ccff00; /* accent used AS text/icons — darkens on light for contrast */
-  /* A rare warm highlight (lantern) — used only for the live pulse / small marks. */
+  --accent-text: #ccff00; /* accent used AS text/icons, darkens on light for contrast */
+  /* A rare warm highlight (lantern), used only for the live pulse / small marks. */
   --ember: #f0a63c;
 
   /* Market semantics only */
   --up: #37d67a;
   --down: #f4576b;
 
-  /* Elevation — subtle, near-flat */
+  /* Elevation, subtle, near-flat */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 6px 24px -14px rgba(0, 0, 0, 0.6);
 
@@ -44,7 +44,7 @@
   --accent-2: #a6e000;
 }
 
-/* Light — warm parchment, daytime tavern */
+/* Light, warm parchment, daytime tavern */
 :root[data-theme="light"] {
   --bg: #faf8f2;
   --surface: #ffffff;
@@ -93,7 +93,7 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
-/* Display serif — the Tavern's voice. Brand, hero, section titles, empty states.
+/* Display serif, the Tavern's voice. Brand, hero, section titles, empty states.
    Never for dense UI or data. */
 .display {
   font-family: var(--font-display), ui-serif, Georgia, "Times New Roman", serif;
@@ -139,7 +139,7 @@ h3 {
   background: var(--surface);
   border: 1px solid var(--border);
 }
-/* Sticky headers / bars — quiet frosted neutral, no color. */
+/* Sticky headers / bars, quiet frosted neutral, no color. */
 .glass {
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(120%) blur(14px);
@@ -193,7 +193,7 @@ h3 {
 .card-hover:hover {
   background: var(--panel-hover);
 }
-/* subtle premium depth on grouped surfaces — a hairline top highlight */
+/* subtle premium depth on grouped surfaces, a hairline top highlight */
 .panel,
 .surface {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
@@ -284,6 +284,31 @@ h3 {
   background-clip: text;
   color: transparent;
   animation: sheen 6s ease-in-out infinite;
+}
+
+/* ---------- market ticker carousel (top-bar strip) ---------- */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  min-width: 200%;
+  animation: marquee 48s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ---------- landing animated backdrop (coded, blurred app simulation) ---------- */

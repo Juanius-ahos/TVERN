@@ -11,7 +11,7 @@ function fmtPrice(n: number): string {
   return `$${n.toPrecision(2)}`;
 }
 
-export function MarketTicker() {
+export function MarketTicker({ inline = false }: { inline?: boolean }) {
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -31,8 +31,8 @@ export function MarketTicker() {
   const row = [...items, ...items]; // duplicate for a seamless loop
 
   return (
-    <div className="marquee-mask overflow-hidden border-b hairline bg-[var(--bg)]/95">
-      <div className="marquee-track py-2 text-[12.5px]">
+    <div className={`marquee-mask overflow-hidden ${inline ? "" : "border-b hairline bg-[var(--bg)]/95"}`}>
+      <div className={`marquee-track text-[12.5px] ${inline ? "" : "py-2"}`}>
         {row.map((it, i) => (
           <a
             key={`${it.symbol}-${i}`}

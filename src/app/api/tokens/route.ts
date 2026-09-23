@@ -23,8 +23,8 @@ function row(p: DiscoverPool) {
 // GET → the full live token screener (deduped, ranked) + market summary.
 export async function GET() {
   const [universe, dex, trending, fresh] = await Promise.all([
-    getPoolUniverse(10), // full paginated pool list — the real token universe, not just page 1
-    getDexUniverse(), // second source (DexScreener) — catches tokens GeckoTerminal misses
+    getPoolUniverse(10), // full paginated pool list, the real token universe, not just page 1
+    getDexUniverse(), // second source (DexScreener), catches tokens GeckoTerminal misses
     getTrendingPools(),
     getNewPools(),
   ]);

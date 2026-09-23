@@ -142,7 +142,7 @@ async function fetchPoolsCached(key: string, url: string, ttl = 45): Promise<Dis
   );
 }
 
-// A broad slice of the token universe — the full paginated pool list, deduped per token.
+// A broad slice of the token universe, the full paginated pool list, deduped per token.
 // GeckoTerminal rate-limits bursts (429), so we fetch pages in small batches with a short
 // gap instead of firing them all at once. Each page is cached with last-known-good, so across
 // the client's periodic refreshes the whole universe warms up and stays populated even if an
@@ -282,7 +282,7 @@ export async function resolvePool(symbol: string): Promise<DiscoverPool | null> 
   return matches[0] ?? null;
 }
 
-// Live token search by symbol/name — one entry per base token, ranked by volume.
+// Live token search by symbol/name, one entry per base token, ranked by volume.
 export async function searchTokens(query: string): Promise<DiscoverPool[]> {
   const pools = await searchPoolsCached(query);
   const bySymbol = new Map<string, DiscoverPool>();
@@ -343,7 +343,7 @@ export type TokenStats = {
   quoteSymbol: string;
 };
 
-// Deep market stats for a token (price, FDV, market cap, supply) — live.
+// Deep market stats for a token (price, FDV, market cap, supply), live.
 export async function getTokenStats(symbol: string): Promise<TokenStats | null> {
   const pool = await resolvePool(symbol);
   if (!pool) return null;

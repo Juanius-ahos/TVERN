@@ -4,7 +4,7 @@ import { readSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// GET → { conversations, unread } — one row per other party, newest first.
+// GET → { conversations, unread }, one row per other party, newest first.
 export async function GET() {
   const session = await readSession();
   if (!session) return NextResponse.json({ conversations: [], unread: 0 });

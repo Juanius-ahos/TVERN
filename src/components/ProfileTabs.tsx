@@ -97,7 +97,7 @@ export function ProfileTabs({
               postsEmpty ? (
                 <Empty title={postsEmpty.title} sub={postsEmpty.sub} />
               ) : isOwn ? (
-                <Empty title="Your posts will live here" sub="Share a take, a chart, or a $ticker — pull up a stool." cta />
+                <Empty title="Your posts will live here" sub="Share a take, a chart, or a $ticker, pull up a stool." cta />
               ) : (
                 <Empty title={`${who} hasn't posted yet`} sub="Follow them to catch it when they do." />
               )

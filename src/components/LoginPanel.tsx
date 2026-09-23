@@ -62,7 +62,7 @@ export function LoginPanel() {
 
   const safety = (
     <p className="mt-5 text-[12.5px] leading-relaxed text-[var(--faint)]">
-      Signing in is a <span className="text-[var(--muted)]">message signature</span>, not a transaction — it costs no
+      Signing in is a <span className="text-[var(--muted)]">message signature</span>, not a transaction, it costs no
       gas and can&apos;t move or approve your funds. We never see your keys.
     </p>
   );
@@ -129,7 +129,7 @@ export function LoginPanel() {
           <h2 className="display text-[26px] font-semibold">One signature</h2>
           <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--muted)]">
             Connected as <span className="font-mono text-[var(--text)]">{shortAddr(address ?? "")}</span>. Sign to
-            confirm it&apos;s you — free and safe.
+            confirm it&apos;s you, free and safe.
           </p>
 
           <button

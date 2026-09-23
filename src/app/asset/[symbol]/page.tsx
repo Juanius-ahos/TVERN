@@ -13,14 +13,14 @@ import { getTokenStats } from "@/lib/registry";
 import { formatUsd } from "@/lib/format";
 
 function fmtPrice(n: number): string {
-  if (!n) return "—";
+  if (!n) return "-";
   if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   if (n >= 1) return `$${n.toFixed(2)}`;
   if (n >= 0.01) return `$${n.toFixed(4)}`;
   return `$${n.toPrecision(3)}`;
 }
 function fmtBig(n: number): string {
-  if (!n) return "—";
+  if (!n) return "-";
   if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
   if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;

@@ -18,7 +18,7 @@ type Row = {
 };
 
 /**
- * "Who to follow" — real people only, ranked by activity + engagement.
+ * "Who to follow", real people only, ranked by activity + engagement.
  * A user must have posted at least once (no empty/idle wallets recommended).
  * Score rewards being active (posts) and, more heavily, earning engagement
  * (likes, reposts, replies) and building an audience (followers).

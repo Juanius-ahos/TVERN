@@ -64,7 +64,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
         <div className="pt-1">
           {replies.length === 0 ? (
-            <div className="py-10 text-center text-[14px] text-[var(--muted)]">No replies yet — be the first.</div>
+            <div className="py-10 text-center text-[14px] text-[var(--muted)]">No replies yet, be the first.</div>
           ) : (
             <div className="space-y-3">
               {replies.map((r) => (

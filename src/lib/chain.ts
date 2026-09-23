@@ -3,7 +3,7 @@ import { createPublicClient, defineChain, http } from "viem";
 const RPC_URL =
   process.env.RPC_URL || "https://rpc.mainnet.chain.robinhood.com";
 
-// Robinhood Chain — Arbitrum Orbit L2, chain id 4663, ETH gas.
+// Robinhood Chain, Arbitrum Orbit L2, chain id 4663, ETH gas.
 export const robinhoodChain = defineChain({
   id: 4663,
   name: "Robinhood Chain",
@@ -19,7 +19,7 @@ export const robinhoodChain = defineChain({
   },
 });
 
-// Read-only client for querying the chain. A browser-like UA is required —
+// Read-only client for querying the chain. A browser-like UA is required -
 // the public RPC sits behind Cloudflare and drops requests with a blank UA.
 export const publicClient = createPublicClient({
   chain: robinhoodChain,

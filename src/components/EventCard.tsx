@@ -70,7 +70,7 @@ export function EventCard({
 
   const k = kindStyle[e.kind] ?? kindStyle.TRANSFER;
   const isLaunch = e.kind === "LAUNCH";
-  // For launches, `fromAddr` is the pool, not a wallet — key the visuals off the asset.
+  // For launches, `fromAddr` is the pool, not a wallet, key the visuals off the asset.
   const avatarSeed = isLaunch ? e.assetAddress || e.assetSymbol : e.fromAddr;
 
   return (

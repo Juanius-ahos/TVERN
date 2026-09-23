@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Coded, animated, blurred simulation of the app itself — charts, social posts,
- * tickers, interactions — drifting behind the hero. No stock imagery. Uses the
+ * Coded, animated, blurred simulation of the app itself, charts, social posts,
+ * tickers, interactions, drifting behind the hero. No stock imagery. Uses the
  * app's own tokens (surface / accent / up / down) so it reads as *this* product.
  * Data is static (no Math.random) to avoid hydration mismatches.
  */

@@ -39,7 +39,7 @@ function ago(iso: string | null): string {
   return `${Math.floor(s / 86400)}d`;
 }
 function Pct({ v }: { v: number }) {
-  if (!v) return <span className="text-[var(--muted)]">—</span>;
+  if (!v) return <span className="text-[var(--muted)]">-</span>;
   const up = v > 0;
   return (
     <span className={`tabular-nums font-semibold ${up ? "text-emerald-400" : "text-rose-400"}`}>
@@ -104,7 +104,7 @@ export default function ExplorePage() {
     <div>
       <header className="sticky top-11 z-20 border-b hairline bg-[var(--bg)]/85 px-4 py-3 backdrop-blur-xl">
         <h1 className="text-[19px] font-bold tracking-tight">Explore</h1>
-        <p className="text-[13px] text-[var(--muted)]">What&apos;s moving on Robinhood Chain — live</p>
+        <p className="text-[13px] text-[var(--muted)]">What&apos;s moving on Robinhood Chain, live</p>
       </header>
 
       <div className="space-y-4 px-4 py-4">
@@ -171,7 +171,7 @@ export default function ExplorePage() {
         {/* Top posters */}
         <Section title="Top voices this week">
           {social.topPosters.length === 0 && (
-            <p className="px-4 py-3 text-[13px] text-[var(--muted)]">Be the first — post something worth engaging with.</p>
+            <p className="px-4 py-3 text-[13px] text-[var(--muted)]">Be the first, post something worth engaging with.</p>
           )}
           {social.topPosters.map((p, i) => (
             <a

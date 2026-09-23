@@ -19,7 +19,7 @@ export function buildSiweMessage(p: SiweParams): string {
     nonce: p.nonce,
     uri: p.uri,
     version: "1",
-    statement: "Sign in to The Tavern. This only proves you own this wallet — no transaction, no gas.",
+    statement: "Sign in to The Tavern. This only proves you own this wallet, no transaction, no gas.",
     issuedAt: new Date(p.issuedAt),
   });
 }

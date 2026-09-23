@@ -47,7 +47,7 @@ export function PostMenu({ authorAddress, postId }: { authorAddress: string; pos
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ targetAddress: authorAddress, action }),
     });
-    setDone(action === "mute" ? "Muted — refresh to hide" : "Blocked — refresh to hide");
+    setDone(action === "mute" ? "Muted, refresh to hide" : "Blocked, refresh to hide");
     setTimeout(() => setDone(null), 3000);
   }
 

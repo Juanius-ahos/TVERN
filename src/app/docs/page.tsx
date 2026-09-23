@@ -1,4 +1,4 @@
-export const metadata = { title: "Docs — The Tavern" };
+export const metadata = { title: "Docs, The Tavern" };
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -60,7 +60,7 @@ export default function DocsPage() {
     <div>
       <header className="glass sticky top-11 z-20 border-b hairline px-4 py-3">
         <h1 className="text-[19px] font-bold tracking-tight">Docs</h1>
-        <p className="text-[13px] text-[var(--muted)]">How The Tavern works — for people and for developers</p>
+        <p className="text-[13px] text-[var(--muted)]">How The Tavern works, for people and for developers</p>
       </header>
 
       <div className="mx-auto max-w-2xl space-y-10 px-4 py-8">
@@ -68,7 +68,7 @@ export default function DocsPage() {
           <h2 className="brand-gradient display text-[30px] font-semibold tracking-tight">The Tavern</h2>
           <p className="mt-2 text-[16px] leading-relaxed text-[var(--text)]/85">
             The social layer and live market terminal for Robinhood Chain. Watch the whales, read the tape, discuss
-            every token — all in one place, all in real time.
+            every token, all in one place, all in real time.
           </p>
         </div>
 
@@ -92,7 +92,7 @@ export default function DocsPage() {
             links to a live asset page with price, market cap, a chart, and a streaming trade tape.
           </p>
           <p>
-            It is scoped entirely to Robinhood Chain — no global crypto noise. Tokenized stocks (NVDA, TSLA, SPY),
+            It is scoped entirely to Robinhood Chain, no global crypto noise. Tokenized stocks (NVDA, TSLA, SPY),
             memecoins, and fresh launches, all native to the chain.
           </p>
         </Section>
@@ -104,8 +104,8 @@ export default function DocsPage() {
               <b>Explore</b> for movers and trends, or any <b>$ticker</b> to see its chart and trades.
             </Step>
             <Step n={2} title="Connect your wallet">
-              Click <b>Connect wallet</b> and approve a one-time signature. It&apos;s <b>gasless</b> — a signature, never
-              a transaction — and there&apos;s no email or password. Your wallet is your identity.
+              Click <b>Connect wallet</b> and approve a one-time signature. It&apos;s <b>gasless</b>, a signature, never
+              a transaction, and there&apos;s no email or password. Your wallet is your identity.
             </Step>
             <Step n={3} title="Follow the action">
               Follow wallets (the whales) and people. Their trades and posts flow into your <b>Home</b> feed in real
@@ -121,11 +121,11 @@ export default function DocsPage() {
         <Section id="using" title="Using The Tavern">
           <div className="grid gap-2 sm:grid-cols-2">
             {[
-              ["Markets", "The live token screener — every token on the chain, sortable by price, 24h, market cap, volume, and age. Filter to stocks or fresh launches."],
+              ["Markets", "The live token screener, every token on the chain, sortable by price, 24h, market cap, volume, and age. Filter to stocks or fresh launches."],
               ["The Tape", "Every trade on the chain, streaming live. Filter to whales ($10k+) to watch the big money move."],
               ["Asset pages", "Open any $ticker for price, market cap, FDV, volume, liquidity, a live chart, and a per-token trade tape."],
               ["Explore", "Top gainers, most traded, fresh launches, trending cashtags, and a creator leaderboard."],
-              ["Feed & social", "Posts, replies, likes, reposts, polls, bookmarks, communities, and 1:1 messages — a real social layer."],
+              ["Feed & social", "Posts, replies, likes, reposts, polls, bookmarks, communities, and 1:1 messages, a real social layer."],
               ["Profiles & watchlist", "Wallet-native identity with live on-chain activity and tipping; save tokens to your watchlist to track them."],
             ].map(([t, d]) => (
               <div key={t} className="surface card-hover rounded-xl p-4">
@@ -140,12 +140,12 @@ export default function DocsPage() {
           <p>The Tavern reads Robinhood Chain two independent ways, and merges them:</p>
           <ul className="list-disc space-y-2 pl-5">
             <li>
-              <span className="font-semibold">Our own indexer</span> — reads ERC-20 transfer logs to and from each DEX
+              <span className="font-semibold">Our own indexer</span>, reads ERC-20 transfer logs to and from each DEX
               pool directly off the chain RPC and turns them into buy/sell events. Universal (works for any token) and
-              produces the fastest, freshest trades — often seconds old.
+              produces the fastest, freshest trades, often seconds old.
             </li>
             <li>
-              <span className="font-semibold">Market data (GeckoTerminal + DexScreener)</span> — keyless sources for
+              <span className="font-semibold">Market data (GeckoTerminal + DexScreener)</span>, keyless sources for
               prices, volume, market cap, liquidity, logos, and OHLCV charts, merged for the widest token coverage.
             </li>
           </ul>
@@ -157,7 +157,7 @@ export default function DocsPage() {
 
         <Section id="identity" title="Identity & safety">
           <p>
-            Your identity is your wallet — no email, no password. Browsing is free; posting uses a one-time gasless
+            Your identity is your wallet, no email, no password. Browsing is free; posting uses a one-time gasless
             signature (Sign-In with Ethereum), never a transaction. You can mute, block, delete your own posts, and
             manage everything from Settings. Wallet activity shown here is public on-chain data.
           </p>
@@ -165,7 +165,7 @@ export default function DocsPage() {
 
         <Section id="api" title="Developer API">
           <p>
-            The Tavern is built on a public read API — the same endpoints that power this app. Build bots, dashboards,
+            The Tavern is built on a public read API, the same endpoints that power this app. Build bots, dashboards,
             alerts, or your own frontend on Robinhood Chain data. No key required for read endpoints.
           </p>
           <div className="surface rounded-xl p-4 text-[13.5px]">
@@ -185,7 +185,7 @@ export default function DocsPage() {
           <div className="space-y-2.5">
             <Endpoint
               path="/api/tokens"
-              desc="The full live token screener plus a market summary — every token on the chain, deduped and ranked."
+              desc="The full live token screener plus a market summary, every token on the chain, deduped and ranked."
               resp={`{ "tokens": [{ "symbol", "imageUrl", "quote", "priceUsd",
   "volume24", "liquidityUsd", "mcap", "fdv", "change1h",
   "change24h", "createdAt", "isStock" }], "stats": {
@@ -193,7 +193,7 @@ export default function DocsPage() {
             />
             <Endpoint
               path="/api/market/ticker"
-              desc="The top market tickers (up to 20) — compact price + 24h change, for a header ticker or widget."
+              desc="The top market tickers (up to 20), compact price + 24h change, for a header ticker or widget."
               resp={`{ "items": [{ "symbol", "priceUsd", "change24h" }] }`}
             />
             <Endpoint
@@ -204,7 +204,7 @@ export default function DocsPage() {
             <Endpoint
               path="/api/chart/:symbol"
               desc="Price chart points for a single token."
-              params="symbol — e.g. NVDA"
+              params="symbol, e.g. NVDA"
               resp={`{ "points": [{ "t", "o", "h", "l", "c" }], "pool" }`}
             />
           </div>
@@ -213,20 +213,20 @@ export default function DocsPage() {
           <div className="space-y-2.5">
             <Endpoint
               path="/api/tape"
-              desc="The live trade tape across the whole chain — newest first."
-              params="min — optional USD floor (e.g. 10000 for whales)"
+              desc="The live trade tape across the whole chain, newest first."
+              params="min, optional USD floor (e.g. 10000 for whales)"
               resp={`{ "trades": [{ "symbol", "side", "usd", "amount",
   "wallet", "txHash", "ts" }] }`}
             />
             <Endpoint
               path="/api/trades/:symbol"
               desc="Recent trades for one token."
-              params="symbol — e.g. PONS"
+              params="symbol, e.g. PONS"
               resp={`{ "trades": [Trade] }`}
             />
             <Endpoint
               path="/api/stats"
-              desc="Chain & site totals — events in the last 24h, latest block, ETH price."
+              desc="Chain & site totals, events in the last 24h, latest block, ETH price."
               resp={`{ "events24h", "latestBlock", "ethUsd", ... }`}
             />
           </div>
@@ -235,18 +235,18 @@ export default function DocsPage() {
           <div className="space-y-2.5">
             <Endpoint
               path="/api/feed"
-              desc="The social feed — posts plus auto-generated on-chain event cards."
+              desc="The social feed, posts plus auto-generated on-chain event cards."
               resp={`{ "items": [Post | Event] }`}
             />
             <Endpoint
               path="/api/discover"
-              desc="Everything behind Explore — trending tokens, fresh launches, communities."
+              desc="Everything behind Explore, trending tokens, fresh launches, communities."
               resp={`{ "trending", "launches", "communities", ... }`}
             />
             <Endpoint
               path="/api/search"
               desc="Search across tokens, wallets, and people."
-              params="q — the query string"
+              params="q, the query string"
               resp={`{ "tokens", "wallets", "users" }`}
             />
             <Endpoint
@@ -270,8 +270,8 @@ export default function DocsPage() {
         <Section id="roadmap" title="Roadmap">
           <ul className="list-disc space-y-2 pl-5">
             <li>Price &amp; wallet alerts (get pinged when a token moves or a wallet you follow trades).</li>
-            <li>Verified trader track records — real on-chain P&amp;L on profiles.</li>
-            <li>Token safety scores — liquidity, holder concentration, and rug risk at a glance.</li>
+            <li>Verified trader track records, real on-chain P&amp;L on profiles.</li>
+            <li>Token safety scores, liquidity, holder concentration, and rug risk at a glance.</li>
             <li>Public API keys, webhooks, and higher rate limits for builders.</li>
           </ul>
         </Section>

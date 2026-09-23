@@ -6,11 +6,11 @@ import { LandingBackdrop } from "./LandingBackdrop";
 export function Landing() {
   return (
     <div>
-      {/* Hero — coded animated backdrop (charts, posts, tickers) behind a crisp brand message */}
+      {/* Hero, coded animated backdrop (charts, posts, tickers) behind a crisp brand message */}
       <section className="relative overflow-hidden border-b hairline">
         <LandingBackdrop />
 
-        {/* readability scrim — solid where the text sits (left), revealing the live app on the right */}
+        {/* readability scrim, solid where the text sits (left), revealing the live app on the right */}
         <div
           className="pointer-events-none absolute inset-0 z-[1]"
           style={{
@@ -41,7 +41,7 @@ export function Landing() {
             </h1>
 
             <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-[var(--muted)] sm:text-[18px]">
-              The social layer for Robinhood Chain. Every token, every trade, and every conversation — live, in one
+              The social layer for Robinhood Chain. Every token, every trade, and every conversation, live, in one
               place. Follow the whales, react to the moves, and trade the culture.
             </p>
 
@@ -57,7 +57,7 @@ export function Landing() {
         </div>
       </section>
 
-      {/* Live proof — real tape from the chain */}
+      {/* Live proof, real tape from the chain */}
       <section className="px-6 py-12 sm:px-10">
         <div className="mx-auto max-w-3xl">
           <div className="mb-4 flex items-baseline justify-between">

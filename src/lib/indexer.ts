@@ -58,7 +58,7 @@ export async function runIndexer(): Promise<{ scanned: number; created: number; 
         ...sells.map((l) => ({ l, side: "sell" as const })),
       ];
     } catch {
-      continue; // RPC hiccup on this token — skip, GT ingest still covers it
+      continue; // RPC hiccup on this token, skip, GT ingest still covers it
     }
 
     for (const { l, side } of logs) {
@@ -110,7 +110,7 @@ export async function runIndexer(): Promise<{ scanned: number; created: number; 
   return { scanned, created, from: Number(fromBlock), to: Number(current) };
 }
 
-// Traffic-driven, self-throttled — one caller per interval runs a pass.
+// Traffic-driven, self-throttled, one caller per interval runs a pass.
 const INDEX_INTERVAL = Number(process.env.INDEX_SECONDS ?? 45);
 let lastLocalIndex = 0;
 
