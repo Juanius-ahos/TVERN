@@ -55,9 +55,10 @@ export function RightRail() {
         fetch("/api/discover").then((r) => r.json()),
         fetch("/api/users/suggested").then((r) => r.json()),
       ]);
-      setTrending(d.trending ?? []);
-      setLaunches(d.launches ?? []);
-      setUsers(u.users ?? []);
+      // Never blank populated data on a transient empty response.
+      if (d.trending?.length) setTrending(d.trending);
+      if (d.launches?.length) setLaunches(d.launches);
+      if (u.users?.length) setUsers(u.users);
     };
     load();
     const id = setInterval(load, 30_000);

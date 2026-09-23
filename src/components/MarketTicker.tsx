@@ -18,7 +18,7 @@ export function MarketTicker() {
     const load = async () => {
       try {
         const d = await fetch("/api/market/ticker").then((r) => r.json());
-        setItems(d.items ?? []);
+        if (d.items?.length) setItems(d.items); // keep last good on empty
       } catch {}
     };
     load();

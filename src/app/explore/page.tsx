@@ -91,8 +91,8 @@ export default function ExplorePage() {
           fetch("/api/explore").then((r) => r.json()),
           fetch("/api/leaderboard").then((r) => r.json()),
         ]);
-        setMarket(m);
-        setSocial(s);
+        if (m && (m.gainers?.length || m.mostTraded?.length || m.launches?.length)) setMarket(m);
+        if (s && (s.topPosters?.length || s.trendingTags?.length)) setSocial(s);
       } catch {}
     };
     load();

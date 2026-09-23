@@ -30,6 +30,9 @@ export async function cached<T>(key: string, ttlSeconds: number, compute: () => 
 
 // A tiny per-instance L1 so bursts of requests on one warm lambda don't all hit Redis.
 const mem = new Map<string, { at: number; val: unknown }>();
+// Per-instance last-known-good — survives even when Redis isn't configured, so a
+// single rate-limited GeckoTerminal call never blanks the UI once we've seen data.
+const lkgMem = new Map<string, unknown>();
 
 /**
  * Live-data cache with last-known-good fallback.
@@ -70,10 +73,11 @@ export async function liveCached<T>(
 
   if (val !== undefined && !isEmpty(val)) {
     mem.set(key, { at: now, val });
+    lkgMem.set(key, val); // remember the last good value on this instance
     if (redis) {
       try {
         await redis.set(key, val, { ex: ttlSeconds });
-        await redis.set(`${key}:lkg`, val, { ex: 3600 }); // last known good
+        await redis.set(`${key}:lkg`, val, { ex: 3600 }); // last known good (shared)
       } catch {
         /* ignore */
       }
@@ -85,14 +89,17 @@ export async function liveCached<T>(
   if (redis) {
     try {
       const lkg = await redis.get<T>(`${key}:lkg`);
-      if (lkg != null) {
+      if (lkg != null && !isEmpty(lkg)) {
         mem.set(key, { at: now, val: lkg });
+        lkgMem.set(key, lkg);
         return lkg;
       }
     } catch {
       /* ignore */
     }
   }
+  const localLkg = lkgMem.get(key) as T | undefined;
+  if (localLkg !== undefined) return localLkg;
   return (val ?? ([] as unknown as T)) as T;
 }
 
