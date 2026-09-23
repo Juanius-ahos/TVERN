@@ -208,6 +208,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
           canPost={!!session}
           isOwn={isMe}
           displayName={name}
+          liveWallet={addr}
         />
       </div>
     </div>

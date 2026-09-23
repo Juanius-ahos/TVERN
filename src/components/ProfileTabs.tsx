@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PostCard, type FeedPost } from "./PostCard";
 import { EventCard, type FeedEvent } from "./EventCard";
+import { LiveTape } from "./LiveTape";
 import { Icon } from "./Icon";
 
 type TabKey = "posts" | "replies" | "media" | "activity";
@@ -17,6 +18,7 @@ export function ProfileTabs({
   isOwn = false,
   displayName,
   postsEmpty,
+  liveWallet,
 }: {
   posts: FeedPost[];
   events: FeedEvent[];
@@ -27,6 +29,7 @@ export function ProfileTabs({
   isOwn?: boolean;
   displayName?: string;
   postsEmpty?: { title: string; sub?: string };
+  liveWallet?: string;
 }) {
   const [tab, setTab] = useState<TabKey>("posts");
   const who = displayName ?? "This wallet";
@@ -114,7 +117,15 @@ export function ProfileTabs({
           />
         )}
         {tab === "activity" &&
-          (events.length === 0 ? (
+          (liveWallet ? (
+            <div className="px-0">
+              <LiveTape
+                wallet={liveWallet}
+                title="On-chain activity"
+                emptyText="No on-chain trades indexed for this wallet yet."
+              />
+            </div>
+          ) : events.length === 0 ? (
             <Empty
               title="No on-chain activity yet"
               sub="Buys, sells and whale moves for this wallet on Robinhood Chain will appear here."

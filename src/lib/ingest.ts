@@ -5,9 +5,9 @@ import { redis } from "./redis";
 
 const GT = "https://api.geckoterminal.com/api/v2";
 const NETWORK = "robinhood";
-const MIN_USD = Number(process.env.MIN_EVENT_USD ?? 5000);
-const MAX_POOLS = Number(process.env.MAX_POOLS ?? 18);
-const MAX_TRADES_PER_POOL = Number(process.env.MAX_TRADES_PER_POOL ?? 6);
+const MIN_USD = Number(process.env.MIN_EVENT_USD ?? 1000); // capture a richer live tape
+const MAX_POOLS = Number(process.env.MAX_POOLS ?? 16);
+const MAX_TRADES_PER_POOL = Number(process.env.MAX_TRADES_PER_POOL ?? 12);
 const MIN_LAUNCH_LIQ = Number(process.env.MIN_LAUNCH_LIQ ?? 1000);
 
 type Trade = {
@@ -156,8 +156,8 @@ export async function runIngest(): Promise<{ pools: number; scanned: number; cre
   return { pools: pools.length, scanned, created };
 }
 
-// How stale the feed may get before a page view triggers a refresh.
-const AUTO_INGEST_INTERVAL = Number(process.env.AUTO_INGEST_SECONDS ?? 240);
+// How stale the tape may get before a page view triggers a refresh.
+const AUTO_INGEST_INTERVAL = Number(process.env.AUTO_INGEST_SECONDS ?? 75);
 let lastLocalIngest = 0; // fallback when Redis is unavailable
 
 /**

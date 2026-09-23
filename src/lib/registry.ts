@@ -28,6 +28,7 @@ export type Pool = {
   poolAddress: string;
   baseSymbol: string;
   baseAddress: string;
+  baseDecimals: number;
   quoteSymbol: string;
   priceUsd: number;
   volume24: number;
@@ -48,6 +49,7 @@ export async function getActivePools(): Promise<Pool[]> {
             poolAddress: p.poolAddress,
             baseSymbol: p.baseSymbol,
             baseAddress: p.baseAddress,
+            baseDecimals: p.baseDecimals,
             quoteSymbol: p.quoteSymbol,
             priceUsd: p.priceUsd,
             volume24: p.volume24,
@@ -66,6 +68,7 @@ export type DiscoverPool = {
   poolAddress: string;
   baseSymbol: string;
   baseAddress: string;
+  baseDecimals: number;
   quoteSymbol: string;
   priceUsd: number;
   volume24: number;
@@ -81,12 +84,13 @@ function parsePools(data: unknown): DiscoverPool[] {
   const out: DiscoverPool[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = data as any;
-  const tokenById = new Map<string, { symbol: string; address: string }>();
+  const tokenById = new Map<string, { symbol: string; address: string; decimals: number }>();
   for (const inc of d?.included ?? []) {
     if (inc.type === "token") {
       tokenById.set(inc.id, {
         symbol: String(inc.attributes?.symbol ?? "").toUpperCase(),
         address: String(inc.attributes?.address ?? "").toLowerCase(),
+        decimals: Number(inc.attributes?.decimals ?? 18),
       });
     }
   }
@@ -103,6 +107,7 @@ function parsePools(data: unknown): DiscoverPool[] {
       poolAddress: String(a.address ?? "").toLowerCase(),
       baseSymbol,
       baseAddress: base?.address ?? "",
+      baseDecimals: base?.decimals ?? 18,
       quoteSymbol,
       priceUsd: Number(a.base_token_price_usd ?? 0),
       volume24: Number(a.volume_usd?.h24 ?? 0),

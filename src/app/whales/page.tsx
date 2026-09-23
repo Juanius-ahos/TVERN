@@ -1,14 +1,14 @@
-import { Feed } from "@/components/Feed";
+import { LiveTape } from "@/components/LiveTape";
 
 export default function WhalesPage() {
   return (
     <div>
-      <header className="sticky top-11 z-20 border-b hairline bg-[var(--bg)]/85 px-4 py-3 backdrop-blur-xl">
+      <header className="glass sticky top-11 z-20 border-b hairline px-4 py-3">
         <h1 className="text-[19px] font-bold tracking-tight">Whales</h1>
-        <p className="text-[13px] text-[var(--muted)]">The biggest moves on Robinhood Chain — $50k+</p>
+        <p className="text-[13px] text-[var(--muted)]">The biggest moves on Robinhood Chain — live, $10k+</p>
       </header>
-      <div className="px-4 py-3">
-        <Feed initialFilter="whale" showTabs={false} showComposer={false} />
+      <div className="px-4 py-4">
+        <LiveTape min={10000} title="Whale trades · $10k+" emptyText="No whale-sized trades just yet…" />
       </div>
     </div>
   );

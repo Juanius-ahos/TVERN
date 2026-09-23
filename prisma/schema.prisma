@@ -6,6 +6,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Cursor for our own on-chain indexer (last block processed per source).
+model IndexerState {
+  id        String   @id
+  lastBlock Int
+  updatedAt DateTime @updatedAt
+}
+
 datasource db {
   provider  = "postgresql"
   // Vercel Postgres (Neon) auto-injects these when you create the DB in Storage.
