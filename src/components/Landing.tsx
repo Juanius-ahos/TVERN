@@ -24,9 +24,9 @@ export function Landing() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden border-b hairline">
-        {/* brand image */}
+        {/* brand image (dark theme only — the dark photo would clash with light parchment) */}
         <div
-          className="pointer-events-none absolute inset-0 bg-cover bg-center"
+          className="hero-img pointer-events-none absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/hero-tavern.jpg)" }}
         />
         {/* readability scrim — solid on the left where the text sits, revealing the bar on the right */}

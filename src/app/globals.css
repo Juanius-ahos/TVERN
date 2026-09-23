@@ -63,6 +63,10 @@
   --panel-2: rgba(38, 30, 18, 0.03);
   --panel-hover: rgba(38, 30, 18, 0.05);
 }
+/* The dark hero photo is dark-theme only (it would clash with light parchment). */
+:root[data-theme="light"] .hero-img {
+  display: none;
+}
 
 html {
   scroll-behavior: smooth;
