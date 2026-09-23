@@ -70,14 +70,23 @@ export function Sidebar() {
               <a
                 key={n.href}
                 href={n.href}
-                className={`group relative flex items-center gap-4 rounded-full px-3 py-2.5 text-[16px] transition ${
-                  active ? "bg-white/[0.06] font-bold text-white" : "text-[var(--text)] hover:bg-white/[0.04]"
+                className={`group relative flex items-center gap-4 rounded-xl px-3 py-2.5 text-[15.5px] transition ${
+                  active
+                    ? "bg-[color:var(--accent)]/[0.1] font-bold text-white ring-1 ring-[color:var(--accent)]/20"
+                    : "text-[var(--muted)] hover:bg-white/[0.045] hover:text-[var(--text)]"
                 }`}
               >
+                {active && (
+                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[var(--accent)]" />
+                )}
                 <span className="relative">
-                  <Icon name={n.icon} size={22} className={active ? "text-[var(--accent)]" : ""} />
+                  <Icon
+                    name={n.icon}
+                    size={22}
+                    className={`transition ${active ? "text-[var(--accent)]" : "group-hover:text-[var(--text)]"}`}
+                  />
                   {badge > 0 && (
-                    <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)]">
+                    <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)] shadow-[0_0_10px_-2px_rgba(204,255,0,0.8)]">
                       {badge > 9 ? "9+" : badge}
                     </span>
                   )}

@@ -18,13 +18,13 @@ const TABS: { key: Filter; label: string }[] = [
 
 function Skeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border hairline p-4">
+    <div className="rounded-2xl border hairline p-4">
       <div className="flex gap-3">
-        <div className="h-10 w-10 rounded-full bg-white/[0.06]" />
+        <div className="skeleton h-10 w-10 rounded-full" />
         <div className="flex-1 space-y-2.5">
-          <div className="h-3 w-28 rounded bg-white/[0.06]" />
-          <div className="h-4 w-3/4 rounded bg-white/[0.06]" />
-          <div className="h-3 w-1/2 rounded bg-white/[0.06]" />
+          <div className="skeleton h-3 w-28 rounded" />
+          <div className="skeleton h-4 w-3/4 rounded" />
+          <div className="skeleton h-3 w-1/2 rounded" />
         </div>
       </div>
     </div>
@@ -64,13 +64,15 @@ export function Feed({
   return (
     <div>
       {showTabs && (
-        <div className="mb-3 flex rounded-full border hairline p-1 text-[14px]">
+        <div className="mb-3 flex rounded-full border hairline bg-[var(--panel-2)] p-1 text-[14px]">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setFilter(t.key)}
               className={`flex-1 rounded-full px-3 py-1.5 font-semibold transition ${
-                filter === t.key ? "bg-white/[0.08] text-white" : "text-[var(--muted)] hover:text-[var(--text)]"
+                filter === t.key
+                  ? "bg-[color:var(--accent)]/[0.12] text-[var(--accent)] ring-1 ring-[color:var(--accent)]/25"
+                  : "text-[var(--muted)] hover:text-[var(--text)]"
               }`}
             >
               {t.label}

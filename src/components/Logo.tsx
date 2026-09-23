@@ -7,13 +7,13 @@ export function Logo({ compact = false }: { compact?: boolean }) {
         alt="The Tavern"
         width={38}
         height={38}
-        className="h-[38px] w-[38px]"
-        style={{ filter: "drop-shadow(0 0 10px rgba(204,255,0,0.25))" }}
+        className="h-[38px] w-[38px] transition-transform duration-300 hover:scale-105"
+        style={{ filter: "drop-shadow(0 0 14px rgba(204,255,0,0.35))" }}
       />
       {!compact && (
         <div className="hidden leading-none lg:block">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">The</div>
-          <div className="text-[19px] font-black tracking-tight text-[var(--accent)]">Tavern</div>
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.24em] text-[var(--muted)]">The</div>
+          <div className="brand-gradient text-[20px] font-black tracking-tight">Tavern</div>
         </div>
       )}
     </div>

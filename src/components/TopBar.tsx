@@ -28,17 +28,17 @@ export function TopBar() {
   const block = s?.block ? s.block.toLocaleString() : "…";
 
   return (
-    <div className="sticky top-0 z-40 h-11 border-b hairline bg-[var(--bg)]/95 backdrop-blur-xl">
+    <div className="glass sticky top-0 z-40 h-11 border-b hairline">
       <div className="mx-auto flex h-full max-w-[1760px] items-center gap-5 px-4 text-[12.5px]">
-        <span className="flex items-center gap-2 font-semibold">
-          <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+        <span className="flex items-center gap-2 font-semibold tracking-tight">
+          <span className="live-dot h-2 w-2 rounded-full bg-[var(--accent)]" />
           Robinhood Chain
         </span>
         <span className="text-[var(--muted)]">
-          ETH <span className="font-semibold text-[var(--text)]">{eth}</span>
+          ETH <span className="font-semibold tabular-nums text-[var(--text)]">{eth}</span>
         </span>
         <span className="hidden text-[var(--muted)] sm:inline">
-          Gas <span className="font-semibold text-[var(--text)]">{gas}</span>
+          Gas <span className="font-semibold tabular-nums text-[var(--text)]">{gas}</span>
         </span>
         <span className="hidden text-[var(--muted)] md:inline">
           Block <span className="font-semibold tabular-nums text-[var(--text)]">{block}</span>
@@ -47,7 +47,7 @@ export function TopBar() {
           href="https://robinhoodchain.blockscout.com"
           target="_blank"
           rel="noreferrer"
-          className="ml-auto hidden text-[var(--muted)] transition hover:text-[var(--accent)] sm:inline"
+          className="ml-auto hidden items-center gap-1 text-[var(--muted)] transition hover:text-[var(--accent)] sm:inline-flex"
         >
           Explorer
         </a>
