@@ -17,7 +17,7 @@ export function MarketTicker() {
   useEffect(() => {
     const load = async () => {
       try {
-        const d = await fetch("/api/market/ticker").then((r) => r.json());
+        const d = await fetch("/api/market/ticker", { cache: "no-store" }).then((r) => r.json());
         if (d.items?.length) setItems(d.items); // keep last good on empty
       } catch {}
     };

@@ -77,5 +77,5 @@ export async function GET(req: Request) {
     ? await buildFeed(session.userId, filter)
     : await cached(`feed:${filter ?? "all"}`, 8, () => buildFeed(undefined, filter));
 
-  return NextResponse.json({ items });
+  return NextResponse.json({ items }, { headers: { "cache-control": "no-store" } });
 }

@@ -88,8 +88,8 @@ export default function ExplorePage() {
     const load = async () => {
       try {
         const [m, s] = await Promise.all([
-          fetch("/api/explore").then((r) => r.json()),
-          fetch("/api/leaderboard").then((r) => r.json()),
+          fetch("/api/explore", { cache: "no-store" }).then((r) => r.json()),
+          fetch("/api/leaderboard", { cache: "no-store" }).then((r) => r.json()),
         ]);
         if (m && (m.gainers?.length || m.mostTraded?.length || m.launches?.length)) setMarket(m);
         if (s && (s.topPosters?.length || s.trendingTags?.length)) setSocial(s);

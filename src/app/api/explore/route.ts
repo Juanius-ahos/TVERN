@@ -57,10 +57,13 @@ export async function GET() {
       isStock: p.isStock,
     }));
 
-  return NextResponse.json({
-    gainers: gainers.map(trim),
-    losers: losers.map(trim),
-    mostTraded,
-    launches: launches.map(trim),
-  });
+  return NextResponse.json(
+    {
+      gainers: gainers.map(trim),
+      losers: losers.map(trim),
+      mostTraded,
+      launches: launches.map(trim),
+    },
+    { headers: { "cache-control": "no-store" } }
+  );
 }

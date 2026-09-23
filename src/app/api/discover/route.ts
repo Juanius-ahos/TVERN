@@ -28,5 +28,5 @@ export async function GET() {
       .slice(0, 10)
       .map(trim),
   };
-  return NextResponse.json(data);
+  return NextResponse.json(data, { headers: { "cache-control": "no-store" } });
 }

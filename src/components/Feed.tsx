@@ -48,7 +48,7 @@ export function Feed({
 
   const load = useCallback(async () => {
     const qs = filter ? `?filter=${filter}` : "";
-    const res = await fetch(`/api/feed${qs}`);
+    const res = await fetch(`/api/feed${qs}`, { cache: "no-store" });
     const data = await res.json();
     setItems(data.items ?? []);
     setLoading(false);

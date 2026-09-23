@@ -67,5 +67,5 @@ export async function GET() {
     .sort((a, b) => b.mentions - a.mentions)
     .slice(0, 10);
 
-  return NextResponse.json({ topPosters, trendingTags });
+  return NextResponse.json({ topPosters, trendingTags }, { headers: { "cache-control": "no-store" } });
 }

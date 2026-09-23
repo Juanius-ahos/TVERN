@@ -31,5 +31,5 @@ export async function GET() {
   }
   // Rank by absolute 24h move — the biggest movers lead the carousel.
   items.sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
-  return NextResponse.json({ items: items.slice(0, 20) });
+  return NextResponse.json({ items: items.slice(0, 20) }, { headers: { "cache-control": "no-store" } });
 }

@@ -52,8 +52,8 @@ export function RightRail() {
   useEffect(() => {
     const load = async () => {
       const [d, u] = await Promise.all([
-        fetch("/api/discover").then((r) => r.json()),
-        fetch("/api/users/suggested").then((r) => r.json()),
+        fetch("/api/discover", { cache: "no-store" }).then((r) => r.json()),
+        fetch("/api/users/suggested", { cache: "no-store" }).then((r) => r.json()),
       ]);
       // Never blank populated data on a transient empty response.
       if (d.trending?.length) setTrending(d.trending);
