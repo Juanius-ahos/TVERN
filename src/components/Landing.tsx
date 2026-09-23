@@ -23,9 +23,24 @@ export function Landing() {
   return (
     <div>
       {/* Hero */}
-      <section className="border-b hairline px-6 py-16 sm:px-10 sm:py-24">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border hairline px-3 py-1 text-[12px] font-medium text-[var(--muted)]">
+      <section className="relative overflow-hidden border-b hairline">
+        {/* brand image */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(/hero-tavern.jpg)" }}
+        />
+        {/* readability scrim — solid on the left where the text sits, revealing the bar on the right */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 82%, transparent) 40%, transparent 78%), linear-gradient(0deg, var(--bg) 2%, transparent 40%)",
+          }}
+        />
+
+        <div className="relative px-6 py-20 sm:px-10 sm:py-28">
+          <div className="max-w-2xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border hairline bg-[color:var(--bg)]/40 px-3 py-1 text-[12px] font-medium text-[var(--muted)] backdrop-blur">
             <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
             Live on Robinhood Chain
           </div>
@@ -57,6 +72,7 @@ export function Landing() {
               <Stat value="Live" label="trade tape" accent />
             </div>
           )}
+          </div>
         </div>
       </section>
 
