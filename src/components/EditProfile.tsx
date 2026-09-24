@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSession } from "@/lib/useSession";
 import { Avatar } from "./Avatar";
 import { gradientFor } from "@/lib/gradient";
@@ -76,8 +77,8 @@ export function EditProfile() {
         Edit profile
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setOpen(false)}>
+      {open && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" onClick={() => setOpen(false)}>
           <div
             className="w-full max-w-md rounded-2xl border hairline bg-[var(--bg)] p-5"
             onClick={(e) => e.stopPropagation()}
@@ -149,7 +150,8 @@ export function EditProfile() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
