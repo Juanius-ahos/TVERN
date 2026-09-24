@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
 import { maybeAutoIngest } from "@/lib/ingest";
 import { maybeAutoIndex } from "@/lib/indexer";
+import { maybePonsIndex } from "@/lib/pons";
 import { KNOWN_TICKERS } from "@/lib/registry";
 import { cached } from "@/lib/redis";
 import { getHiddenAuthorIds } from "@/lib/moderation";
@@ -72,7 +73,7 @@ export async function GET(req: Request) {
   // Keep the feed fresh off live traffic: after responding, one visitor per
   // interval refreshes on-chain events (self-throttled; no cron/secret needed).
   after(async () => {
-    await Promise.allSettled([maybeAutoIndex(), maybeAutoIngest()]);
+    await Promise.allSettled([maybeAutoIndex(), maybeAutoIngest(), maybePonsIndex()]);
   });
 
   // Anonymous traffic (most of a launch-day spike) is served from an 8s cache.
