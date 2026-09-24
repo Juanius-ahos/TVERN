@@ -88,6 +88,7 @@ function Counter({ to, format, duration = 1500 }: { to: number; format: (n: numb
 
 /* --------------------------------------------------- 3D particle field bg */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ParticleField() {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -418,10 +419,6 @@ export function Landing() {
 
       {/* ============================================================ HERO */}
       <section ref={heroRef} className="ld-hero relative overflow-hidden border-b hairline">
-        <div className="ld-grid" aria-hidden="true">
-          <div className="ld-grid-inner" />
-        </div>
-        <ParticleField />
         <div className="ld-hero-glow" aria-hidden="true" />
 
         <div className="relative z-[3] mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-[1.15fr_0.85fr]">
@@ -622,14 +619,14 @@ const LD_CSS = `
   backdrop-filter: saturate(120%) blur(14px); -webkit-backdrop-filter: saturate(120%) blur(14px); }
 
 /* floating product preview */
-.ld-preview { position:relative; width:100%; max-width:380px; animation: ld-float 7s ease-in-out infinite; }
-@keyframes ld-float { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-12px); } }
-.ld-preview-card { position:relative; border-radius:20px; padding:18px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, #fff 3%), var(--surface));
+.ld-preview { position:relative; width:100%; max-width:430px; animation: ld-float 7s ease-in-out infinite; }
+@keyframes ld-float { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+.ld-preview-card { position:relative; border-radius:22px; padding:20px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, #fff 3%), var(--surface));
   border: 1px solid var(--border-strong);
-  box-shadow: 0 40px 80px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.02) inset,
-    0 0 60px -20px color-mix(in srgb, var(--accent) 40%, transparent);
-  transform: perspective(1200px) rotateY(-14deg) rotateX(6deg); transform-style:preserve-3d; }
+  box-shadow: 0 48px 90px -34px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 70px -24px color-mix(in srgb, var(--accent) 34%, transparent);
+  transform: perspective(1600px) rotateY(-7deg) rotateX(3deg); transform-style:preserve-3d; }
 .ld-preview-chip { position:absolute; display:inline-flex; align-items:center; gap:6px;
   border-radius:999px; padding:6px 12px; font-size:12px; font-weight:600;
   background: color-mix(in srgb, var(--surface) 80%, transparent); border:1px solid var(--border-strong);
