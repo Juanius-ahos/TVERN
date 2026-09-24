@@ -502,7 +502,15 @@ export function Landing() {
 
       {/* ===================================================== LIVE SECTION */}
       <section id="live" className="border-y hairline bg-[color:var(--surface)]/40">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-2">
+        <div className="mx-auto max-w-6xl px-6 pt-20 sm:px-10 sm:pt-24">
+          <div className="ld-reveal text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">
+            Live now
+          </div>
+          <h2 className="ld-reveal display mt-3 text-[34px] font-semibold tracking-tight sm:text-[46px]">
+            Straight off the chain.
+          </h2>
+        </div>
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 pb-20 pt-10 sm:px-10 sm:pb-24 lg:grid-cols-2">
           <div className="ld-reveal">
             <div className="mb-4 flex items-baseline justify-between">
               <h2 className="display text-[24px] font-semibold">Fresh kegs from Pons</h2>
@@ -538,9 +546,11 @@ export function Landing() {
             ["03", "Trade the culture", "Post a $ticker, quote a launch, tip a caller. This is where the chain talks and trades."],
           ].map(([n, t, b], i) => (
             <div key={n} className="ld-reveal text-center" style={{ transitionDelay: `${i * 80}ms` }}>
-              <div className="display mx-auto mb-3 text-[40px] font-semibold text-[color:var(--accent)]/30">{n}</div>
-              <h3 className="text-[17px] font-bold">{t}</h3>
-              <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--muted)]">{b}</p>
+              <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-[color:var(--accent)]/12 text-[17px] font-bold text-[var(--accent-text)] ring-1 ring-[color:var(--accent)]/25">
+                {n}
+              </div>
+              <h3 className="text-[18px] font-bold tracking-tight">{t}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-[var(--muted)]">{b}</p>
             </div>
           ))}
         </div>
