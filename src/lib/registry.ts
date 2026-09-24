@@ -262,6 +262,49 @@ export async function getDexUniverse(): Promise<DiscoverPool[]> {
   return [...bySymbol.values()];
 }
 
+// Bulk logo lookup from DexScreener (up to 30 token addresses per call), address -> imageUrl.
+async function fetchDexLogos(key: string, addrs: string[]): Promise<Record<string, string>> {
+  return liveCached(
+    key,
+    600, // logos rarely change; cache for 10 minutes
+    async () => {
+      const res = await fetch(`${DEXS}/tokens/v1/${NETWORK}/${addrs.join(",")}`, {
+        headers: { accept: "application/json", "User-Agent": "Mozilla/5.0 (compatible; wtf-happened/0.1)" },
+      });
+      if (!res.ok) throw new Error(`dexscreener ${res.status}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const arr = (await res.json()) as any[];
+      const map: Record<string, string> = {};
+      for (const p of Array.isArray(arr) ? arr : []) {
+        const a = String(p?.baseToken?.address ?? "").toLowerCase();
+        const img = p?.info?.imageUrl;
+        if (a && img && !map[a]) map[a] = String(img);
+      }
+      return map;
+    },
+    (m) => Object.keys(m).length === 0
+  );
+}
+
+// Top up tokens that still have no logo after the GeckoTerminal + DexScreener passes,
+// looking them up by address in batches. Mutates rows in place; safe to fail silently.
+export async function fillMissingLogos(rows: DiscoverPool[]): Promise<void> {
+  const need = rows.filter((r) => !r.baseImageUrl && r.baseAddress).slice(0, 150);
+  if (!need.length) return;
+  const found: Record<string, string> = {};
+  for (let i = 0; i < need.length; i += 30) {
+    const batch = need.slice(i, i + 30).map((r) => r.baseAddress);
+    try {
+      Object.assign(found, await fetchDexLogos(`ds:logos:${batch[0]}:${batch.length}`, batch));
+    } catch {
+      /* keep the letter fallback for this batch */
+    }
+  }
+  for (const r of rows) {
+    if (!r.baseImageUrl && found[r.baseAddress]) r.baseImageUrl = found[r.baseAddress];
+  }
+}
+
 // Live search results for a query (cached briefly, shared).
 async function searchPoolsCached(query: string): Promise<DiscoverPool[]> {
   const q = query.trim();

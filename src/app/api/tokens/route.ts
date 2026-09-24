@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { getPoolUniverse, getDexUniverse, getTrendingPools, getNewPools, type DiscoverPool } from "@/lib/registry";
+import {
+  getPoolUniverse,
+  getDexUniverse,
+  getTrendingPools,
+  getNewPools,
+  fillMissingLogos,
+  type DiscoverPool,
+} from "@/lib/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +65,9 @@ export async function GET() {
   trending.forEach(add);
   fresh.forEach(add);
 
-  const tokens = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 400).map(row);
+  const list = [...bySymbol.values()].sort((a, b) => b.volume24 - a.volume24).slice(0, 400);
+  await fillMissingLogos(list); // top up logos neither source had, by address, from DexScreener
+  const tokens = list.map(row);
 
   const stats = {
     tokens: tokens.length,

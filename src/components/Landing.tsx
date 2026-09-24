@@ -452,8 +452,8 @@ export function Landing() {
             </div>
           </div>
 
-          {/* Floating product preview */}
-          <div className="ld-parallax-strong hidden justify-center lg:flex">
+          {/* Floating product preview (now on mobile too) */}
+          <div className="ld-parallax-strong flex justify-center pt-2 lg:pt-0">
             <ProductPreview />
           </div>
         </div>
