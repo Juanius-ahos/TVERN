@@ -23,7 +23,6 @@ export const metadata: Metadata = {
   },
   description:
     "See every token, trade, and conversation on Robinhood Chain, live. The Tavern is where the chain gathers.",
-  icons: { icon: "/logo.png", shortcut: "/logo.png", apple: "/logo.png" },
   openGraph: {
     type: "website",
     siteName: "The Tavern",
