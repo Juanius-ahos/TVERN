@@ -8,34 +8,34 @@ import { redis } from "./redis";
 // except events a user has quoted in a post (those are referenced and worth
 // keeping) and recent launches (few in number, nice to keep a bit longer).
 
-const RETENTION_DAYS = Number(process.env.EVENT_RETENTION_DAYS ?? 10);
-const LAUNCH_RETENTION_DAYS = Number(process.env.LAUNCH_RETENTION_DAYS ?? 30);
+const RETENTION_DAYS = Number(process.env.EVENT_RETENTION_DAYS ?? 4);
+const LAUNCH_RETENTION_DAYS = Number(process.env.LAUNCH_RETENTION_DAYS ?? 21);
 
 export async function pruneOldEvents(): Promise<{ deleted: number }> {
   const cutoff = new Date(Date.now() - RETENTION_DAYS * 864e5);
   const launchCutoff = new Date(Date.now() - LAUNCH_RETENTION_DAYS * 864e5);
 
+  const BATCH = 5000;
+  const MAX_BATCHES = 40; // up to 200k rows per run, well under the 60s function cap
   let deleted = 0;
 
-  // Trades/whales/transfers older than the window, that nobody quoted.
-  const trades = await prisma.event.deleteMany({
-    where: {
-      createdAt: { lt: cutoff },
-      kind: { not: "LAUNCH" },
-      posts: { none: {} },
-    },
-    // Prisma deleteMany has no limit; Neon handles this fine, but cap churn by
-    // only ever looking at the aged slice above.
-  });
-  deleted += trades.count;
+  // Aged trades/whales/transfers that nobody quoted. Delete in batches so a large
+  // backlog can never blow the function timeout; each run just makes more progress.
+  for (let i = 0; i < MAX_BATCHES; i++) {
+    const batch = await prisma.event.findMany({
+      where: { createdAt: { lt: cutoff }, kind: { not: "LAUNCH" }, posts: { none: {} } },
+      select: { id: true },
+      take: BATCH,
+    });
+    if (batch.length === 0) break;
+    const r = await prisma.event.deleteMany({ where: { id: { in: batch.map((b) => b.id) } } });
+    deleted += r.count;
+    if (batch.length < BATCH) break;
+  }
 
-  // Launches age out more slowly, and only once un-quoted.
+  // Launches age out more slowly, and only once un-quoted (few rows).
   const launches = await prisma.event.deleteMany({
-    where: {
-      createdAt: { lt: launchCutoff },
-      kind: "LAUNCH",
-      posts: { none: {} },
-    },
+    where: { createdAt: { lt: launchCutoff }, kind: "LAUNCH", posts: { none: {} } },
   });
   deleted += launches.count;
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { runIngest } from "@/lib/ingest";
+import { maybePrune } from "@/lib/prune";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -24,6 +25,7 @@ function authed(req: Request): boolean {
 export async function GET(req: Request) {
   if (!authed(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const result = await runIngest();
+  await maybePrune(); // trim the Event table on the same schedule as ingest (self-throttled hourly)
   return NextResponse.json({ ok: true, ...result });
 }
 
