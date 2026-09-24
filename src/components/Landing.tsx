@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LiveTape } from "./LiveTape";
 import { Logo } from "./Logo";
+import { LandingBackdrop } from "./LandingBackdrop";
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -294,6 +295,7 @@ function LiveLaunches() {
 
 /* ------------------------------------------------ 3D product preview card */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ProductPreview() {
   // A realistic, static mock of the app itself: token header, chart, live rows.
   const ys = [58, 54, 60, 49, 52, 44, 47, 38, 41, 33, 36, 28, 24, 27, 19];
@@ -419,10 +421,20 @@ export function Landing() {
 
       {/* ============================================================ HERO */}
       <section ref={heroRef} className="ld-hero relative overflow-hidden border-b hairline">
+        {/* blurred, animated simulation of the live app behind the hero */}
+        <LandingBackdrop />
+        {/* readability scrim: crisp where the text sits, revealing the live activity on the right */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[1]"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 82%, transparent) 46%, transparent 80%), linear-gradient(0deg, var(--bg) 4%, transparent 46%)",
+          }}
+        />
         <div className="ld-hero-glow" aria-hidden="true" />
 
-        <div className="relative z-[3] mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="ld-parallax">
+        <div className="relative z-[3] mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32">
+          <div className="ld-parallax max-w-2xl">
             <div className="ld-badge mb-6 inline-flex items-center gap-2 rounded-full border hairline bg-[color:var(--bg)]/60 px-3 py-1 text-[12px] font-medium text-[var(--muted)] backdrop-blur">
               <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
               Live on Robinhood Chain
@@ -434,7 +446,7 @@ export function Landing() {
               <span className="ld-shine">gathers.</span>
             </h1>
 
-            <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-[var(--muted)] sm:text-[19px]">
+            <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--muted)] sm:text-[19px]">
               The social layer and live market for Robinhood Chain. Every token, every trade, and every conversation,
               poured live in one place. Follow the whales, react to the moves, and trade the culture.
             </p>
@@ -447,11 +459,6 @@ export function Landing() {
                 Explore the chain
               </a>
             </div>
-          </div>
-
-          {/* Floating product preview (now on mobile too) */}
-          <div className="ld-parallax-strong flex justify-center pt-2 lg:pt-0">
-            <ProductPreview />
           </div>
         </div>
 
