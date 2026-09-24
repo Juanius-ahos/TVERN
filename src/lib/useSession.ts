@@ -10,6 +10,7 @@ export type Me = {
   avatarUrl?: string | null;
   bannerUrl?: string | null;
   website?: string | null;
+  isDev?: boolean;
 } | null;
 
 export function useSession() {

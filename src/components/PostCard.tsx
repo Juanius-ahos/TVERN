@@ -6,6 +6,7 @@ import { Icon } from "./Icon";
 import { TipButton } from "./TipButton";
 import { Poll } from "./Poll";
 import { PostMenu } from "./PostMenu";
+import { DevBadge } from "./DevBadge";
 import { RichText } from "@/lib/richtext";
 import { shortAddr, timeAgo } from "@/lib/format";
 
@@ -15,7 +16,7 @@ export type FeedPost = {
   body: string;
   mediaUrl?: string | null;
   mediaType?: string | null;
-  author: { address: string; username: string | null; avatarUrl?: string | null };
+  author: { address: string; username: string | null; avatarUrl?: string | null; isDev?: boolean };
   event: { id: string; title: string; assetSymbol: string; kind: string } | null;
   community?: { slug: string; name: string } | null;
   createdAt: string;
@@ -100,6 +101,7 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
             <a href={`/wallet/${p.author.address}`} className="font-bold hover:underline">
               {p.author.username ?? shortAddr(p.author.address)}
             </a>
+            {p.author.isDev && <DevBadge />}
             {p.author.username && (
               <span className="font-mono text-[12px] text-[var(--muted)]">{shortAddr(p.author.address)}</span>
             )}

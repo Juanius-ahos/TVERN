@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/db";
 import { readSession } from "@/lib/auth";
+import { isDev } from "@/lib/roles";
+import { DevBadge } from "@/components/DevBadge";
 import { Avatar } from "@/components/Avatar";
 import { gradientFor } from "@/lib/gradient";
 import { EditProfile } from "@/components/EditProfile";
@@ -148,7 +150,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ addres
         </div>
 
         <div className="mt-2">
-          <h1 className="text-xl font-extrabold">{name}</h1>
+          <h1 className="flex items-center gap-2 text-xl font-extrabold">
+            {name}
+            {isDev({ username: user?.username, address: addr }) && <DevBadge />}
+          </h1>
           <p className="break-all font-mono text-[13px] text-[var(--muted)]">{addr}</p>
         </div>
 

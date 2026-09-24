@@ -20,6 +20,7 @@ export function PostMenu({ authorAddress, postId }: { authorAddress: string; pos
   }, []);
 
   const isMine = !!user && user.address === authorAddress;
+  const isDev = !!user?.isDev;
 
   // On your own content: offer delete (only where there's a post to delete).
   // On your own profile header (no postId): nothing to show.
@@ -88,6 +89,14 @@ export function PostMenu({ authorAddress, postId }: { authorAddress: string; pos
               >
                 Block user
               </button>
+              {isDev && postId && (
+                <button
+                  onClick={del}
+                  className="block w-full border-t hairline px-4 py-2 text-left text-[14px] font-semibold text-rose-400 transition hover:bg-white/[0.05]"
+                >
+                  Delete (dev)
+                </button>
+              )}
             </>
           )}
         </div>

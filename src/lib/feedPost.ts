@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import type { FeedPost } from "@/components/PostCard";
+import { isDev } from "@/lib/roles";
 
 /**
  * Shared Prisma `include` for loading a post with everything PostCard needs.
@@ -51,7 +52,7 @@ export function mapPost(p: any): FeedPost {
     body: p.body,
     mediaUrl: p.mediaUrl,
     mediaType: p.mediaType,
-    author: p.author,
+    author: { ...p.author, isDev: isDev(p.author) },
     event: p.event,
     community: p.community ?? null,
     createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt,
