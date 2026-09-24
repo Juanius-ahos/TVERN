@@ -467,9 +467,14 @@ export function Landing() {
 
       {/* ========================================================= FEATURES */}
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-24">
-        <div className="ld-reveal mb-12 max-w-xl">
-          <h2 className="display text-[32px] font-semibold tracking-tight sm:text-[42px]">One bar, the whole chain.</h2>
-          <p className="mt-3 text-[16px] leading-relaxed text-[var(--muted)]">
+        <div className="ld-reveal mb-14 max-w-xl">
+          <div className="mb-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">
+            The product
+          </div>
+          <h2 className="display text-[34px] font-semibold leading-tight tracking-tight sm:text-[46px]">
+            One bar, the whole chain.
+          </h2>
+          <p className="mt-4 text-[16.5px] leading-relaxed text-[var(--muted)]">
             A social network fused with a market terminal, scoped entirely to Robinhood Chain. No global crypto noise,
             just what is moving here, right now.
           </p>
@@ -478,16 +483,16 @@ export function Landing() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <div key={f.title} className="ld-reveal" style={{ transitionDelay: `${i * 60}ms` }}>
-              <TiltCard className="ld-feature h-full rounded-2xl border hairline bg-[var(--surface)] p-6">
+              <TiltCard className="ld-feature h-full rounded-2xl border hairline bg-[var(--surface)] p-7">
                 <div className="ld-feature-glow" aria-hidden="true" />
                 <div className="relative">
-                  <span className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--accent)]/12 text-[var(--accent-text)]">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <span className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-[color:var(--accent)]/12 text-[var(--accent-text)] ring-1 ring-[color:var(--accent)]/20">
+                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d={f.icon} />
                     </svg>
                   </span>
-                  <h3 className="text-[17px] font-bold">{f.title}</h3>
-                  <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--muted)]">{f.body}</p>
+                  <h3 className="text-[18px] font-bold tracking-tight">{f.title}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--muted)]">{f.body}</p>
                 </div>
               </TiltCard>
             </div>
@@ -520,7 +525,10 @@ export function Landing() {
 
       {/* ====================================================== HOW IT WORKS */}
       <section className="mx-auto max-w-5xl px-6 py-20 sm:px-10 sm:py-24">
-        <h2 className="ld-reveal display mb-12 text-center text-[32px] font-semibold tracking-tight sm:text-[42px]">
+        <div className="ld-reveal mb-3 text-center text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">
+          Get started
+        </div>
+        <h2 className="ld-reveal display mb-14 text-center text-[34px] font-semibold tracking-tight sm:text-[46px]">
           Pull up a stool.
         </h2>
         <div className="grid gap-8 sm:grid-cols-3">
@@ -542,7 +550,10 @@ export function Landing() {
       <section className="relative overflow-hidden border-t hairline">
         <div className="ld-cta-glow" aria-hidden="true" />
         <div className="ld-reveal relative z-[2] mx-auto max-w-3xl px-6 py-24 text-center sm:py-28">
-          <h2 className="display text-[38px] font-semibold leading-tight tracking-tight sm:text-[56px]">
+          <div className="mb-4 text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">
+            Free to browse
+          </div>
+          <h2 className="display text-[40px] font-semibold leading-tight tracking-tight sm:text-[58px]">
             The Tavern is open.
           </h2>
           <p className="mx-auto mt-4 max-w-md text-[17px] leading-relaxed text-[var(--muted)]">
