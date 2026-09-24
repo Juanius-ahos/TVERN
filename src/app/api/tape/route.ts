@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { maybeAutoIngest } from "@/lib/ingest";
 import { maybeAutoIndex } from "@/lib/indexer";
 import { maybePonsIndex } from "@/lib/pons";
+import { maybePrune } from "@/lib/prune";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
 
   // Keep the tape warm off traffic: our own RPC indexer + the GeckoTerminal ingest.
   after(async () => {
-    await Promise.allSettled([maybeAutoIndex(), maybeAutoIngest(), maybePonsIndex()]);
+    await Promise.allSettled([maybeAutoIndex(), maybeAutoIngest(), maybePonsIndex(), maybePrune()]);
   });
 
   const where: Record<string, unknown> = {};
