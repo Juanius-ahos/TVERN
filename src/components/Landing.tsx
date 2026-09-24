@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { LiveTape } from "./LiveTape";
 import { Logo } from "./Logo";
 import { LandingBackdrop } from "./LandingBackdrop";
+import { MarketTicker } from "./MarketTicker";
 
 /* ------------------------------------------------------------------ helpers */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function fmtBig(n: number): string {
   if (!isFinite(n)) return "0";
   if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
@@ -47,6 +49,7 @@ function useReveal() {
 
 /* --------------------------------------------- animated count-up on reveal */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Counter({ to, format, duration = 1500 }: { to: number; format: (n: number) => string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [val, setVal] = useState(0);
@@ -368,14 +371,6 @@ const FEATURES: { icon: string; title: string; body: string }[] = [
 export function Landing() {
   useReveal();
   const heroRef = useRef<HTMLDivElement>(null);
-  const [stats, setStats] = useState<{ tokens: number; volume24: number; liquidity: number } | null>(null);
-
-  useEffect(() => {
-    fetch("/api/tokens", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => d.stats && setStats(d.stats))
-      .catch(() => {});
-  }, []);
 
   // hero mouse parallax
   useEffect(() => {
@@ -467,22 +462,8 @@ export function Landing() {
         </a>
       </section>
 
-      {/* ========================================================== STATS */}
-      <section className="border-b hairline">
-        <div className="ld-reveal mx-auto grid max-w-5xl grid-cols-2 gap-px px-4 py-2 sm:grid-cols-4">
-          {[
-            { label: "tokens tracked", val: <Counter to={stats?.tokens ?? 0} format={(n) => Math.round(n).toString()} /> },
-            { label: "24h volume", val: <Counter to={stats?.volume24 ?? 0} format={fmtBig} /> },
-            { label: "liquidity", val: <Counter to={stats?.liquidity ?? 0} format={fmtBig} /> },
-            { label: "trade tape", val: "Live" },
-          ].map((s, i) => (
-            <div key={i} className="px-4 py-6 text-center">
-              <div className="display text-[28px] font-semibold tabular-nums text-[var(--text)] sm:text-[34px]">{s.val}</div>
-              <div className="mt-1 text-[11px] uppercase tracking-wide text-[var(--faint)]">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* ============================================== LIVE MARKET CAROUSEL */}
+      <MarketTicker />
 
       {/* ========================================================= FEATURES */}
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-24">
