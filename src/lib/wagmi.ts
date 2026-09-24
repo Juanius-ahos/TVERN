@@ -20,7 +20,7 @@ const metadata = {
   name: "The Tavern",
   description: "The live market and community for Robinhood Chain.",
   url: "https://tvern.xyz",
-  icons: ["https://tvern.xyz/logo.svg"],
+  icons: ["https://tvern.xyz/logo.png"],
 };
 
 export const wagmiConfig = createConfig({

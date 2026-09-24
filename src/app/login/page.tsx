@@ -8,7 +8,7 @@ export default function LoginPage() {
         {/* Brand side */}
         <div className="relative flex flex-col justify-between border-b hairline p-8 sm:p-12 lg:border-b-0 lg:border-r">
           <a href="/" className="flex items-center gap-2.5">
-            <img src="/logo.svg" className="h-8 w-8" alt="" />
+            <img src="/logo.png" className="h-8 w-8" alt="" />
             <span className="display text-[22px] font-semibold text-[var(--text)]">Tavern</span>
           </a>
 

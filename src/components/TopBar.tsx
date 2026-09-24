@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import { MarketTicker } from "./MarketTicker";
 
 type Stats = {
   block: number | null;
@@ -44,6 +45,12 @@ export function TopBar() {
         <span className="hidden text-[var(--muted)] md:inline">
           Block <span className="font-semibold tabular-nums text-[var(--text)]">{block}</span>
         </span>
+
+        {/* live market carousel, fills the empty middle of the strip */}
+        <div className="hidden min-w-0 flex-1 overflow-hidden lg:block">
+          <MarketTicker inline />
+        </div>
+
         <div className="ml-auto flex items-center gap-3">
           <a
             href="https://robinhoodchain.blockscout.com"

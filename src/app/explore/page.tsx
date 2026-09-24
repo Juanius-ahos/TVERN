@@ -171,7 +171,7 @@ export default function ExplorePage() {
         {/* Top posters */}
         <Section title="Top voices this week">
           {social.topPosters.length === 0 && (
-            <p className="px-4 py-3 text-[13px] text-[var(--muted)]">Be the first to say something worth toasting to.</p>
+            <p className="px-4 py-3 text-[13px] text-[var(--muted)]">Be the first, post something worth engaging with.</p>
           )}
           {social.topPosters.map((p, i) => (
             <a

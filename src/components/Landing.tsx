@@ -1,86 +1,74 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { LiveTape } from "./LiveTape";
-
-function fmtBig(n: number): string {
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
-  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
-  return `$${n.toFixed(0)}`;
-}
+import { LandingBackdrop } from "./LandingBackdrop";
 
 export function Landing() {
-  const [stats, setStats] = useState<{ tokens: number; volume24: number } | null>(null);
-
-  useEffect(() => {
-    fetch("/api/tokens", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => d.stats && setStats(d.stats))
-      .catch(() => {});
-  }, []);
-
   return (
     <div>
-      {/* Hero */}
-      <section className="border-b hairline px-6 py-16 sm:px-10 sm:py-24">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border hairline px-3 py-1 text-[12px] font-medium text-[var(--muted)]">
-            <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            Live on Robinhood Chain
-          </div>
+      {/* Hero, coded animated backdrop (charts, posts, tickers) behind a crisp brand message */}
+      <section className="relative overflow-hidden border-b hairline">
+        <LandingBackdrop />
 
-          <h1 className="display text-[42px] font-semibold leading-[1.05] tracking-tight sm:text-[64px]">
-            Where the chain
-            <br />
-            gathers.
-          </h1>
+        {/* readability scrim, solid where the text sits (left), revealing the live app on the right */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[1]"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 80%, transparent) 44%, transparent 76%), linear-gradient(0deg, var(--bg) 3%, transparent 42%)",
+          }}
+        />
+        {/* subtle brand glow */}
+        <div
+          className="pointer-events-none absolute -right-24 -top-28 z-[1] h-[440px] w-[440px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent), transparent 62%)",
+            filter: "blur(24px)",
+          }}
+        />
 
-          <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--muted)]">
-            The Tavern is the live market and community for Robinhood Chain. Every token, every trade, and every
-            conversation, in one place, in real time.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href="/login" className="btn-accent rounded-full px-6 py-2.5 text-[15px] font-semibold">
-              Connect wallet
-            </a>
-            <a href="/explore" className="btn-ghost rounded-full px-6 py-2.5 text-[15px] font-semibold">
-              Explore the chain
-            </a>
-          </div>
-
-          {stats && (
-            <div className="mt-12 flex flex-wrap gap-x-10 gap-y-4">
-              <Stat value={String(stats.tokens)} label="tokens tracked" />
-              <Stat value={fmtBig(stats.volume24)} label="24h volume" />
-              <Stat value="Live" label="trade tape" accent />
+        <div className="relative z-[2] px-6 py-24 sm:px-10 sm:py-32">
+          <div className="max-w-2xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border hairline bg-[color:var(--bg)]/50 px-3 py-1 text-[12px] font-medium text-[var(--muted)] backdrop-blur">
+              <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+              Live on Robinhood Chain
             </div>
-          )}
+
+            <h1 className="display text-[46px] font-semibold leading-[1.02] tracking-tight sm:text-[72px]">
+              Where the chain
+              <br />
+              gathers.
+            </h1>
+
+            <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-[var(--muted)] sm:text-[18px]">
+              The social layer for Robinhood Chain. Every token, every trade, and every conversation, live, in one
+              place. Follow the whales, react to the moves, and trade the culture.
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <a href="/login" className="btn-accent rounded-full px-7 py-3 text-[15px] font-semibold">
+                Connect wallet
+              </a>
+              <a href="/explore" className="btn-ghost rounded-full px-7 py-3 text-[15px] font-semibold">
+                Explore the chain
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Live proof */}
+      {/* Live proof, real tape from the chain */}
       <section className="px-6 py-12 sm:px-10">
         <div className="mx-auto max-w-3xl">
           <div className="mb-4 flex items-baseline justify-between">
             <h2 className="display text-[22px] font-semibold">Happening right now</h2>
-            <a href="/explore" className="text-[13px] text-[var(--muted)] hover:text-[var(--text)]">
+            <a href="/explore" className="text-[13px] text-[var(--muted)] transition-colors hover:text-[var(--text)]">
               View all →
             </a>
           </div>
           <LiveTape title="Live trades" emptyText="Listening to the chain…" compact />
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
-  return (
-    <div>
-      <div className={`text-[26px] font-bold tabular-nums ${accent ? "text-[var(--accent-text)]" : ""}`}>{value}</div>
-      <div className="text-[13px] text-[var(--muted)]">{label}</div>
     </div>
   );
 }

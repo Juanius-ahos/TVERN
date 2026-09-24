@@ -10,6 +10,7 @@ import { useSession } from "@/lib/useSession";
 const baseNav = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/explore", label: "Explore", icon: "compass" },
+  { href: "/tokens", label: "Markets", icon: "markets", accent: true },
   { href: "/search", label: "Search", icon: "search" },
 ];
 
@@ -60,21 +61,42 @@ export function Sidebar() {
           {items.map((n) => {
             const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
             const badge = "badge" in n ? (n.badge as number) : 0;
+            const accent = "accent" in n && (n as { accent?: boolean }).accent === true;
             return (
               <a
                 key={n.href}
                 href={n.href}
                 className={`group relative flex items-center gap-4 rounded-lg px-3 py-2.5 text-[15px] transition ${
-                  active ? "font-semibold text-[var(--text)]" : "text-[var(--muted)] hover:text-[var(--text)]"
+                  accent
+                    ? "bg-[color:var(--accent)]/10 font-semibold text-[var(--accent-text)] hover:bg-[color:var(--accent)]/20"
+                    : active
+                      ? "font-semibold text-[var(--text)]"
+                      : "text-[var(--muted)] hover:text-[var(--text)]"
                 }`}
               >
                 <span className="relative">
-                  <Icon
-                    name={n.icon}
-                    size={21}
-                    fill={active && (n.icon === "home" || n.icon === "user")}
-                    className={active ? "text-[var(--text)]" : "text-[var(--muted)] group-hover:text-[var(--text)]"}
-                  />
+                  {accent ? (
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      <path d="M4 19V11M9 19V6M14 19v-9M19 19V8" />
+                    </svg>
+                  ) : (
+                    <Icon
+                      name={n.icon}
+                      size={21}
+                      fill={active && (n.icon === "home" || n.icon === "user")}
+                      className={active ? "text-[var(--text)]" : "text-[var(--muted)] group-hover:text-[var(--text)]"}
+                    />
+                  )}
                   {badge > 0 && (
                     <span className="absolute -right-1.5 -top-1 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold text-[var(--accent-ink)]">
                       {badge > 9 ? "9+" : badge}
@@ -108,8 +130,8 @@ export function Sidebar() {
           <a href="/docs" className="hover:text-[var(--muted)]">
             Docs
           </a>
-          <a href="/tokens" className="hover:text-[var(--muted)]">
-            Markets
+          <a href="/docs#api" className="hover:text-[var(--muted)]">
+            API
           </a>
           <a
             href="https://x.com/TVERN_xyz"
