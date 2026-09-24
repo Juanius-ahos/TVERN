@@ -59,7 +59,7 @@ export function AssetChart({ symbol }: { symbol: string }) {
         <div>
           <div className="text-[13px] text-[var(--muted)]">Price · ${symbol}</div>
           <div className="text-2xl font-bold tabular-nums">
-            {last != null ? `$${last < 1 ? last.toPrecision(4) : last.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "—"}
+            {last != null ? `$${last < 1 ? last.toPrecision(4) : last.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "-"}
           </div>
         </div>
         {change != null && (
@@ -84,7 +84,7 @@ export function AssetChart({ symbol }: { symbol: string }) {
         </svg>
       ) : (
         <div className="grid h-[150px] place-items-center text-[13px] text-[var(--muted)]">
-          No price data yet — this token may be too new or illiquid.
+          No price data yet, this token may be too new or illiquid.
         </div>
       )}
     </div>

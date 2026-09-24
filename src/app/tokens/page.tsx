@@ -19,21 +19,21 @@ type Token = {
 type SortKey = "volume24" | "mcap" | "change24h" | "liquidityUsd" | "priceUsd" | "createdAt";
 
 function fmtPrice(n: number): string {
-  if (!n) return "—";
+  if (!n) return "-";
   if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   if (n >= 1) return `$${n.toFixed(2)}`;
   if (n >= 0.01) return `$${n.toFixed(4)}`;
   return `$${n.toPrecision(2)}`;
 }
 function fmtBig(n: number): string {
-  if (!n) return "—";
+  if (!n) return "-";
   if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
   if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
   return `$${n.toFixed(0)}`;
 }
 function age(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 3600) return `${Math.floor(s / 60)}m`;
   if (s < 86400) return `${Math.floor(s / 3600)}h`;
@@ -101,12 +101,12 @@ export default function TokensPage() {
     <div>
       <header className="glass sticky top-11 z-20 border-b hairline px-4 py-3">
         <h1 className="text-[19px] font-bold tracking-tight">Tokens</h1>
-        <p className="mb-3 text-[13px] text-[var(--muted)]">Every token on Robinhood Chain — live market screener</p>
+        <p className="mb-3 text-[13px] text-[var(--muted)]">Every token on Robinhood Chain, live market screener</p>
 
         {/* stat strip */}
         <div className="mb-3 grid grid-cols-3 gap-2">
           {[
-            { label: "Tokens", value: stats.tokens || "—" },
+            { label: "Tokens", value: stats.tokens || "-" },
             { label: "24h Volume", value: fmtBig(stats.volume24) },
             { label: "Liquidity", value: fmtBig(stats.liquidity) },
           ].map((s) => (
@@ -196,7 +196,7 @@ export default function TokensPage() {
                       t.change24h > 0 ? "text-emerald-400" : t.change24h < 0 ? "text-rose-400" : "text-[var(--muted)]"
                     }`}
                   >
-                    {t.change24h ? `${t.change24h > 0 ? "+" : ""}${t.change24h.toFixed(1)}%` : "—"}
+                    {t.change24h ? `${t.change24h > 0 ? "+" : ""}${t.change24h.toFixed(1)}%` : "-"}
                   </td>
                   <td className="border-b border-white/[0.04] px-3 py-2.5 text-right tabular-nums">{fmtBig(t.mcap)}</td>
                   <td className="border-b border-white/[0.04] px-3 py-2.5 text-right tabular-nums">{fmtBig(t.volume24)}</td>

@@ -70,7 +70,7 @@ export function EventCard({
 
   const k = kindStyle[e.kind] ?? kindStyle.TRANSFER;
   const isLaunch = e.kind === "LAUNCH";
-  // For launches, `fromAddr` is the pool, not a wallet — key the visuals off the asset.
+  // For launches, `fromAddr` is the pool, not a wallet, key the visuals off the asset.
   const avatarSeed = isLaunch ? e.assetAddress || e.assetSymbol : e.fromAddr;
 
   return (
@@ -148,7 +148,7 @@ export function EventCard({
               <textarea
                 value={body}
                 onChange={(ev) => setBody(ev.target.value)}
-                placeholder="what happened here?"
+                placeholder="what’s the story here?"
                 className="w-full resize-none rounded-xl border hairline bg-black/40 p-3 text-[14px] outline-none transition focus:border-[var(--accent)]"
                 rows={2}
                 maxLength={500}

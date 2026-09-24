@@ -163,7 +163,7 @@ let lastLocalIngest = 0; // fallback when Redis is unavailable
 /**
  * Acquire a short lock and, if it's been long enough since the last run,
  * refresh on-chain events. Meant to be fired via `after()` on hot routes so
- * live traffic keeps the feed fresh — no external cron or secret required.
+ * live traffic keeps the feed fresh, no external cron or secret required.
  * Only one caller per interval wins the lock; everyone else is a no-op.
  */
 export async function maybeAutoIngest(): Promise<void> {

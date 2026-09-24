@@ -1,5 +1,5 @@
 // Decorative, blurred preview of the app sitting behind the login card
-// (like the temp site's blurred mockup). Purely visual — no data, no interaction.
+// (like the temp site's blurred mockup). Purely visual, no data, no interaction.
 
 function Line({ w, h = 8, c = "rgba(255,255,255,0.14)" }: { w: string; h?: number; c?: string }) {
   return <div style={{ width: w, height: h, background: c, borderRadius: 6 }} />;

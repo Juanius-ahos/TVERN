@@ -22,7 +22,7 @@ export default async function CommunitiesPage() {
 
         {rows.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-[var(--muted)]">
-            No communities yet — start the first one.
+            No communities yet, start the first one.
           </div>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">

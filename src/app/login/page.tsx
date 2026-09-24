@@ -21,7 +21,7 @@ export default function LoginPage() {
               Where the chain gathers.
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-[var(--muted)]">
-              The live market and community for Robinhood Chain. Your wallet is your account — no email, no password,
+              The live market and community for Robinhood Chain. Your wallet is your account, no email, no password,
               nothing to remember.
             </p>
           </div>

@@ -18,25 +18,25 @@ const STABLE_URL = "https://web-juans-projects-853e3122.vercel.app";
 export const metadata: Metadata = {
   metadataBase: new URL(STABLE_URL),
   title: {
-    default: "The Tavern — the live market and community for Robinhood Chain",
+    default: "The Tavern, the live market and community for Robinhood Chain",
     template: "%s · The Tavern",
   },
   description:
-    "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
+    "See every token, trade, and conversation on Robinhood Chain, live. The Tavern is where the chain gathers.",
   icons: { icon: "/logo.svg", shortcut: "/logo.svg", apple: "/logo.svg" },
   openGraph: {
     type: "website",
     siteName: "The Tavern",
     url: STABLE_URL,
-    title: "The Tavern — the live market and community for Robinhood Chain",
+    title: "The Tavern, the live market and community for Robinhood Chain",
     description:
-      "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
+      "See every token, trade, and conversation on Robinhood Chain, live. The Tavern is where the chain gathers.",
   },
   twitter: {
     card: "summary",
-    title: "The Tavern — the live market and community for Robinhood Chain",
+    title: "The Tavern, the live market and community for Robinhood Chain",
     description:
-      "See every token, trade, and conversation on Robinhood Chain — live. The Tavern is where the chain gathers.",
+      "See every token, trade, and conversation on Robinhood Chain, live. The Tavern is where the chain gathers.",
   },
 };
 
@@ -59,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Sidebar />
             </div>
 
-            {/* Center feed — fills available width */}
+            {/* Center feed, fills available width */}
             <div className="min-w-0 flex-1 border-r hairline">{children}</div>
 
             {/* Right rail */}

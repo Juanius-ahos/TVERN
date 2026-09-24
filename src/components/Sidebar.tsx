@@ -104,12 +104,23 @@ export function Sidebar() {
 
       <div className="px-1 pb-2">
         <ConnectButton />
-        <div className="mt-3 hidden gap-3 px-2 text-[12px] text-[var(--faint)] lg:flex">
+        <div className="mt-3 hidden items-center gap-3 px-2 text-[12px] text-[var(--faint)] lg:flex">
           <a href="/docs" className="hover:text-[var(--muted)]">
             Docs
           </a>
           <a href="/tokens" className="hover:text-[var(--muted)]">
             Markets
+          </a>
+          <a
+            href="https://x.com/TVERN_xyz"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="The Tavern on X"
+            className="ml-auto hover:text-[var(--text)]"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.08-6.93Zm-1.3 19.5h2.04L6.49 3.24H4.3l13.3 17.41Z" />
+            </svg>
           </a>
         </div>
       </div>

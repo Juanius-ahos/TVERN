@@ -24,12 +24,12 @@ export function Landing() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden border-b hairline">
-        {/* brand image (dark theme only — the dark photo would clash with light parchment) */}
+        {/* brand image (dark theme only, the dark photo would clash with light parchment) */}
         <div
           className="hero-img pointer-events-none absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/hero-tavern.jpg)" }}
         />
-        {/* readability scrim — solid on the left where the text sits, revealing the bar on the right */}
+        {/* readability scrim, solid on the left where the text sits, revealing the bar on the right */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -53,7 +53,7 @@ export function Landing() {
 
           <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--muted)]">
             The Tavern is the live market and community for Robinhood Chain. Every token, every trade, and every
-            conversation — in one place, in real time.
+            conversation, in one place, in real time.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">

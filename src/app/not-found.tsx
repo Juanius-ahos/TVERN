@@ -11,7 +11,7 @@ export default function NotFound() {
       </div>
       <h1 className="display text-[28px] font-semibold tracking-tight">Nothing brewing here</h1>
       <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-[var(--muted)]">
-        This page isn&apos;t on the wall yet. The chain keeps moving — check the live tape instead.
+        This page isn&apos;t on the wall yet. The chain keeps moving, check the live tape instead.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link href="/" className="btn-accent rounded-full px-5 py-2 text-[14px] font-semibold">

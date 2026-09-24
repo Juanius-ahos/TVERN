@@ -11,7 +11,7 @@ export default function LivePage() {
       <header className="glass sticky top-11 z-20 border-b hairline px-4 py-3">
         <h1 className="text-[19px] font-bold tracking-tight">The Tape</h1>
         <p className="mb-2.5 text-[13px] text-[var(--muted)]">
-          Every trade on Robinhood Chain, live — indexed straight from the chain.
+          Every trade on Robinhood Chain, live, indexed straight from the chain.
         </p>
         <div className="flex w-full max-w-xs rounded-full border hairline bg-[var(--panel-2)] p-1 text-[14px]">
           {(["all", "whales"] as const).map((k) => (

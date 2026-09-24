@@ -87,7 +87,7 @@ export function LiveTrades({ symbol }: { symbol: string }) {
 
       <div className="max-h-[420px] overflow-y-auto">
         {!ready ? (
-          <p className="px-4 py-8 text-center text-[13px] text-[var(--muted)]">Loading the tape…</p>
+          <p className="px-4 py-8 text-center text-[13px] text-[var(--muted)]">Pouring the tape…</p>
         ) : trades.length === 0 ? (
           <p className="px-4 py-8 text-center text-[13px] text-[var(--muted)]">No recent trades.</p>
         ) : (

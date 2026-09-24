@@ -32,7 +32,7 @@ export function LiveTape({
   wallet,
   title = "Live tape",
   compact = false,
-  emptyText = "Waiting for the next trade…",
+  emptyText = "Waiting on the next round…",
 }: {
   min?: number;
   wallet?: string;
@@ -91,7 +91,7 @@ export function LiveTape({
 
       <div className={compact ? "max-h-[360px] overflow-y-auto" : "max-h-[70vh] overflow-y-auto"}>
         {!ready ? (
-          <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">Loading…</p>
+          <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">Pouring…</p>
         ) : ticks.length === 0 ? (
           <p className="px-4 py-10 text-center text-[13px] text-[var(--muted)]">{emptyText}</p>
         ) : (

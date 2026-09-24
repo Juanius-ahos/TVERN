@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "sign in first" }, { status: 401 });
 
   const rl = await checkRateLimit(`community:${session.userId}`, 5, "1 h");
-  if (!rl.ok) return NextResponse.json({ error: "slow down — too many communities" }, { status: 429 });
+  if (!rl.ok) return NextResponse.json({ error: "slow down, too many communities" }, { status: 429 });
 
   const { name, description } = await req.json().catch(() => ({}));
   const cleanName = String(name ?? "").trim().slice(0, 40);

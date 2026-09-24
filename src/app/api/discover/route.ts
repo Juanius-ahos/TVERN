@@ -17,7 +17,7 @@ function trim(p: DiscoverPool) {
   };
 }
 
-// GET → { trending, launches } — live from GeckoTerminal (registry caches ~60s).
+// GET → { trending, launches }, live from GeckoTerminal (registry caches ~60s).
 export async function GET() {
   const [trend, fresh] = await Promise.all([getTrendingPools(), getNewPools()]);
   const data = {

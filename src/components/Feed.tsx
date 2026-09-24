@@ -85,7 +85,7 @@ export function Feed({
         {showComposer && filter === "" && canPost && <PostComposer onPosted={load} />}
         {showComposer && filter === "" && !canPost && (
           <div className="rounded-xl border hairline p-4 text-[14px] text-[var(--muted)]">
-            Sign in with your wallet to post and reply. Reading is open to everyone.
+            Reading’s on the house. Sign in with your wallet to pull up a stool and post.
           </div>
         )}
 
@@ -100,10 +100,10 @@ export function Feed({
         {!loading && items.length === 0 && (
           <div className="rounded-2xl border hairline py-12 text-center text-[14px] text-[var(--muted)]">
             {filter === "stock"
-              ? "No tokenized-stock trades recently."
+              ? "No tokenized-stock rounds poured recently."
               : filter === "launch"
-              ? "No new launches in the last few hours."
-              : "No posts yet."}
+              ? "No fresh kegs tapped in the last few hours."
+              : "Quiet at the bar. Be the first to speak up."}
           </div>
         )}
 

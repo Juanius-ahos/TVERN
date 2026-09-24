@@ -1,4 +1,4 @@
-export const metadata = { title: "Docs — The Tavern" };
+export const metadata = { title: "Docs, The Tavern" };
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -22,7 +22,7 @@ export default function DocsPage() {
           <h2 className="brand-gradient text-[28px] font-black tracking-tight">The Tavern</h2>
           <p className="mt-2 text-[16px] leading-relaxed text-[var(--text)]/85">
             The social layer and live market terminal for Robinhood Chain. Watch the whales, read the tape, discuss
-            every token — all in one place, all in real time.
+            every token, all in one place, all in real time.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export default function DocsPage() {
             to a live asset page with price, market cap, a chart, and a streaming trade tape.
           </p>
           <p>
-            It is scoped entirely to Robinhood Chain — no global crypto noise. Tokenized stocks (NVDA, TSLA, SPY),
+            It is scoped entirely to Robinhood Chain, no global crypto noise. Tokenized stocks (NVDA, TSLA, SPY),
             memecoins, and fresh launches, all native to the chain.
           </p>
         </Section>
@@ -42,18 +42,18 @@ export default function DocsPage() {
           <p>The Tavern reads Robinhood Chain two independent ways, and merges them:</p>
           <ul className="list-disc space-y-2 pl-5">
             <li>
-              <span className="font-semibold">Our own indexer</span> — reads ERC-20 transfer logs to and from each DEX
+              <span className="font-semibold">Our own indexer</span>, reads ERC-20 transfer logs to and from each DEX
               pool directly off the chain RPC and turns them into buy/sell events. This is universal (works for any
-              token) and produces the fastest, freshest trades — often seconds old.
+              token) and produces the fastest, freshest trades, often seconds old.
             </li>
             <li>
-              <span className="font-semibold">GeckoTerminal</span> — a keyless market-data source for prices, volume,
+              <span className="font-semibold">GeckoTerminal</span>, a keyless market-data source for prices, volume,
               market cap, liquidity, and OHLCV charts.
             </li>
           </ul>
           <p>
-            Both write into one database, deduped per transaction. Everything you see — the feed, the tape, the
-            screener, charts — reads from that database, so it scales to thousands of users without multiplying calls
+            Both write into one database, deduped per transaction. Everything you see, the feed, the tape, the
+            screener, charts, reads from that database, so it scales to thousands of users without multiplying calls
             to any upstream source.
           </p>
         </Section>
@@ -61,9 +61,9 @@ export default function DocsPage() {
         <Section id="features" title="Features">
           <div className="grid gap-2 sm:grid-cols-2">
             {[
-              ["The Tape", "Every trade on the chain, streaming live — filter to whales ($10k+)."],
+              ["The Tape", "Every trade on the chain, streaming live, filter to whales ($10k+)."],
               ["Token pages", "Price, market cap, FDV, volume, liquidity, a live chart, and a per-token trade tape."],
-              ["Tokens screener", "A sortable, live table of every token — market cap, 24h, volume, age."],
+              ["Tokens screener", "A sortable, live table of every token, market cap, 24h, volume, age."],
               ["Explore", "Top gainers, most traded, fresh launches, trending cashtags, and a creator leaderboard."],
               ["Social", "Posts, replies, likes, reposts, polls, bookmarks, communities, and 1:1 messages."],
               ["Profiles", "Wallet-native identity with live on-chain activity, followers, and tipping."],
@@ -78,7 +78,7 @@ export default function DocsPage() {
 
         <Section id="identity" title="Identity & safety">
           <p>
-            Your identity is your wallet — no email, no password. Browsing is free; posting uses a one-time gasless
+            Your identity is your wallet, no email, no password. Browsing is free; posting uses a one-time gasless
             signature (never a transaction). You can mute, block, delete your own posts, and manage everything from
             Settings.
           </p>
@@ -87,9 +87,9 @@ export default function DocsPage() {
         <Section id="roadmap" title="Roadmap">
           <ul className="list-disc space-y-2 pl-5">
             <li>Price & wallet alerts (get pinged when a token moves or a wallet you follow trades).</li>
-            <li>Verified trader track records — real on-chain P&amp;L on profiles.</li>
-            <li>Token safety scores — liquidity, holder concentration, and rug risk at a glance.</li>
-            <li>Deeper indexing — full historical trade history straight from the chain.</li>
+            <li>Verified trader track records, real on-chain P&amp;L on profiles.</li>
+            <li>Token safety scores, liquidity, holder concentration, and rug risk at a glance.</li>
+            <li>Deeper indexing, full historical trade history straight from the chain.</li>
           </ul>
         </Section>
 

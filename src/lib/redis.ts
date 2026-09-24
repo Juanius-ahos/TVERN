@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 
 // Vercel Storage injects KV_* names for the Upstash store; manual setups use UPSTASH_*.
-// Either wiring works — prefer UPSTASH_* if both are present.
+// Either wiring works, prefer UPSTASH_* if both are present.
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
@@ -29,7 +29,7 @@ export async function cached<T>(key: string, ttlSeconds: number, compute: () => 
 
 // A tiny per-instance L1 so bursts of requests on one warm lambda don't all hit Redis.
 const mem = new Map<string, { at: number; val: unknown }>();
-// Per-instance last-known-good — survives even when Redis isn't configured, so a
+// Per-instance last-known-good, survives even when Redis isn't configured, so a
 // single rate-limited GeckoTerminal call never blanks the UI once we've seen data.
 const lkgMem = new Map<string, unknown>();
 
@@ -84,7 +84,7 @@ export async function liveCached<T>(
     return val;
   }
 
-  // Upstream failed or came back empty — serve the last good value we have.
+  // Upstream failed or came back empty, serve the last good value we have.
   if (redis) {
     try {
       const lkg = await redis.get<T>(`${key}:lkg`);
