@@ -51,18 +51,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-dvh antialiased">
         <Providers>
-          <TopBar />
-          <div className="mx-auto flex w-full max-w-[1600px]">
+          <div className="app-topbar">
+            <TopBar />
+          </div>
+          <div className="app-shell mx-auto flex w-full max-w-[1600px]">
             {/* Left nav */}
-            <div className="w-[68px] shrink-0 border-r hairline lg:w-[248px]">
+            <div className="app-sidebar w-[68px] shrink-0 border-r hairline lg:w-[248px]">
               <Sidebar />
             </div>
 
             {/* Center feed, fills available width */}
-            <div className="min-w-0 flex-1 border-r hairline">{children}</div>
+            <div className="app-center min-w-0 flex-1 border-r hairline">{children}</div>
 
             {/* Right rail */}
-            <div className="hidden w-[340px] shrink-0 xl:block 2xl:w-[380px]">
+            <div className="app-rightrail hidden w-[340px] shrink-0 xl:block 2xl:w-[380px]">
               <div className="px-5 py-4">
                 <RightRail />
               </div>

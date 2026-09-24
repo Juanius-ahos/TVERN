@@ -489,3 +489,16 @@ h3 {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- full-bleed marketing landing (hides the app chrome) ---------- */
+body:has(.ld-fullbleed) .app-topbar,
+body:has(.ld-fullbleed) .app-sidebar,
+body:has(.ld-fullbleed) .app-rightrail {
+  display: none;
+}
+body:has(.ld-fullbleed) .app-shell {
+  max-width: none;
+}
+body:has(.ld-fullbleed) .app-center {
+  border-right: 0;
+}

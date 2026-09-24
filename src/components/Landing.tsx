@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LiveTape } from "./LiveTape";
+import { Logo } from "./Logo";
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -290,6 +291,64 @@ function LiveLaunches() {
   );
 }
 
+/* ------------------------------------------------ 3D product preview card */
+
+function ProductPreview() {
+  // A realistic, static mock of the app itself: token header, chart, live rows.
+  const ys = [58, 54, 60, 49, 52, 44, 47, 38, 41, 33, 36, 28, 24, 27, 19];
+  const step = 300 / (ys.length - 1);
+  const line = ys.map((y, i) => `${(i * step).toFixed(1)},${y}`).join(" ");
+  const area = `M0,${ys[0]} ` + ys.map((y, i) => `L${(i * step).toFixed(1)},${y}`).join(" ") + " L300,120 L0,120 Z";
+  const rows = [
+    { k: "BUY", sym: "NVDA", usd: "$24.1K", cls: "text-emerald-400" },
+    { k: "NEW", sym: "SEEDX", usd: "$4.5K", cls: "text-[var(--accent-text)]" },
+    { k: "SELL", sym: "ROBIN", usd: "$8.7K", cls: "text-rose-400" },
+  ];
+  return (
+    <div className="ld-preview">
+      <div className="ld-preview-card">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-[color:var(--accent)]/15 text-[12px] font-bold text-[var(--accent-text)]">
+            N
+          </span>
+          <div className="leading-tight">
+            <div className="text-[13px] font-bold">$NVDA</div>
+            <div className="text-[11px] text-[var(--muted)]">Robinhood Chain</div>
+          </div>
+          <div className="ml-auto text-right leading-tight">
+            <div className="text-[14px] font-bold tabular-nums">$182.40</div>
+            <div className="text-[11px] font-semibold text-emerald-400">+4.2%</div>
+          </div>
+        </div>
+        <svg viewBox="0 0 300 120" className="h-24 w-full" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="ld-pg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="var(--accent)" stopOpacity="0.32" />
+              <stop offset="1" stopColor="var(--accent)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#ld-pg)" />
+          <polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+          <circle cx="300" cy={ys[ys.length - 1]} r="3.5" fill="var(--accent)" className="lb-pulse" />
+        </svg>
+        <div className="mt-3 space-y-1.5 border-t hairline pt-3">
+          {rows.map((r, i) => (
+            <div key={i} className="flex items-center gap-2 text-[12px]">
+              <span className={`w-9 shrink-0 font-bold ${r.cls}`}>{r.k}</span>
+              <span className="font-bold">${r.sym}</span>
+              <span className="ml-auto font-semibold tabular-nums text-[var(--muted)]">{r.usd}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="ld-preview-chip ld-preview-chip-a">
+        <span className="live-dot h-1.5 w-1.5 rounded-full bg-[var(--accent)]" /> Live tape
+      </div>
+      <div className="ld-preview-chip ld-preview-chip-b">🍻 New launch</div>
+    </div>
+  );
+}
+
 /* --------------------------------------------------------------- features */
 
 const FEATURES: { icon: string; title: string; body: string }[] = [
@@ -331,8 +390,31 @@ export function Landing() {
   }, []);
 
   return (
-    <div className="ld-root">
+    <div className="ld-root ld-fullbleed">
       <style>{LD_CSS}</style>
+
+      {/* ===================================================== LANDING NAV */}
+      <header className="ld-nav sticky top-0 z-40 border-b hairline">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3 sm:px-10">
+          <div className="flex items-center">
+            <Logo />
+          </div>
+          <nav className="ml-auto flex items-center gap-1 sm:gap-2">
+            <a href="/explore" className="hidden rounded-full px-3 py-1.5 text-[14px] text-[var(--muted)] transition hover:text-[var(--text)] sm:block">
+              Explore
+            </a>
+            <a href="/tokens" className="hidden rounded-full px-3 py-1.5 text-[14px] text-[var(--muted)] transition hover:text-[var(--text)] sm:block">
+              Markets
+            </a>
+            <a href="/docs" className="hidden rounded-full px-3 py-1.5 text-[14px] text-[var(--muted)] transition hover:text-[var(--text)] sm:block">
+              Docs
+            </a>
+            <a href="/login" className="btn-accent rounded-full px-5 py-2 text-[14px] font-semibold">
+              Connect wallet
+            </a>
+          </nav>
+        </div>
+      </header>
 
       {/* ============================================================ HERO */}
       <section ref={heroRef} className="ld-hero relative overflow-hidden border-b hairline">
@@ -370,20 +452,9 @@ export function Landing() {
             </div>
           </div>
 
-          {/* 3D coin */}
-          <div className="ld-coin-stage ld-parallax-strong hidden justify-center lg:flex">
-            <div className="ld-coin-wrap">
-              <div className="ld-coin">
-                <div className="ld-face ld-front">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo.png" alt="" className="h-20 w-20 object-contain" />
-                </div>
-                <div className="ld-face ld-back">
-                  <span className="display text-[26px] font-semibold text-[var(--accent-ink)]">TVERN</span>
-                </div>
-              </div>
-              <div className="ld-coin-shadow" />
-            </div>
+          {/* Floating product preview */}
+          <div className="ld-parallax-strong hidden justify-center lg:flex">
+            <ProductPreview />
           </div>
         </div>
 
@@ -546,24 +617,26 @@ const LD_CSS = `
   animation: ld-shine 5.5s ease-in-out infinite; }
 @keyframes ld-shine { 0%,100%{ background-position: 120% 0; } 50%{ background-position: -20% 0; } }
 
-/* 3D spinning coin */
-.ld-coin-stage { perspective: 1000px; }
-.ld-coin-wrap { position:relative; }
-.ld-coin { position:relative; width:190px; height:190px; transform-style:preserve-3d;
-  animation: ld-spin 8s linear infinite; transform: rotateX(12deg) rotateY(0deg); }
-@keyframes ld-spin { to { transform: rotateX(12deg) rotateY(360deg); } }
-.ld-face { position:absolute; inset:0; border-radius:50%; display:grid; place-items:center;
-  backface-visibility:hidden; -webkit-backface-visibility:hidden; }
-.ld-front { background: radial-gradient(circle at 34% 28%, #ffffff 0%, var(--accent) 44%, #9dcb04 100%);
-  box-shadow: 0 0 70px -6px color-mix(in srgb, var(--accent) 70%, transparent), inset 0 6px 18px rgba(255,255,255,.5), inset 0 -10px 20px rgba(0,0,0,.25);
-  border: 4px solid color-mix(in srgb, var(--accent) 60%, #fff); }
-.ld-back { transform: rotateY(180deg); background: radial-gradient(circle at 66% 28%, #ffffff 0%, var(--accent) 46%, #9dcb04 100%);
-  box-shadow: 0 0 70px -6px color-mix(in srgb, var(--accent) 70%, transparent), inset 0 6px 18px rgba(255,255,255,.5), inset 0 -10px 20px rgba(0,0,0,.25);
-  border: 4px solid color-mix(in srgb, var(--accent) 60%, #fff); }
-.ld-coin-shadow { position:absolute; left:50%; bottom:-38px; width:150px; height:26px; transform:translateX(-50%);
-  background: radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%); filter: blur(6px);
-  animation: ld-coin-shadow 8s ease-in-out infinite; }
-@keyframes ld-coin-shadow { 0%,100%{ transform:translateX(-50%) scaleX(1); opacity:.5; } 50%{ transform:translateX(-50%) scaleX(.6); opacity:.28; } }
+/* landing nav */
+.ld-nav { background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: saturate(120%) blur(14px); -webkit-backdrop-filter: saturate(120%) blur(14px); }
+
+/* floating product preview */
+.ld-preview { position:relative; width:100%; max-width:380px; animation: ld-float 7s ease-in-out infinite; }
+@keyframes ld-float { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-12px); } }
+.ld-preview-card { position:relative; border-radius:20px; padding:18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, #fff 3%), var(--surface));
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 40px 80px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.02) inset,
+    0 0 60px -20px color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: perspective(1200px) rotateY(-14deg) rotateX(6deg); transform-style:preserve-3d; }
+.ld-preview-chip { position:absolute; display:inline-flex; align-items:center; gap:6px;
+  border-radius:999px; padding:6px 12px; font-size:12px; font-weight:600;
+  background: color-mix(in srgb, var(--surface) 80%, transparent); border:1px solid var(--border-strong);
+  backdrop-filter: blur(8px); box-shadow: 0 12px 30px -14px rgba(0,0,0,.6); }
+.ld-preview-chip-a { top:8px; left:-42px; animation: ld-float 6s ease-in-out infinite; }
+.ld-preview-chip-b { bottom:24px; right:-30px; color: var(--accent-text);
+  animation: ld-float 8s ease-in-out .6s infinite; }
 
 /* scroll cue */
 .ld-scroll { opacity:.7; transition: opacity .2s; } .ld-scroll:hover { opacity:1; }
@@ -589,7 +662,7 @@ const LD_CSS = `
   background: radial-gradient(700px 300px at 50% 120%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%); }
 
 @media (prefers-reduced-motion: reduce) {
-  .ld-coin, .ld-grid-inner, .ld-shine, .ld-mouse::after, .ld-coin-shadow { animation: none !important; }
+  .ld-grid-inner, .ld-shine, .ld-mouse::after, .ld-preview, .ld-preview-chip { animation: none !important; }
   .ld-parallax, .ld-parallax-strong { transform: none !important; }
 }
 `;
