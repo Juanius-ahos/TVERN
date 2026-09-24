@@ -81,7 +81,8 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
     const raw = (p.body || p.event?.title || "").trim();
     const snippet = raw.length > 180 ? `${raw.slice(0, 180).trim()}…` : raw;
     const text = snippet ? `"${snippet}"\n\nby ${author} on The Tavern` : `${author} on The Tavern`;
-    const url = typeof window !== "undefined" ? `${window.location.origin}/post/${p.id}` : `/post/${p.id}`;
+    // Always share the canonical production link, not the host the reader is on.
+    const url = `https://tvern.xyz/post/${p.id}`;
     const intent =
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}` +
       `&url=${encodeURIComponent(url)}&via=TVERN_xyz`;

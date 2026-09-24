@@ -13,7 +13,7 @@ const fraunces = Fraunces({
   axes: ["opsz"],
 });
 
-const STABLE_URL = "https://web-juans-projects-853e3122.vercel.app";
+const STABLE_URL = "https://tvern.xyz";
 
 export const metadata: Metadata = {
   metadataBase: new URL(STABLE_URL),

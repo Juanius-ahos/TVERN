@@ -54,7 +54,7 @@ export function TipButton({ recipient }: { recipient: string }) {
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 text-[var(--muted)] transition hover:text-[var(--accent-text)]"
-        title={live ? `Tip ${SYMBOL}` : `Tipping goes live when $${SYMBOL} launches`}
+        title={live ? `Tip ${SYMBOL}` : "Tipping when $TVERN launches"}
       >
         <Icon name="bolt" size={16} />
         Tip
@@ -64,7 +64,7 @@ export function TipButton({ recipient }: { recipient: string }) {
         <div className="absolute bottom-7 left-0 z-30 w-56 rounded-xl border hairline bg-[var(--panel)] p-3 shadow-xl backdrop-blur-xl">
           {!live ? (
             <p className="text-[12.5px] text-[var(--muted)]">
-              Tipping goes live when <span className="text-[var(--accent-text)]">${SYMBOL}</span> launches on Pons.
+              Tipping when <span className="text-[var(--accent-text)]">$TVERN</span> launches.
             </p>
           ) : !isConnected ? (
             <p className="text-[12.5px] text-[var(--muted)]">Connect your wallet to tip.</p>
