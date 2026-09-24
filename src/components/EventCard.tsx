@@ -18,6 +18,8 @@ export type FeedEvent = {
   txHash: string;
   createdAt: string;
   commentCount: number;
+  imageUrl?: string | null;
+  progressPct?: number | null;
 };
 
 const kindStyle: Record<
@@ -44,6 +46,7 @@ export function EventCard({
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [followed, setFollowed] = useState(false);
+  const [imgErr, setImgErr] = useState(false);
 
   async function quote() {
     if (!body.trim()) return;
@@ -78,7 +81,19 @@ export function EventCard({
       <div className="flex items-start gap-3">
         {isLaunch ? (
           <a href={`/asset/${e.assetSymbol}`} className="transition hover:opacity-90">
-            <Avatar address={avatarSeed} size={42} />
+            {e.imageUrl && !imgErr ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={e.imageUrl}
+                alt={e.assetSymbol}
+                width={42}
+                height={42}
+                onError={() => setImgErr(true)}
+                className="h-[42px] w-[42px] rounded-full object-cover ring-1 ring-[color:var(--accent)]/25"
+              />
+            ) : (
+              <Avatar address={avatarSeed} size={42} />
+            )}
           </a>
         ) : (
           <a href={`/wallet/${e.fromAddr}`} className="transition hover:opacity-90">
@@ -98,7 +113,27 @@ export function EventCard({
           </div>
 
           {isLaunch ? (
-            <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">{e.title}</p>
+            <>
+              <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">{e.title}</p>
+              {typeof e.progressPct === "number" && (
+                <div className="mt-2.5">
+                  <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
+                    <span className="text-[var(--faint)]">
+                      {e.progressPct >= 100 ? "Graduated" : "Graduation"}
+                    </span>
+                    <span className={e.progressPct >= 100 ? "text-[var(--accent-text)]" : "text-[var(--muted)]"}>
+                      {e.progressPct >= 100 ? "100%" : `${e.progressPct.toFixed(e.progressPct < 10 ? 1 : 0)}%`}
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-[color:var(--border-strong)]">
+                    <div
+                      className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
+                      style={{ width: `${Math.max(2, Math.min(100, e.progressPct))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <p className="mt-1.5 text-[15px] font-medium leading-snug text-[var(--text)]">
               <a href={`/wallet/${e.fromAddr}`} className="font-mono font-semibold hover:underline">

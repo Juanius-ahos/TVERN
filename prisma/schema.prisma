@@ -306,6 +306,8 @@ model Event {
   usdValue     Float
   severity     Float    // higher = more interesting
   title        String   // rendered headline
+  imageUrl     String?  // token/asset logo (e.g. Pons launch logo)
+  progressPct  Float?   // graduation progress 0-100, for launch cards
   createdAt    DateTime @default(now())
 
   posts Post[]

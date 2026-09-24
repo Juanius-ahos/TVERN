@@ -57,6 +57,8 @@ async function buildFeed(myId: string | undefined, filter: string | null) {
     txHash: e.txHash,
     createdAt: e.blockTs,
     commentCount: e._count.posts,
+    imageUrl: e.imageUrl,
+    progressPct: e.progressPct,
   }));
 
   const postItems = posts.map(mapPost);

@@ -12,9 +12,19 @@ import { formatUsd } from "./format";
 // Source: https://www.ponsfamily.com/api/pons-launches (the Explore feed).
 
 const PONS_API = "https://www.ponsfamily.com/api/pons-launches";
+const PONS_IPFS = "https://www.ponsfamily.com/api/ipfs/content";
 const PAGE_SIZE = Number(process.env.PONS_PAGE_SIZE ?? 40);
 const AGE = process.env.PONS_AGE ?? "24h";
 const ZERO = "0x0000000000000000000000000000000000000000";
+
+// Resolve a token logo to a loadable URL. Pons stores logos on IPFS and serves a
+// card-sized variant through its own gateway, which is what its app renders.
+function logoUrl(logo?: string): string | null {
+  if (!logo) return null;
+  if (logo.startsWith("http")) return logo;
+  const cid = logo.replace(/^ipfs:\/\//i, "").replace(/^\/+/, "").trim();
+  return cid ? `${PONS_IPFS}/${cid}?variant=card` : null;
+}
 
 type PonsLaunch = {
   version?: string;
@@ -77,6 +87,7 @@ export async function runPonsIndexer(): Promise<{ scanned: number; created: numb
     const title = `$${t.symbol}${nameNote} just launched on Pons${mcapNote}${gradNote}`;
 
     const pool = t.pool && t.pool.toLowerCase() !== ZERO ? t.pool.toLowerCase() : token;
+    const progress = t.graduated ? 100 : Math.max(0, Math.min(100, pct));
 
     try {
       await prisma.event.upsert({
@@ -99,8 +110,11 @@ export async function runPonsIndexer(): Promise<{ scanned: number; created: numb
           // Launches rank prominently; graduated ones higher, then a nudge by size.
           severity: (t.graduated ? 80_000 : 40_000) + Math.min(mcap, 100_000),
           title,
+          imageUrl: logoUrl(t.logo),
+          progressPct: progress,
         },
-        update: {},
+        // Keep the card's market cap and graduation progress live on each pass.
+        update: { title, usdValue: mcap, imageUrl: logoUrl(t.logo), progressPct: progress },
       });
       created++;
     } catch {
