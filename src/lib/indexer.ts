@@ -1,7 +1,7 @@
 import { parseAbiItem, formatUnits, type Address } from "viem";
 import { publicClient } from "./chain";
 import { prisma } from "./db";
-import { getActivePools } from "./registry";
+import { getActivePools, resolvePool } from "./registry";
 import { redis } from "./redis";
 import { formatUsd, shortAddr } from "./format";
 
@@ -108,6 +108,105 @@ export async function runIndexer(): Promise<{ scanned: number; created: number; 
   });
 
   return { scanned, created, from: Number(fromBlock), to: Number(current) };
+}
+
+// On-demand: index just one token's pool when its page is opened, so even a
+// small or brand-new coin (not in the top pools the main pass scans) gets
+// seconds-fresh trades straight off the chain. Rescans a short recent window;
+// upserts dedupe, so repeated polls are cheap.
+const SYMBOL_SPAN = Number(process.env.INDEX_SYMBOL_SPAN ?? 1800); // ~3 min at 0.1s blocks
+const SYMBOL_MIN_USD = Number(process.env.INDEX_SYMBOL_MIN_USD ?? 5);
+
+export async function indexSymbol(symbol: string): Promise<{ created: number }> {
+  let created = 0;
+  const pool = await resolvePool(symbol.toUpperCase());
+  if (!pool?.poolAddress || !pool.baseAddress || !(pool.priceUsd > 0)) return { created };
+
+  const token = pool.baseAddress as Address;
+  const poolAddr = pool.poolAddress.toLowerCase();
+  const current = await publicClient.getBlockNumber();
+  let fromBlock = current - BigInt(SYMBOL_SPAN);
+  if (fromBlock < BigInt(0)) fromBlock = BigInt(0);
+
+  let logs;
+  try {
+    const [buys, sells] = await Promise.all([
+      publicClient.getLogs({ address: token, event: transferEvent, args: { from: poolAddr as Address }, fromBlock, toBlock: current }),
+      publicClient.getLogs({ address: token, event: transferEvent, args: { to: poolAddr as Address }, fromBlock, toBlock: current }),
+    ]);
+    logs = [
+      ...buys.map((l) => ({ l, side: "buy" as const })),
+      ...sells.map((l) => ({ l, side: "sell" as const })),
+    ];
+  } catch {
+    return { created };
+  }
+
+  const head = await publicClient.getBlock({ blockNumber: current });
+  const headMs = Number(head.timestamp) * 1000;
+  const tsFor = (block: bigint) => new Date(headMs - Number(current - block) * BLOCK_MS);
+
+  for (const { l, side } of logs) {
+    const value = l.args.value ?? BigInt(0);
+    const amount = Number(formatUnits(value, pool.baseDecimals));
+    const usd = amount * pool.priceUsd;
+    if (!isFinite(usd) || usd < SYMBOL_MIN_USD) continue;
+    const wallet = String(side === "buy" ? l.args.to : l.args.from).toLowerCase();
+    if (!wallet || wallet === poolAddr || wallet === "0x0000000000000000000000000000000000000000") continue;
+    const kind = usd >= 50_000 ? "WHALE" : side === "buy" ? "BUY" : "SELL";
+    const verb = side === "buy" ? "bought" : "sold";
+    try {
+      await prisma.event.upsert({
+        where: { txHash_logIndex: { txHash: l.transactionHash, logIndex: l.logIndex } },
+        create: {
+          kind,
+          txHash: l.transactionHash,
+          logIndex: l.logIndex,
+          blockNumber: Number(l.blockNumber),
+          blockTs: tsFor(l.blockNumber),
+          assetSymbol: pool.baseSymbol,
+          assetAddress: pool.baseAddress,
+          fromAddr: wallet,
+          toAddr: poolAddr,
+          amountRaw: value.toString(),
+          amountUi: amount,
+          usdValue: usd,
+          severity: pool.isStock ? usd * 3 : usd,
+          title: `${shortAddr(wallet)} ${verb} ${formatUsd(usd)} of ${pool.baseSymbol}`,
+        },
+        update: {},
+      });
+      created++;
+    } catch {
+      // dup / race
+    }
+  }
+  return { created };
+}
+
+// Per-symbol throttle so the asset page's 6s polling does not stack passes.
+const SYMBOL_INTERVAL = Number(process.env.INDEX_SYMBOL_SECONDS ?? 6);
+const lastLocalSymbol = new Map<string, number>();
+
+export async function maybeIndexSymbol(symbol: string): Promise<void> {
+  const key = symbol.toUpperCase();
+  const now = Date.now();
+  if (redis) {
+    try {
+      const ok = await redis.set(`indexer:sym:${key}`, now, { nx: true, ex: SYMBOL_INTERVAL });
+      if (ok !== "OK") return;
+    } catch {
+      return;
+    }
+  } else {
+    if (now - (lastLocalSymbol.get(key) ?? 0) < SYMBOL_INTERVAL * 1000) return;
+    lastLocalSymbol.set(key, now);
+  }
+  try {
+    await indexSymbol(key);
+  } catch {
+    // best-effort
+  }
 }
 
 // Traffic-driven, self-throttled, one caller per interval runs a pass.
