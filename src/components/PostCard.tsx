@@ -74,6 +74,20 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
     }
   }
 
+  // Open X's share composer pre-filled with a quote of this post + a link back.
+  // Uses the web intent, so it needs no API keys and posts as the reader, not us.
+  function shareToX() {
+    const author = p.author.username ? `@${p.author.username}` : shortAddr(p.author.address);
+    const raw = (p.body || p.event?.title || "").trim();
+    const snippet = raw.length > 180 ? `${raw.slice(0, 180).trim()}…` : raw;
+    const text = snippet ? `"${snippet}"\n\nby ${author} on The Tavern` : `${author} on The Tavern`;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/post/${p.id}` : `/post/${p.id}`;
+    const intent =
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}` +
+      `&url=${encodeURIComponent(url)}&via=TVERN_xyz`;
+    window.open(intent, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <article className="animate-in card-hover rounded-2xl border hairline p-4">
       <div className="flex items-start gap-3">
@@ -156,6 +170,16 @@ export function PostCard({ p, canPost }: { p: FeedPost; canPost: boolean }) {
               aria-label="Bookmark"
             >
               <Icon name="bookmark" size={16} fill={bookmarked} />
+            </button>
+            <button
+              onClick={shareToX}
+              className="flex items-center gap-1.5 transition hover:text-[var(--text)]"
+              aria-label="Share to X"
+              title="Share to X"
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                <path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.08-6.93Zm-1.3 19.5h2.04L6.49 3.24H4.3l13.3 17.41Z" />
+              </svg>
             </button>
             <TipButton recipient={p.author.address} />
           </div>
