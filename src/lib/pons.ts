@@ -1,166 +1,103 @@
-import { parseAbi, parseAbiItem, type Address } from "viem";
-import { publicClient } from "./chain";
 import { prisma } from "./db";
 import { redis } from "./redis";
-import { shortAddr } from "./format";
+import { formatUsd } from "./format";
 
-// Pons Family launch indexer. Reads the factory's TokenLaunched event straight
-// off Robinhood Chain, so a fresh launch shows up in The Tavern the moment it
-// hits a block, instead of waiting for GeckoTerminal to discover the pool.
+// Pons Family launch feed. Pons runs its own launch factories on Robinhood Chain
+// and rev's them (the current one is a v2 factory the public docs list under a
+// different tab, with a different event topic than v1). Rather than decode raw
+// factory logs against addresses that change every version, we read Pons's own
+// launches API, which already resolves token, symbol, logo, market cap and
+// graduation progress across every factory version.
 //
-// Integration surface published at https://docs.ponsfamily.com (Integration).
-// Every launch deploys a token + its locked WETH pool in one transaction, and
-// the token is self-describing on-chain (name/symbol/decimals/logo/pool).
+// Source: https://www.ponsfamily.com/api/pons-launches (the Explore feed).
 
-const CURSOR_ID = "pons-launches";
+const PONS_API = "https://www.ponsfamily.com/api/pons-launches";
+const PAGE_SIZE = Number(process.env.PONS_PAGE_SIZE ?? 40);
+const AGE = process.env.PONS_AGE ?? "24h";
+const ZERO = "0x0000000000000000000000000000000000000000";
 
-// Deployed factories on Robinhood Chain (active serves current launches; legacy
-// stays for tokens deployed before the current version). Both emit TokenLaunched.
-export const PONS = {
-  activeFactory: "0xA5aAb3F0c6EeadF30Ef1D3Eb997108E976351feB" as Address,
-  legacyFactory: "0x0c37a24F5D23A486FA692d1500881d698B1F77a4" as Address,
-  weth: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73" as Address,
-  activeStartBlock: 8991118,
-} as const;
+type PonsLaunch = {
+  version?: string;
+  token?: string;
+  deployer?: string;
+  pool?: string;
+  transactionHash?: string;
+  blockNumber?: number;
+  launchedAt?: string;
+  name?: string;
+  symbol?: string;
+  logo?: string;
+  marketCapUsd?: number | null;
+  graduated?: boolean;
+  graduationProgressPct?: number | null;
+};
 
-const FACTORIES: Address[] = [PONS.activeFactory, PONS.legacyFactory];
+type PonsResponse = {
+  active?: { items?: PonsLaunch[] };
+  graduated?: { items?: PonsLaunch[] };
+};
 
-// event TokenLaunched(address indexed token, address indexed deployer, address indexed dexFactory,
-//   address pairToken, address pool, uint256 dexId, uint256 launchConfigId, uint256 positionId,
-//   uint256 restrictionsEndBlock, uint256 initialBuyAmount)
-const tokenLaunchedEvent = parseAbiItem(
-  "event TokenLaunched(address indexed token, address indexed deployer, address indexed dexFactory, address pairToken, address pool, uint256 dexId, uint256 launchConfigId, uint256 positionId, uint256 restrictionsEndBlock, uint256 initialBuyAmount)"
-);
-
-// The launch token describes itself on-chain.
-const tokenAbi = parseAbi([
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-]);
-
-// graduationStatus(token) -> (pairedPrincipal, threshold, graduated). Best-effort.
-const graduationAbi = [
-  parseAbiItem(
-    "function graduationStatus(address token) view returns (uint256 pairedPrincipal, uint256 threshold, bool graduated)"
-  ),
-] as const;
-
-// Robinhood Chain runs ~101ms blocks (measured), so one day is ~855k blocks.
-// Launches are sparse, so on the first pass we backfill ~3 days and then walk
-// forward chunk by chunk until the cursor catches up to the head.
-const BACKFILL_BLOCKS = Number(process.env.PONS_BACKFILL ?? 2_600_000);
-// Max blocks per pass. The public RPC accepts a ~20k window on a single indexed
-// event filter (tested); we advance the cursor by this much each pass.
-const MAX_BLOCK_SPAN = Number(process.env.PONS_MAX_SPAN ?? 20_000);
-const BLOCK_MS = 101;
-
-type LaunchMeta = { symbol: string; name: string; graduated: boolean; progress: number };
-
-async function readLaunchMeta(token: Address, factory: Address): Promise<LaunchMeta> {
-  let symbol = "";
-  let name = "";
-  try {
-    const [s, n] = await Promise.all([
-      publicClient.readContract({ address: token, abi: tokenAbi, functionName: "symbol" }),
-      publicClient.readContract({ address: token, abi: tokenAbi, functionName: "name" }),
-    ]);
-    symbol = String(s ?? "").trim();
-    name = String(n ?? "").trim();
-  } catch {
-    // token not readable yet; fall back to the address
-  }
-  if (!symbol) symbol = shortAddr(token).replace(/[^a-zA-Z0-9]/g, "").slice(0, 8) || "NEW";
-
-  let graduated = false;
-  let progress = 0;
-  try {
-    const [paired, threshold, grad] = await publicClient.readContract({
-      address: factory,
-      abi: graduationAbi,
-      functionName: "graduationStatus",
-      args: [token],
-    });
-    graduated = Boolean(grad);
-    const t = Number(threshold);
-    if (t > 0) progress = Math.min(1, Number(paired) / t);
-  } catch {
-    // graduation view is optional; a launch still gets indexed without it
-  }
-
-  return { symbol, name, graduated, progress };
-}
-
-export async function runPonsIndexer(): Promise<{ scanned: number; created: number; from: number; to: number }> {
+export async function runPonsIndexer(): Promise<{ scanned: number; created: number }> {
   let created = 0;
   let scanned = 0;
 
-  const current = await publicClient.getBlockNumber();
-  const cursor = await prisma.indexerState.findUnique({ where: { id: CURSOR_ID } });
-  let fromBlock = cursor ? BigInt(cursor.lastBlock) + BigInt(1) : current - BigInt(BACKFILL_BLOCKS);
-  if (fromBlock < BigInt(0)) fromBlock = BigInt(0);
-  if (fromBlock > current) return { scanned, created, from: Number(fromBlock), to: Number(current) };
+  const url =
+    `${PONS_API}?explore=1&sort=newest&age=${AGE}&page=1&pageSize=${PAGE_SIZE}` +
+    `&graduatedPage=1&graduatedPageSize=6&includeGraduated=1&version=all`;
 
-  // Walk forward one window at a time so a large backfill catches up over
-  // several passes instead of snapping the cursor straight to the head.
-  let toBlock = fromBlock + BigInt(MAX_BLOCK_SPAN);
-  if (toBlock > current) toBlock = current;
-
-  let logs;
+  let data: PonsResponse;
   try {
-    logs = await publicClient.getLogs({
-      address: FACTORIES,
-      event: tokenLaunchedEvent,
-      fromBlock,
-      toBlock,
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; TheTavern/1.0; +https://x.com/TVERN_xyz)",
+        accept: "application/json",
+      },
+      cache: "no-store",
     });
+    if (!res.ok) return { scanned, created };
+    data = (await res.json()) as PonsResponse;
   } catch {
-    return { scanned, created, from: Number(fromBlock), to: Number(toBlock) };
+    return { scanned, created };
   }
 
-  // One reference timestamp; estimate per-log time from block distance.
-  const head = await publicClient.getBlock({ blockNumber: current });
-  const headMs = Number(head.timestamp) * 1000;
-  const tsFor = (block: bigint) => new Date(headMs - Number(current - block) * BLOCK_MS);
+  const items = [...(data.active?.items ?? []), ...(data.graduated?.items ?? [])];
 
-  for (const l of logs) {
+  for (const t of items) {
+    if (!t.token || !t.symbol) continue;
     scanned++;
-    const token = l.args.token as Address | undefined;
-    const pool = l.args.pool as Address | undefined;
-    const deployer = l.args.deployer as Address | undefined;
-    if (!token || !pool) continue;
 
-    const factory = (l.address as Address) ?? PONS.activeFactory;
-    const meta = await readLaunchMeta(token, factory);
+    const token = t.token.toLowerCase();
+    const ts = t.launchedAt ? new Date(t.launchedAt) : new Date();
+    const mcap = typeof t.marketCapUsd === "number" && isFinite(t.marketCapUsd) ? t.marketCapUsd : 0;
+    const pct = typeof t.graduationProgressPct === "number" ? t.graduationProgressPct : 0;
 
-    const nameNote = meta.name && meta.name.toLowerCase() !== meta.symbol.toLowerCase() ? ` (${meta.name})` : "";
-    const gradNote = meta.graduated
-      ? " · graduated"
-      : meta.progress > 0
-      ? ` · ${Math.round(meta.progress * 100)}% to graduation`
-      : "";
-    const title = `$${meta.symbol}${nameNote} just launched on Pons${gradNote}`;
+    const nameNote = t.name && t.name.toLowerCase() !== t.symbol.toLowerCase() ? ` (${t.name})` : "";
+    const mcapNote = mcap > 0 ? ` · ${formatUsd(mcap)} mcap` : "";
+    const gradNote = t.graduated ? " · graduated" : pct >= 1 ? ` · ${Math.round(pct)}% to graduation` : "";
+    const title = `$${t.symbol}${nameNote} just launched on Pons${mcapNote}${gradNote}`;
+
+    const pool = t.pool && t.pool.toLowerCase() !== ZERO ? t.pool.toLowerCase() : token;
 
     try {
       await prisma.event.upsert({
-        // Synthetic key: one launch event per pool, ever. Dedupes cleanly with
-        // the GeckoTerminal ingest, which uses the same launch:<pool> key.
-        where: { txHash_logIndex: { txHash: `launch:${pool.toLowerCase()}`, logIndex: 0 } },
+        // One launch event per token, keyed the same way the GeckoTerminal ingest
+        // now keys its launches so the two sources dedupe cleanly.
+        where: { txHash_logIndex: { txHash: `launch:${token}`, logIndex: 0 } },
         create: {
           kind: "LAUNCH",
-          txHash: `launch:${pool.toLowerCase()}`,
+          txHash: `launch:${token}`,
           logIndex: 0,
-          blockNumber: Number(l.blockNumber ?? BigInt(0)),
-          blockTs: tsFor(l.blockNumber ?? current),
-          assetSymbol: meta.symbol,
-          assetAddress: token.toLowerCase(),
-          fromAddr: pool.toLowerCase(),
-          toAddr: (deployer ?? "").toLowerCase(),
+          blockNumber: Number(t.blockNumber ?? 0),
+          blockTs: ts,
+          assetSymbol: t.symbol,
+          assetAddress: token,
+          fromAddr: pool,
+          toAddr: (t.deployer ?? "").toLowerCase(),
           amountRaw: "0",
           amountUi: 0,
-          usdValue: 0,
-          // Launches rank prominently; graduated ones a notch higher.
-          severity: meta.graduated ? 60_000 : 35_000,
+          usdValue: mcap,
+          // Launches rank prominently; graduated ones higher, then a nudge by size.
+          severity: (t.graduated ? 80_000 : 40_000) + Math.min(mcap, 100_000),
           title,
         },
         update: {},
@@ -171,13 +108,7 @@ export async function runPonsIndexer(): Promise<{ scanned: number; created: numb
     }
   }
 
-  await prisma.indexerState.upsert({
-    where: { id: CURSOR_ID },
-    create: { id: CURSOR_ID, lastBlock: Number(toBlock) },
-    update: { lastBlock: Number(toBlock) },
-  });
-
-  return { scanned, created, from: Number(fromBlock), to: Number(toBlock) };
+  return { scanned, created };
 }
 
 // Traffic-driven, self-throttled. One caller per interval runs a pass.
@@ -200,6 +131,6 @@ export async function maybePonsIndex(): Promise<void> {
   try {
     await runPonsIndexer();
   } catch {
-    // best-effort; GeckoTerminal ingest still discovers launches on a delay
+    // best-effort; the GeckoTerminal ingest still discovers launches on a delay
   }
 }

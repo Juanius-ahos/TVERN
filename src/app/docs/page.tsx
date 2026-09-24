@@ -49,7 +49,9 @@ const TOC = [
   ["what", "Overview"],
   ["start", "Getting started"],
   ["using", "Using The Tavern"],
+  ["pons", "Pons launches"],
   ["live", "Live data engine"],
+  ["chain", "Robinhood Chain"],
   ["identity", "Identity & safety"],
   ["api", "Developer API"],
   ["roadmap", "Roadmap"],
@@ -136,13 +138,54 @@ export default function DocsPage() {
           </div>
         </Section>
 
+        <Section id="pons" title="Pons launches">
+          <p>
+            Most fresh tokens on Robinhood Chain are minted through{" "}
+            <a href="https://www.ponsfamily.com" target="_blank" rel="noreferrer" className="font-semibold text-[var(--accent-text)] hover:underline">
+              Pons
+            </a>
+            , the chain&apos;s launchpad. The Tavern surfaces every Pons launch the moment it lands, so the{" "}
+            <b>Launches</b> feed and the <b>NEW</b> tags on the tape are live, not a daily digest.
+          </p>
+          <p>How a Pons launch works, so you know what a launch card is telling you:</p>
+          <div className="space-y-4">
+            <Step n={1} title="Create">
+              The token mints with a fixed supply of one billion and its WETH pool goes live in a single transaction.
+              The pool&apos;s liquidity is locked automatically. There is no bonding curve and no later migration.
+            </Step>
+            <Step n={2} title="Trade">
+              Buys and sells run against WETH in that same locked pool and move the price. The first two blocks are
+              protected: only the creator&apos;s initial buy lands on the launch block, and per-wallet caps apply until
+              the window closes.
+            </Step>
+            <Step n={3} title="Graduate">
+              A launch <b>graduates</b> once the WETH paired in the pool reaches the threshold (4.2 ETH by default).
+              Trading continues in the same pool, nothing migrates. Graduation is a milestone, not a safety signal.
+            </Step>
+          </div>
+          <p>
+            Every launch carries a <b>1% pool fee</b>. The creator keeps most of it and the protocol keeps a share
+            (currently 70/30 on the active factory), snapshotted per token at launch. A launch card links straight to
+            the token&apos;s page here and out to Pons to trade. The Tavern never holds funds, every trade is a
+            transaction your own wallet approves.
+          </p>
+          <div className="surface rounded-xl border-[color:var(--border-strong)] p-4 text-[13.5px] text-[var(--muted)]">
+            Launches are user-created and experimental. Names and logos can be copied, liquidity can be thin, and a
+            token can lose all value. Always check the token address before you trade. Nothing here is financial advice.
+          </div>
+        </Section>
+
         <Section id="live" title="Live data engine">
-          <p>The Tavern reads Robinhood Chain two independent ways, and merges them:</p>
+          <p>The Tavern reads Robinhood Chain three independent ways, and merges them:</p>
           <ul className="list-disc space-y-2 pl-5">
             <li>
               <span className="font-semibold">Our own indexer</span>, reads ERC-20 transfer logs to and from each DEX
               pool directly off the chain RPC and turns them into buy/sell events. Universal (works for any token) and
               produces the fastest, freshest trades, often seconds old.
+            </li>
+            <li>
+              <span className="font-semibold">Pons launches</span>, read from the Pons launch feed so a new token
+              appears the instant it mints, with its market cap and graduation progress, across every factory version.
             </li>
             <li>
               <span className="font-semibold">Market data (GeckoTerminal + DexScreener)</span>, keyless sources for
@@ -152,6 +195,37 @@ export default function DocsPage() {
           <p>
             Reads flow through a shared server cache with last-known-good fallback, so the feed, tape, screener, and
             charts stay live and populated for everyone without hammering any upstream source.
+          </p>
+        </Section>
+
+        <Section id="chain" title="Robinhood Chain">
+          <p>
+            Robinhood Chain is an Arbitrum Orbit L2 with ETH for gas. Tokens launch into Uniswap V3 pools and are quoted
+            against WETH. The Tavern is scoped entirely to this one chain.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              ["Network", "Robinhood Chain"],
+              ["Chain ID", "4663"],
+              ["Native asset", "ETH"],
+              ["Block time", "~0.1s"],
+              ["Pons supply", "1,000,000,000 per token"],
+              ["Pool fee", "1% (10000)"],
+              ["Graduation", "4.2 ETH paired (default)"],
+              ["Creator / protocol fee", "70 / 30 on the active factory"],
+            ].map(([k, v]) => (
+              <div key={k} className="surface rounded-xl p-3">
+                <div className="text-[12px] uppercase tracking-wide text-[var(--faint)]">{k}</div>
+                <div className="mt-0.5 font-semibold text-[var(--text)]">{v}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[13px] text-[var(--muted)]">
+            Launchpad, contracts, and the full onchain integration surface are documented by Pons at{" "}
+            <a href="https://docs.ponsfamily.com" target="_blank" rel="noreferrer" className="text-[var(--accent-text)] hover:underline">
+              docs.ponsfamily.com
+            </a>
+            .
           </p>
         </Section>
 
@@ -237,6 +311,13 @@ export default function DocsPage() {
               path="/api/feed"
               desc="The social feed, posts plus auto-generated on-chain event cards."
               resp={`{ "items": [Post | Event] }`}
+            />
+            <Endpoint
+              path="/api/feed?filter=launch"
+              desc="Fresh Pons launches as event cards, newest first, each with symbol, market cap, and graduation note."
+              params="filter, one of launch | whale | stock"
+              resp={`{ "items": [{ "type": "event", "kind": "LAUNCH",
+  "assetSymbol", "assetAddress", "usdValue", "title", "blockTs" }] }`}
             />
             <Endpoint
               path="/api/discover"

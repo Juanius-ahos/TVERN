@@ -122,13 +122,15 @@ export async function runIngest(): Promise<{ pools: number; scanned: number; cre
       const ts = p.createdAt ? new Date(p.createdAt) : new Date();
       const pairNote = p.quoteSymbol ? ` (${p.baseSymbol}/${p.quoteSymbol})` : "";
       const title = `$${p.baseSymbol} just launched${pairNote} · ${formatUsd(p.liquidityUsd)} liquidity`;
+      // Key on the token address (falling back to the pool) so this dedupes with
+      // the Pons launches feed, which keys the same launch on launch:<token>.
+      const launchKey = `launch:${(p.baseAddress || p.poolAddress).toLowerCase()}`;
       try {
         await prisma.event.upsert({
-          // Synthetic id: one launch event per pool, ever.
-          where: { txHash_logIndex: { txHash: `launch:${p.poolAddress}`, logIndex: 0 } },
+          where: { txHash_logIndex: { txHash: launchKey, logIndex: 0 } },
           create: {
             kind: "LAUNCH",
-            txHash: `launch:${p.poolAddress}`,
+            txHash: launchKey,
             logIndex: 0,
             blockNumber: 0,
             blockTs: ts,
