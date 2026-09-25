@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { parseUnits } from "viem";
 import { Icon } from "./Icon";
+import { TVRN_ADDRESS, TVRN_SYMBOL } from "@/lib/tvrn";
 
-const TVRN = process.env.NEXT_PUBLIC_TVRN_ADDRESS as `0x${string}` | "";
-const SYMBOL = process.env.NEXT_PUBLIC_TVRN_SYMBOL || "TVRN";
+const TVRN = TVRN_ADDRESS as `0x${string}`;
+const SYMBOL = TVRN_SYMBOL;
 
 const erc20Transfer = [
   {

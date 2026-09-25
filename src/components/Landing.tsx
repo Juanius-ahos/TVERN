@@ -5,6 +5,8 @@ import { LiveTape } from "./LiveTape";
 import { Logo } from "./Logo";
 import { LandingBackdrop } from "./LandingBackdrop";
 import { MarketTicker } from "./MarketTicker";
+import { ContractAddress } from "./ContractAddress";
+import { TVRN_ADDRESS, TVRN_SYMBOL } from "@/lib/tvrn";
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -453,6 +455,12 @@ export function Landing() {
               <a href="/explore" className="btn-ghost rounded-full px-7 py-3 text-[15px] font-semibold">
                 Explore the chain
               </a>
+            </div>
+
+            {/* official $TVERN contract address, copy-pasteable */}
+            <div className="mt-7 flex flex-wrap items-center gap-2">
+              <span className="text-[12.5px] font-semibold text-[var(--accent-text)]">${TVRN_SYMBOL}</span>
+              <ContractAddress address={TVRN_ADDRESS} label="CA" />
             </div>
           </div>
         </div>

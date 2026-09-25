@@ -1,3 +1,6 @@
+import { ContractAddress } from "@/components/ContractAddress";
+import { TVRN_ADDRESS, TVRN_SYMBOL, TVRN_LINKS } from "@/lib/tvrn";
+
 export const metadata = { title: "Docs, The Tavern" };
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
@@ -49,6 +52,7 @@ const TOC = [
   ["what", "Overview"],
   ["start", "Getting started"],
   ["using", "Using The Tavern"],
+  ["tvrn", "$TVERN token"],
   ["pons", "Pons launches"],
   ["live", "Live data engine"],
   ["chain", "Robinhood Chain"],
@@ -135,6 +139,36 @@ export default function DocsPage() {
                 <div className="mt-0.5 text-[13px] text-[var(--muted)]">{d}</div>
               </div>
             ))}
+          </div>
+        </Section>
+
+        <Section id="tvrn" title={`$${TVRN_SYMBOL} — the house token`}>
+          <p>
+            <span className="font-semibold text-[var(--accent-text)]">${TVRN_SYMBOL}</span> is The Tavern&apos;s house
+            token on Robinhood Chain. The product is free; ${TVRN_SYMBOL} is where the community and the culture trade.
+            Upside tracks genuine adoption, with no forced buying, nothing you ever need to hold to use the app.
+          </p>
+          <ContractAddress address={TVRN_ADDRESS} label="Contract" className="w-full max-w-lg" />
+          <div className="flex flex-wrap gap-2 pt-1">
+            <a href={TVRN_LINKS.asset} className="btn-accent rounded-full px-4 py-1.5 text-[13px] font-semibold">
+              Buy ${TVRN_SYMBOL}
+            </a>
+            <a
+              href={TVRN_LINKS.dexscreener}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-ghost rounded-full px-4 py-1.5 text-[13px] font-semibold"
+            >
+              DexScreener
+            </a>
+            <a
+              href={TVRN_LINKS.explorer}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-ghost rounded-full px-4 py-1.5 text-[13px] font-semibold"
+            >
+              Explorer
+            </a>
           </div>
         </Section>
 
