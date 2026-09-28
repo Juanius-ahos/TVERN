@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { formatUsd, shortAddr } from "@/lib/format";
 import { Avatar } from "./Avatar";
 import { FollowUserButton } from "./FollowUserButton";
-import { TvrnCard } from "./TvrnCard";
 
 type Pool = {
   symbol: string;
@@ -68,7 +67,6 @@ export function RightRail() {
 
   return (
     <div className="sticky top-[3.25rem] space-y-7 py-1">
-      <TvrnCard />
       {users.length > 0 && (
         <section>
           <h3 className="display mb-2 text-[16px] font-semibold">Who to follow</h3>
